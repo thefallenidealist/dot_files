@@ -222,7 +222,7 @@ augroup END
 
 " setup when in diff mode:
 if &diff
-	cnoreabbrev q qa!
+	cabbrev q qa!
 	nnoremap q :qa!<cr>
 endif
 """"""""""""""""""""""""""""""""""""}}}
@@ -231,6 +231,7 @@ endif
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "		cmd aliases						{{{
 """""""""""""""""""""""""""""""""""""""""""
+" INFO all abbrev commands are non recursive
 " annoying misspell:
 cabbrev W w
 cabbrev Q q
@@ -239,7 +240,7 @@ cabbrev X x
 cabbrev x1 x!
 cabbrev QA qa
 cabbrev QA1 qa!
-cnoreabbrev Qa! qa!
+cabbrev Qa! qa!
 cabbrev qA qa
 cabbrev Qa qa
 cabbrev WQ wq
@@ -259,30 +260,29 @@ if exists(":PluginInstall")
 endif
 
 " open help in vertical split right
-cnoreabbrev h vert bo help
-cnoreabbrev man vert bo Man
+cabbrev h vert bo help
+cabbrev man vert bo Man
 " get file path:
-cnoreabbrev fpath echo @%
-cnoreabbrev fp echo @%
-cnoreabbrev FP echo expand('%:p')
+cabbrev fpath echo @%
+cabbrev fp echo @%
+cabbrev FP echo expand('%:p')
 " reload syntax
-cnoreabbrev rsyn syntax sync fromstart
-" INFO there is inoreabbrev also
-"cnoreabbrev fix_dos ed ++ff=dos
-"cnoreabbrev fixdos ed ++ff=dos
+cabbrev rsyn syntax sync fromstart
+"cabbrev fix_dos ed ++ff=dos
+"cabbrev fixdos ed ++ff=dos
 " TODO put this inf function (:e ++ff=dos) ili tako nekako
-cnoreabbrev cc set cursorcolumn!
+cabbrev cc set cursorcolumn!
 
 " close all folds
-cnoreabbrev foldcloseall %foldclose!
-cnoreabbrev foldca %foldclose!
-cnoreabbrev fca %foldclose!
-cnoreabbrev foa %foldopen!
+cabbrev foldcloseall %foldclose!
+cabbrev foldca %foldclose!
+cabbrev fca %foldclose!
+cabbrev foa %foldopen!
 "because standard Vim fold shortcuts are starting with z
-cnoreabbrev zca %foldclose!
-cnoreabbrev zoa %foldopen!
+cabbrev zca %foldclose!
+cabbrev zoa %foldopen!
 
-inoreabbrev adn and
+iabbrev adn and
 """"""""""""""""""""""""""""""""""""""""}}}
 "		generic mappings				{{{
 """""""""""""""""""""""""""""""""""""""""""
@@ -694,9 +694,7 @@ Plug 'rking/ag.vim'			" multifile grep - faster version of ack
 
 "Plug 'vim-scripts/ZoomWin'		" toggle between one window and multi-window (Ctrl-W o)
 Plug 'tpope/vim-fugitive'			" plugin on GitHub repo
-
-"Plug 'airblade/vim-gitgutter'	" Show +-~ left of number column
-" INFO fugitive is maybe a better choice
+Plug 'airblade/vim-gitgutter'	" Show +-~ left of number column
 
 Plug 'xolox/vim-misc'				" Needed for easytags and vim-session
 "Plug 'xolox/vim-easytags'			" TODO
@@ -772,11 +770,10 @@ Plug 'vim-scripts/AutoTag'
 "Plug 'plasticboy/vim-markdown'
 
 Plug 'tpope/vim-obsession'	" restore session, needed for tmux ressurect
-Plug 'tpope/vim-vividchalk'
-Plug 'gosukiwi/vim-atom-dark'
-
 
 "			themes
+Plug 'tpope/vim-vividchalk'
+Plug 'gosukiwi/vim-atom-dark'
 Plug 'lisposter/vim-blackboard'	" colortheme, pretty ugly
 Plug 'dracula/dracula-theme'
 Plug 'tomasr/molokai'
@@ -785,7 +782,6 @@ Plug 'chriskempson/base16-vim'
 Plug 'jpo/vim-railscasts-theme'
 Plug 'morhetz/gruvbox'
 Plug 'chriskempson/tomorrow-theme'
-
 
 
 
@@ -979,7 +975,7 @@ let g:lastplace_ignore = "gitcommit,gitrebase,svn,hgcommit"
 let g:extra_whitespace_ignored_filetypes = ['help', 'Help', 'quickfix', 'vim-plug', 'man', 'diff']
 " XXX still will work on help filetype
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		indexed search                                                      {{{
+"		indexed search														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " INFO shows search 1 of 123
 let g:indexed_search_center = 1 " center the screen, default 0
@@ -1261,15 +1257,23 @@ let g:indentLine_char = '¦'
 "let g:indentLine_indentLevel=1
 """"""""""""""""""""""""""""""""""""}}}
 "		git plugins					{{{
-"GitGutterEnable
-"GitGutterLineHighligthsenable 		" pomogne za maknito, dodane linije lose oboja pa se ne vide
+"""""""""""""""""""""""""""""""""""""""
+" INFO show +-~ on the left of line if line is added/removed/changed
+" GitGutter{Enable,Disable,Toggle}
+" update: GitGutter{,All}	current/all buffers
+" keys: [c ]c goto prev/next
+
+
 let g:gitgutter_enabled = 1				" default
 "let g:gitgutter_highlight_lines = 1
-let g:gitgutter_sign_modified_removed = 'x'		" XXX meni ne radi
+let g:gitgutter_sign_modified_removed = 'xx'
 " Required after having changed the colorscheme
 hi clear SignColumn
+
 " In vim-airline, only display "hunks" if the diff is non-zero
 let g:airline#extensions#hunks#non_zero_only = 1
+
+" TODO disable in non active split
 """"""""""""""""""""""""""""""""""""}}}
 "		Tabularize					{{{
 """""""""""""""""""""""""""""""""""""""
@@ -1357,6 +1361,11 @@ highlight VertSplit		term=reverse cterm=bold ctermfg=202 ctermbg=232 gui=bold gu
 " change color of tab chars (:set list)
 highlight SpecialKey	ctermfg=236 gui=italic guifg=#465457
 "highlight SpecialKey	ctermfg=95 gui=italic guifg=#465457
+
+"set fillchars=vert:|,fold:- " default
+"set fillchars=vert:\│,fold:·
+" longer vertical bar for vertical splits, space for folds
+set fillchars=vert:\│,fold:\ 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "				GUI settings												{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
