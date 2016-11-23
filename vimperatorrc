@@ -1,0 +1,98 @@
+" created 160804
+" Vimpeator used for many years before creating this
+
+" Emacs shortcuts														{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+cnoremap <C-n> <Tab>
+cnoremap <C-p> <S-Tab>
+cnoremap <C-f> <Right>
+cnoremap <C-b> <Left>
+"cmap <C-j> <CR>
+"noremap <C-j> <CR>
+"inoremap <C-j> <CR>
+inoremap <C-n> <Down>
+inoremap <C-p> <Up>
+inoremap <C-f> <Right>
+inoremap <C-b> <Left>
+
+nnoremap <C-p> <Nop>
+nnoremap <C-n> <Nop>
+
+cnoremap <C-n> <Down>
+cnoremap <C-p> <Up>
+cnoremap <C-f> <Right>
+cnoremap <C-b> <Left>
+
+" C-g as cancel (C-q is stop)
+cmap <C-g> <Esc>
+imap <C-g> <Esc>
+noremap <C-g> <Esc>
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		cmd aliases														{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" annoying misspell:
+cabbrev W w
+cabbrev Q q
+cabbrev q1 q!
+cabbrev X x
+cabbrev x1 x!
+cabbrev QA qa
+cabbrev QA1 qa!
+"cnoreabbrev Qa! qa! " don't work in vimperator
+cabbrev Qa! qa!
+cabbrev qA qa
+cabbrev Qa qa
+cabbrev WQ wq
+cabbrev Wq wq
+cabbrev wQ wq
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+nnoremap <leader>r :source ~/.vimperator.rc<cr>:echom "config reloaded"<cr>
+
+
+" vimperator default:
+" C-S-p/n prev/next tab group
+" :bn/:tn
+" C-^	goto previous selected tab
+" g0 g$	first/last tab
+
+"colorscheme solarized_dark
+colorscheme seaweed
+"colorscheme ywgx	" XXX matchevi budu crno na crnom
+
+" show link preview
+" 2 cmd line XXX dosn't clean up
+" 3 content area 		Vanilla Firefox default (at least in older versions)
+set showstatuslinks=3
+
+nnoremap <A-,> :tabprev<CR>
+nnoremap <A-.> :tabnext<CR>
+
+nnoremap <A-h> :tabprev<cr>
+nnoremap <A-j> :tabnext<cr>
+nnoremap <A-k> :tabprev<cr>
+nnoremap <A-l> :tabnext<cr>
+
+" XXX:
+nnoremap <A-S-H> :tabmove -1<cr>
+nnoremap <A-S-L> :tabmove -1<cr>
+
+" :tabgroups
+abbrev tg tabgroups
+
+" because there are close to default "gt" and easier than gT
+nnoremap gy :tabprev<cr>
+nnoremap gr :tabprev<cr>
+
+" disable iritating default Firefox shortcut for mute
+nnoremap <C-m> <cr>
+
+" TODO copy/paste shortcuts
+nnoremap <leader>l :echom "Hello"<cr>
+
+" add history to the search (older default), default: sl:
+set complete+=h
+
+" 161009
+" temporary fix for nor remembering history
+js services.services.autoCompleteSearch.class_="@mozilla.org/autocomplete/search;1?name=unifiedcomplete"
+" vim: set ts=4 sw=4 tw=78 foldmethod=marker ft=vim noet :
