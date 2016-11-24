@@ -5,7 +5,8 @@
 
 " Unicode characters can be inserted by typing ctrl-vu followed by the 4 digit hexadecimal code.
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"				Generic Vim setting 										{{{
+"				settings
+"				Generic Vim settings 										{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if !has('nvim')
 	" these are already default in nvim
@@ -162,18 +163,11 @@ set binary	" TODO
 set equalalways
 """"""""""""""""""""""""""""""""""""}}}
 
-" don't show ^M (\r - DOS ending) at the end of the file: :e ++ff=dos
-match Ignore /\r$/ " they are no more red, now they are with black background
-" TODO make Invisible hi group (fg and bg color as background color)
-" TODO mozda upotrijebit conceal feature
-"match Invisible /\r$/   " show them in background color, still visible
 
 " hide ANSCI escape chars
 syntax match Ignore /\%o33\[[0-9]\{0,5}m/ conceal
-" moj pokusaj za ^M
-" ima nekih zajeba kad je \r u komentaru
-"syntax match Ignore /\r$/ conceal
-syntax match Ignore /\r/ conceal
+
+set conceallevel=2	" hide until cursor is on that line
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		autocmd																{{{
 "
@@ -181,12 +175,6 @@ syntax match Ignore /\r/ conceal
 augroup my_group_with_a_very_uniq_name
 	" this is executed every time when vimrc is sourced, so clear it at the beggining:
 	autocmd!
-
-	" write new file to the disk
-	"autocmd BufNewFile * :write
-	" in case that expandtab is set (at the work for example):
-	autocmd Filetype vim set noexpandtab
-	autocmd Filetype conf set noexpandtab
 
 	autocmd Filetype man NumbersDisable
 	" Filetype only works on first time opening the help window
@@ -218,6 +206,11 @@ augroup my_group_with_a_very_uniq_name
 
 	" in case I ever open a python file
 	autocmd Filetype python set expandtab
+
+	" hide all ^M in DOS file
+	" INFO this need conceallevel higher than 1
+	"autocmd Filetype * syntax match Ignore /\r$/ conceal containedin=ALL
+	" autocmd Filetype * FixDos
 augroup END
 
 " setup when in diff mode:
@@ -226,9 +219,7 @@ if &diff
 	nnoremap q :qa!<cr>
 endif
 """"""""""""""""""""""""""""""""""""}}}
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"					keymaps
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"				keymaps
 "		cmd aliases						{{{
 """""""""""""""""""""""""""""""""""""""""""
 " INFO all abbrev commands are non recursive
@@ -242,6 +233,7 @@ cabbrev QA qa
 cabbrev QA1 qa!
 cabbrev Qa! qa!
 cabbrev qA qa
+cabbrev qa1 qa!
 cabbrev Qa qa
 cabbrev WQ wq
 cabbrev Wq wq
@@ -647,7 +639,7 @@ vnoremap <2-LeftMouse> *N
 
 " TODO Shift and/or Alt + 2 mouse click: goto tag
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-
+"				Plugins
 "				Plugins														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 call plug#begin('~/.vim/plugged')
@@ -1362,6 +1354,11 @@ highlight VertSplit		term=reverse cterm=bold ctermfg=202 ctermbg=232 gui=bold gu
 highlight SpecialKey	ctermfg=236 gui=italic guifg=#465457
 "highlight SpecialKey	ctermfg=95 gui=italic guifg=#465457
 
+" change concel to match background
+"Conceal        xxx ctermfg=7 ctermbg=242 guifg=LightGrey guibg=DarkGrey
+highlight Conceal	ctermfg=7 ctermbg=233 guifg=LightGrey guibg=DarkGrey
+
+
 "set fillchars=vert:|,fold:- " default
 "set fillchars=vert:\│,fold:·
 " longer vertical bar for vertical splits, space for folds
@@ -1433,19 +1430,8 @@ vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR>
 
 " TODO combo with indexed_search
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" INFO must start with an uppercase
-function! Fix_dos()
-	" INFO don't show (red) ^M in DOS file
-	"execute "normal! :e ++ff=dos<cr>"
-	"execute "normal! :e ++ff=dos<cr>" " ne javi error, ne radi
-	"execute "normal! e ++ff=dos<cr>" " ne javi error, ne radi
-	"execute "normal e ++ff=dos<cr>" " error
-	"execute "normal :e ++ff=dos<cr>" " ne radi
-	execute "normal :e ++ff=dos<cr>"
-endfunction
-
-" INFO cannot have _ in the name
-command! FixDos call Fix_dos()
+" Don't show ^M in DOS files
+command! FixDos edit ++ff=dos
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " INFO toggle between ^ and 0
 function! ZeroMove()
@@ -1515,15 +1501,8 @@ nnoremap <tab> :wincmd p<cr>
 " when Ag quickfix window is active: <space> for preview file (now is "go")
 " Ag ignore: .o tags
 " when quickfix is active: Ctrl-W c should close main buffer and quickfix
-" vimdiff: :q exits both buffers
 " put cursor at the end of the pasted part
 
-
-
-" izgleda da je ovo do nekog plugina, pogledat kod kuce
-" Vim autosession (xolox) plugin
-" let g:session_autoload = 'no'
-" let g:session_autosave = 'no'
 
 "" TODO <leader>cn to uncomment {{{
 ""I'm using tab for cycling over the items in a completion menu (instead of c-n). But I also use tab when there is no completion menu to expand a snippet, and jump to the next placeholder inside the snippet. So the tab key needed some love:
@@ -1582,7 +1561,12 @@ nnoremap <tab> :wincmd p<cr>
 " gCtrl-] If there is only one match, it will take you there. If there are multiple matches, it will list them all, letting you choose the one you want, just like :tselect
 
 " multiple files load: args files*.c
-" multiple replace:
+" multiple replace: TODO
+
+" yank until mark a: y'a
+" '. goto place of last edit
+
+" reselect last visually selected block: gv
 "##########################################################################}}}
 " tips and tricks 															{{{
 " TODO jednom sredit:
