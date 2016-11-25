@@ -99,6 +99,7 @@ if !has('gui_running')
 	set showbreak=…		" char to be displayed on the beggining of broken line
 	"set listchars=tab:\|·,eol:¬,trail:·
 	" trail is not needed, plugin take care of that
+	" TODO same font as xterm
 endif
 
 " show invisible characters, tab is longer (unicode) pipe char
@@ -647,11 +648,12 @@ call plug#begin('~/.vim/plugged')
 if has("nvim")
 	" Autocomplete for nvim (needs python3)
 	Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-	"Plug 'zchee/deoplete-clang'	" show functions arguments
-	" INFO run this after installing :UpdateRemotePlugs
+	Plug 'zchee/deoplete-clang'	" show functions arguments
 else
-	"Plug 'Shougo/neocomplete.vim' " Needs Lua
+	Plug 'Shougo/neocomplete.vim' " Needs Lua
 endif
+Plug 'Shougo/neoinclude.vim'	" headers autocomplete
+
 " INFO ne svidja mi se bas, nekad zna bit previse pametan i iritantan,
 " svejedno ne pokazuje argumente funkcijama
 "Plug 'justmao945/vim-clang'   " complete after . -> ::
@@ -663,7 +665,7 @@ endif
 Plug 'vim-airline/vim-airline'
 "Plug 'vim-airline/vim-airline-themes'
 Plug 'ctrlpvim/ctrlp.vim'			" fuzzy file/buffer/MRU finder
-Plug 'bogado/file-line'			" open file.txt:123
+Plug 'bogado/file-line'				" open file.txt:123
 Plug 'dietsche/vim-lastplace'		" Open file at last edit position
 Plug 'qpkorr/vim-bufkill'			" kill buffer without killing split :BD :BW
 Plug 'henrik/vim-indexed-search'	" show search as: result 123 of 456
@@ -682,6 +684,7 @@ Plug 'ciaranm/securemodelines'
 Plug 'rking/ag.vim'			" multifile grep - faster version of ack
 
 "Plug 'tpope/vim-characterize'	" show dec/hex/oct for char under the cursos, (ga), unicode style
+" čć
 
 
 "Plug 'vim-scripts/ZoomWin'		" toggle between one window and multi-window (Ctrl-W o)
@@ -713,7 +716,7 @@ Plug 'tomtom/tlib_vim'				" Needed for snipmate
 Plug 'dyng/ctrlsf.vim'		" Like sublimes Ctrl-Shift-f
 "Plug 'edkolev/tmuxline.vim'	" enable tmux to pickup Vim airline style
 Plug 'vim-scripts/a.vim'		" open headers
-Plug 'jez/vim-superman'		" man pages
+"Plug 'jez/vim-superman'		" man pages
 Plug 'altercation/vim-colors-solarized'
 "Plug 'xolox/vim-session'		" won't restore multiple buffers in a tab
 Plug 'Shougo/vimshell.vim'
@@ -832,7 +835,7 @@ let g:deoplete#enable_smart_case = 1	" but use smart case
 "let g:deoplete#enable_camel_case = 1 " INFO only with deoplete-matcher*fuzzy
 let g:neocomplete#enable_fuzzy_completion = 1
 " let g:deoplete#auto_complete_start_length = 1	" default: 2
-let g:deoplete#auto_complete_start_length = 2
+let g:deoplete#auto_complete_start_length = 1
 "let g:deoplete#max_abbr_width = 0 " disable, default: 80
 "-> is added
 let g:deoplete#delimiters = ['/', '.', '::', ':', '#', '->']
@@ -844,8 +847,21 @@ let g:deoplete#delimiters = ['/', '.', '::', ':', '#', '->']
 "let g:deoplete#sources.h = ['buffer', 'tag']
 
 " deoplete-clang
-"let g:deoplete#sources#clang#libclang_path = "/usr/lib/llvm-3.6/lib/libclang.so"
-"let g:deoplete#sources#clang#clang_header = "/usr/include/clang/"
+if system("uname") == "Linux"
+	" let g:deoplete#sources#clang#libclang_path = "/usr/lib/llvm-3.6/lib/libclang.so"
+	" let g:deoplete#sources#clang#clang_header = "/usr/include/clang/"
+endif
+if system("uname") == "FreeBSD"
+	let g:deoplete#sources#clang#libclang_path = "/usr/local/llvm38/lib/libclang.so"
+	let g:deoplete#sources#clang#clang_header = "/usr/local/llvm38/include/clang"
+endif
+"let g:deoplete#sources#clang#std = {'c': 'c11', 'cpp': 'c++11'}		" prefered version
+"let g:deoplete#sources#clang#flags = 
+let g:deoplete#sources#clang#std#c = 'c11'
+let g:deoplete#sources#clang#std#cpp = 'c++14'
+let g:deoplete#sources#clang#sort_algo = 'priority'
+
+
 """"""""""""""""""""""""""""""""""""}}}
 "		airline						{{{
 """""""""""""""""""""""""""""""""""""""
@@ -1471,7 +1487,7 @@ endif
 
 " open tag in a new tab
 map <C-\> :tab split<cr>:exec("tag ".expand("<cword>"))<CR>
-" TODO korisno, al dosredit
+" open tag in a new split
 map <A-]> :vsp <cr>:exec("tag ".expand("<cword>"))<CR>
 
 "		work specific stuff												{{{
@@ -1548,7 +1564,7 @@ nnoremap <tab> :wincmd p<cr>
 " Ctrl-R '1p	paste from the first register in insert mode
 
 " Ctrl-W } show variable/function in a preview window
-" Ctrl-W ] open a tag in a split windows	TODO open in a vsp instead split
+" Ctrl-W (ctrl)] open a tag in a split windows	TODO open in a vsp instead split
 " :pc	close preview window
 " C delete to the end of the line and go to insert mode
 
