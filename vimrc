@@ -236,58 +236,36 @@ endif
 " 					colors and TERM setup									{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " colors as sublime
-" INFO need to be after plugin load
 colorscheme molokai
-" original molokai bg
-"let g:molokai_original = 1
-" make cterm close as possible to GUI version
-"let g:rehash256 = 1 " too bright
 
-set t_Co=256	" already set, probably in a theme file
-
-" for base16 theme (and green linenubmers)
-let base16colorspace=256
-
-" INFO need to be after loading the theme
-" Search         xxx term=reverse ctermfg=0 ctermbg=222 guifg=#000000 guibg=#FFE792
-highlight Todo	term=standout	cterm=bold ctermfg=196 ctermbg=232 gui=bold guifg=#FFFFFF guibg=bg
-highlight Debug 				cterm=bold ctermfg=226 ctermbg=234 gui=bold guibg=Purple
-"highlight Search term=reverse			   ctermfg=0   ctermbg=222 guifg=#000000 guibg=#FFE792
+highlight Todo			ctermfg=196 ctermbg=232
+highlight Debug			ctermfg=226 ctermbg=234
 
 " color of tw bar at right (funny color for bad LCD panels)
 "highlight ColorColumn ctermbg=93 guibg=DarkMagenta
 " a little bit brighter than bg
-highlight ColorColumn ctermbg=234
+highlight ColorColumn	ctermbg=234
 " highlight all afer 80 chars
 let &colorcolumn=join(range(81,999),",")
 " double highlight, 80 and 120 chars:
 "let &colorcolumn="80,".join(range(120,999),",")
 
 "highlight CursorLine     term=underline ctermbg=235 guibg=#293739	" default
-" change background
-" INFO this will fuckup colors, need to be set in a theme file, default is 233. 234 is a little darker
-"highlight Normal ctermbg=234
 
-"		  VertSplit xxx term=reverse cterm=bold ctermfg=244 ctermbg=232 gui=bold guifg=#808080 guibg=#080808
-highlight VertSplit		term=reverse cterm=bold ctermfg=202 ctermbg=232 gui=bold guifg=#808080 guibg=#080808
+highlight VertSplit		ctermfg=202 ctermbg=232
 
 " change color of tab chars (:set list)
-highlight SpecialKey	ctermfg=236 gui=italic guifg=#465457
-"highlight SpecialKey	ctermfg=95 gui=italic guifg=#465457
+highlight SpecialKey	ctermfg=236
 
 " change concel to match background
-"Conceal        xxx ctermfg=7 ctermbg=242 guifg=LightGrey guibg=DarkGrey
-highlight Conceal	ctermfg=7 ctermbg=233 guifg=LightGrey guibg=DarkGrey
+highlight Conceal		ctermfg=7 ctermbg=233
 
-
-"set fillchars=vert:|,fold:- " default
-"set fillchars=vert:\│,fold:·
-" longer vertical bar for vertical splits, space for folds
+" longer vertical bar for vertical splits, space for folds (default was -)
 set fillchars=vert:\│,fold:\ 
 
 " change the colors in diff mode
-" highlight DiffAdd
-" highlight Diff
+highlight DiffAdded		ctermfg=81
+highlight DiffRemoved	ctermfg=208
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "				keymaps
 "		cmd aliases						{{{
@@ -314,14 +292,14 @@ cabbrev wQ wq
 " TODO remap all to this
 "cnoreabbrev <expr> W ((getcmdtype() is# ':' && getcmdline() is# 'W')?('w'):('W'))
 
-if exists(":PlugInstall")	" vim-plug
+" if exists(":Plug")	" vim-plug
 	cabbrev	pi PlugInstall
 	cabbrev pu PlugUpdate
-endif
-if exists(":PluginInstall")	" Vundle
-	cabbrev	pi PluginInstall
-	cabbrev pu PluginUpdate
-endif
+" endif
+" if exists(":PluginInstall")	" Vundle
+	" cabbrev	pi PluginInstall
+	" cabbrev pu PluginUpdate
+" endif
 
 " open help in vertical split right
 cabbrev h vert bo help
@@ -846,7 +824,6 @@ Plug 'gosukiwi/vim-atom-dark'	" not-to-high contrast
 Plug 'lisposter/vim-blackboard'	" pretty ugly
 Plug 'dracula/vim'	" this 
 Plug 'tomasr/molokai'
-"Plug 'justinmk/molokai' " previse svijetla bg
 Plug 'chriskempson/base16-vim'
 Plug 'jpo/vim-railscasts-theme'
 Plug 'morhetz/gruvbox'				" too little contrast
@@ -1530,11 +1507,11 @@ endfunction
 set foldtext=NeatFoldText()
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-
 if executable('ag')
 	" Note we extract the column as well as the file and line number
 	set grepprg=ag\ --nogroup\ --nocolor\ --column
 	" f file name
+	" "
 	" l line number
 	" c column number
 	" m error message
@@ -1548,10 +1525,9 @@ if executable('ag')
 	let g:ctrlp_use_caching = 0
 endif
 
-"Improve your efficiency further by remapping the keys for jumping through search matches (stored in the "quickfix" list):		:cnext:w
 "" Add set path=.,<relative include dir> for searching for header in particular directories. For more information do ":help file-searching".
 
-" open tag in a new tab
+" open tag in a new tab TEST modified line
 map <C-\> :tab split<cr>:exec("tag ".expand("<cword>"))<CR>
 " open tag in a new split
 " XXX will open split when tag is not found
