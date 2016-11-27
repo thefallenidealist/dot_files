@@ -41,9 +41,9 @@ set timeoutlen=1000 ttimeoutlen=0		" delay for the esc key, 10ms
 set exrc		" source .vimrc file if it present in working directory
 set secure		" This option will restrict usage of some commands in non-default .vimrc files; commands that wrote to file or execute shell commands are not allowed and map commands are displayed.
 
-" TODO disable modeline for root
-"":set modelines=0
-"":set nomodeline
+set nomodeline
+set modelines=0
+" INFO secure-modelines plugin is used which only allows some (secure) modeline options
 
 set matchpairs+=<:>	" Include angle brackets in matching.
 
@@ -66,7 +66,7 @@ set linebreak		" break line without breaking the word
 					" wont't work when "list" is enabled
 
 " hard break
-"set tw=80			" autowrap after N chars
+" set textwidth=78			" autowrap after N chars
 set colorcolumn=+1	" show coloumn where autowrap will start"
 set formatoptions=""
 		" default: tcq
@@ -219,7 +219,76 @@ if &diff
 	cabbrev q qa!
 	nnoremap q :qa!<cr>
 endif
+
+" setup for preview window
+" if &previewwindow
+	" nnoremap q :q!<cr>
+" endif
+
+" TODO:
+" autocmd WinEnter *
+" if &previewwindow
+	" nnoremap q :q!<cr>
+" endif
+
+"autocmd WinEnter * if &previewwindow | ... | endif
 """"""""""""""""""""""""""""""""""""}}}
+" 					colors and TERM setup									{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" colors as sublime
+" INFO need to be after plugin load
+colorscheme molokai
+" original molokai bg
+"let g:molokai_original = 1
+" make cterm close as possible to GUI version
+"let g:rehash256 = 1 " too bright
+
+set t_Co=256	" already set, probably in a theme file
+
+" for base16 theme (and green linenubmers)
+let base16colorspace=256
+
+" INFO need to be after loading the theme
+" Search         xxx term=reverse ctermfg=0 ctermbg=222 guifg=#000000 guibg=#FFE792
+highlight Todo	term=standout	cterm=bold ctermfg=196 ctermbg=232 gui=bold guifg=#FFFFFF guibg=bg
+highlight Debug 				cterm=bold ctermfg=226 ctermbg=234 gui=bold guibg=Purple
+"highlight Search term=reverse			   ctermfg=0   ctermbg=222 guifg=#000000 guibg=#FFE792
+
+" color of tw bar at right (funny color for bad LCD panels)
+"highlight ColorColumn ctermbg=93 guibg=DarkMagenta
+" a little bit brighter than bg
+highlight ColorColumn ctermbg=234
+" highlight all afer 80 chars
+let &colorcolumn=join(range(81,999),",")
+" double highlight, 80 and 120 chars:
+"let &colorcolumn="80,".join(range(120,999),",")
+
+"highlight CursorLine     term=underline ctermbg=235 guibg=#293739	" default
+" change background
+" INFO this will fuckup colors, need to be set in a theme file, default is 233. 234 is a little darker
+"highlight Normal ctermbg=234
+
+"		  VertSplit xxx term=reverse cterm=bold ctermfg=244 ctermbg=232 gui=bold guifg=#808080 guibg=#080808
+highlight VertSplit		term=reverse cterm=bold ctermfg=202 ctermbg=232 gui=bold guifg=#808080 guibg=#080808
+
+" change color of tab chars (:set list)
+highlight SpecialKey	ctermfg=236 gui=italic guifg=#465457
+"highlight SpecialKey	ctermfg=95 gui=italic guifg=#465457
+
+" change concel to match background
+"Conceal        xxx ctermfg=7 ctermbg=242 guifg=LightGrey guibg=DarkGrey
+highlight Conceal	ctermfg=7 ctermbg=233 guifg=LightGrey guibg=DarkGrey
+
+
+"set fillchars=vert:|,fold:- " default
+"set fillchars=vert:\│,fold:·
+" longer vertical bar for vertical splits, space for folds
+set fillchars=vert:\│,fold:\ 
+
+" change the colors in diff mode
+" highlight DiffAdd
+" highlight Diff
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "				keymaps
 "		cmd aliases						{{{
 """""""""""""""""""""""""""""""""""""""""""
@@ -240,14 +309,16 @@ cabbrev WQ wq
 cabbrev Wq wq
 cabbrev wQ wq
 " generic aliases
+" TODO :we
 
-if exists(":PlugInstall")
-	" vim-plug
+" TODO remap all to this
+"cnoreabbrev <expr> W ((getcmdtype() is# ':' && getcmdline() is# 'W')?('w'):('W'))
+
+if exists(":PlugInstall")	" vim-plug
 	cabbrev	pi PlugInstall
 	cabbrev pu PlugUpdate
 endif
-if exists(":PluginInstall")
-	" Vundle
+if exists(":PluginInstall")	" Vundle
 	cabbrev	pi PluginInstall
 	cabbrev pu PluginUpdate
 endif
@@ -275,7 +346,12 @@ cabbrev foa %foldopen!
 cabbrev zca %foldclose!
 cabbrev zoa %foldopen!
 
-iabbrev adn and
+" Don't show ^M in DOS files
+command! FixDos edit ++ff=dos
+
+" :we to write and reload file
+" TODO:
+"command! we write edit
 """"""""""""""""""""""""""""""""""""""""}}}
 "		generic mappings				{{{
 """""""""""""""""""""""""""""""""""""""""""
@@ -648,11 +724,12 @@ call plug#begin('~/.vim/plugged')
 if has("nvim")
 	" Autocomplete for nvim (needs python3)
 	Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-	Plug 'zchee/deoplete-clang'	" show functions arguments
+	"Plug 'zchee/deoplete-clang'	" show functions arguments
 else
 	Plug 'Shougo/neocomplete.vim' " Needs Lua
 endif
-Plug 'Shougo/neoinclude.vim'	" headers autocomplete
+"Plug 'Shougo/neoinclude.vim'	" headers autocomplete
+Plug 'Shougo/neoinclude.vim', {'for': 'c,cpp'}	" headers autocomplete
 
 " INFO ne svidja mi se bas, nekad zna bit previse pametan i iritantan,
 " svejedno ne pokazuje argumente funkcijama
@@ -669,16 +746,17 @@ Plug 'bogado/file-line'				" open file.txt:123
 Plug 'dietsche/vim-lastplace'		" Open file at last edit position
 Plug 'qpkorr/vim-bufkill'			" kill buffer without killing split :BD :BW
 Plug 'henrik/vim-indexed-search'	" show search as: result 123 of 456
+Plug 'bronson/vim-trailing-whitespace'	" show red block when there is a trailing whitespace  :FixWhiteSpace
 Plug 'kshenoy/vim-signature'		" show marks visually
 "Plug 'romgrk/winteract.vim'
-" buggy as fuck
-"Plug 'Yggdroot/indentLine'		" show chars instead of leading spaces (not tabs)
+
 "Plug 'tpope/vim-speeddating'		" Ctrl-A/X now works on dates	XXX TODO
 
 "Plug 'vim-scripts/taglist.vim'		" list functions
 Plug 'majutsushi/tagbar'			" show tags in the window at the right
 
 
+Plug 'mhinz/vim-signify'			" svn, git, ...
 
 Plug 'ciaranm/securemodelines'
 Plug 'rking/ag.vim'			" multifile grep - faster version of ack
@@ -695,7 +773,6 @@ Plug 'xolox/vim-misc'				" Needed for easytags and vim-session
 "Plug 'xolox/vim-easytags'			" TODO
 Plug 'Raimondi/delimitMate'		" automatic closing quotes, brackets, ...
 Plug 'scrooloose/nerdcommenter'	" comments
-"Plug 'drmikehenry/vim-fixkey'	" INFO experimental fix Alt-key
 " Project tree (file explorer) in the window at the left
 Plug 'scrooloose/nerdtree',		{ 'on': 'NERDTreeToggle' }
 "Plug 'jistr/vin-nerdtree-tabs' 	" Nerdtree for all tabs
@@ -704,7 +781,6 @@ Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'godlygeek/tabular'			" aligning/tabulating text
 Plug 'regedarek/ZoomWin'			" toggle between one window and multi-window (Ctrl-W o)	newer version than vim-scripts
 "Plug 'terryma/vim-multiple-cursors'		" rename var at multiple places at once
-Plug 'bronson/vim-trailing-whitespace'	" show red block when there is a trailing whitespace  :FixWhiteSpace
 Plug 'tpope/vim-unimpaired'				" TODO
 Plug 'gioele/vim-autoswap'
 Plug 'chrisbra/NrrwRgn'				" plugin for focussing on a selected region
@@ -729,8 +805,6 @@ Plug 'vim-ctrlspace/vim-ctrlspace'	" tabs/buffer/file management, sessions, book
 Plug 'sheerun/vim-polyglot'			" A collection of language packs for Vim. won't affect your startup time
 Plug 'easymotion/vim-easymotion'		" leader leader and magic begins
 
-Plug 'sheerun/vim-wombat-scheme'		" colorscheme
-Plug 'ChrisKempson/Tomorrow-Theme'
 
 "Plug 'tpope/vim-surround'
 "Plug 'tpope/vim-repeat'
@@ -768,18 +842,20 @@ Plug 'tpope/vim-obsession'	" restore session, needed for tmux ressurect
 
 "			themes
 Plug 'tpope/vim-vividchalk'
-Plug 'gosukiwi/vim-atom-dark'
-Plug 'lisposter/vim-blackboard'	" colortheme, pretty ugly
-Plug 'dracula/dracula-theme'
+Plug 'gosukiwi/vim-atom-dark'	" not-to-high contrast
+Plug 'lisposter/vim-blackboard'	" pretty ugly
+Plug 'dracula/vim'	" this 
 Plug 'tomasr/molokai'
 "Plug 'justinmk/molokai' " previse svijetla bg
 Plug 'chriskempson/base16-vim'
 Plug 'jpo/vim-railscasts-theme'
-Plug 'morhetz/gruvbox'
+Plug 'morhetz/gruvbox'				" too little contrast
 Plug 'chriskempson/tomorrow-theme'
+Plug 'sheerun/vim-wombat-scheme'
 
 
 
+" neki test{()}
 
 Plug 'kien/rainbow_parentheses.vim'
 Plug 'myusuf3/numbers.vim'		" disable relative numbers in insert mode and other windows
@@ -847,19 +923,19 @@ let g:deoplete#delimiters = ['/', '.', '::', ':', '#', '->']
 "let g:deoplete#sources.h = ['buffer', 'tag']
 
 " deoplete-clang
-if system("uname") == "Linux"
-	" let g:deoplete#sources#clang#libclang_path = "/usr/lib/llvm-3.6/lib/libclang.so"
-	" let g:deoplete#sources#clang#clang_header = "/usr/include/clang/"
-endif
-if system("uname") == "FreeBSD"
-	let g:deoplete#sources#clang#libclang_path = "/usr/local/llvm38/lib/libclang.so"
-	let g:deoplete#sources#clang#clang_header = "/usr/local/llvm38/include/clang"
-endif
-"let g:deoplete#sources#clang#std = {'c': 'c11', 'cpp': 'c++11'}		" prefered version
-"let g:deoplete#sources#clang#flags = 
-let g:deoplete#sources#clang#std#c = 'c11'
-let g:deoplete#sources#clang#std#cpp = 'c++14'
-let g:deoplete#sources#clang#sort_algo = 'priority'
+" if system("uname") == "Linux"
+	" " let g:deoplete#sources#clang#libclang_path = "/usr/lib/llvm-3.6/lib/libclang.so"
+	" " let g:deoplete#sources#clang#clang_header = "/usr/include/clang/"
+" endif
+" if system("uname") == "FreeBSD"
+	" let g:deoplete#sources#clang#libclang_path = "/usr/local/llvm38/lib/libclang.so"
+	" let g:deoplete#sources#clang#clang_header = "/usr/local/llvm38/include/clang"
+" endif
+" "let g:deoplete#sources#clang#std = {'c': 'c11', 'cpp': 'c++11'}		" prefered version
+" "let g:deoplete#sources#clang#flags = 
+" let g:deoplete#sources#clang#std#c = 'c11'
+" let g:deoplete#sources#clang#std#cpp = 'c++14'
+" let g:deoplete#sources#clang#sort_algo = 'priority'
 
 
 """"""""""""""""""""""""""""""""""""}}}
@@ -969,11 +1045,102 @@ let g:CtrlSpaceUseTabline = 1
 "" *ctrlspace-single-mode*
 " Displays only buffers related to the current tab. By related I mean
 """"""""""""""""""""""""""""""""""""}}}
+"		CtrlP						{{{
+"""""""""""""""""""""""""""""""""""""""
+let g:ctrlp_map = '<leader>o'	" disable default Ctrl-P
+"let g:ctrlp_cmd = 'CtrlP'
+
+let g:ctrlp_arg_map = 0		" Stop CtrlP from using Ctrl-O as his shortcut
+" Disable Ctrl-o as CtrlP shortcut, he has better things to do
+let g:ctrlp_prompt_mappings = {
+			\ 'OpenMulti()':          [''],
+			\ }
+
+" don't let ctrlp take over the screen!
+let g:ctrlp_max_height=30
+" TODO provjerit
+"let g:ctrlp_by_filename = 1
+"let g:ctrlp_regex_search = 1
+"let g:ctrlp_use_caching = 1
+
+" Search from current directory instead of project root
+let g:ctrlp_working_path_mode = 0
+
+"let g:ctrlp_user_command = 'find %s -type f'	" Use a custom file listing command
+let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files -co --exclude-standard']	" Ignore files in .gitignore
+
+" This is already set in Vim's wildignore
+let g:ctrlp_custom_ignore = {
+			\ 'dir':  '\v[\/]\.(git|hg|svn)$',
+			\ 'file': '\v\.(exe|so|dll|o)$',
+			\ 'link': 'some_bad_symbolic_links',
+			\ }
+
+
+" CtrlP Emacs shortcuts
+" INFO older shortcuts with used keys need to be removed
+" TODO mozda jos nesta, zasad samo "j" i "k" dodani Emacs
+let g:ctrlp_prompt_mappings = {
+			\ 'PrtBS()':              ['<bs>', '<c-]>'],
+			\ 'PrtDelete()':          ['<del>'],
+			\ 'PrtDeleteWord()':      ['<c-w>'],
+			\ 'PrtClear()':           ['<c-u>'],
+			\ 'PrtSelectMove("j")':   ['<c-n>', '<c-j>', '<down>'],
+			\ 'PrtSelectMove("k")':   ['<c-p>', '<c-k>', '<up>'],
+			\ 'PrtSelectMove("t")':   ['<Home>', '<kHome>'],
+			\ 'PrtSelectMove("b")':   ['<End>', '<kEnd>'],
+			\ 'PrtSelectMove("u")':   ['<PageUp>', '<kPageUp>'],
+			\ 'PrtSelectMove("d")':   ['<PageDown>', '<kPageDown>'],
+			\ 'PrtHistory(-1)':       [''],
+			\ 'PrtHistory(1)':        [''],
+			\ 'AcceptSelection("e")': ['<cr>', '<2-LeftMouse>'],
+			\ 'AcceptSelection("h")': ['<c-x>', '<c-cr>', '<c-s>'],
+			\ 'AcceptSelection("t")': ['<c-t>'],
+			\ 'AcceptSelection("v")': ['<c-v>', '<RightMouse>'],
+			\ 'ToggleFocus()':        ['<s-tab>'],
+			\ 'ToggleRegex()':        ['<c-r>'],
+			\ 'ToggleByFname()':      ['<c-d>'],
+			\ 'ToggleType(1)':        ['<c-f>', '<c-up>'],
+			\ 'ToggleType(-1)':       ['<c-b>', '<c-down>'],
+			\ 'PrtExpandDir()':       ['<tab>'],
+			\ 'PrtInsert("c")':       ['<MiddleMouse>', '<insert>'],
+			\ 'PrtInsert()':          ['<c-\>'],
+			\ 'PrtCurStart()':        ['<c-a>'],
+			\ 'PrtCurEnd()':          ['<c-e>'],
+			\ 'PrtCurLeft()':         ['<c-h>', '<left>', '<c-^>'],
+			\ 'PrtCurRight()':        ['<c-l>', '<right>'],
+			\ 'PrtClearCache()':      ['<F5>'],
+			\ 'PrtDeleteEnt()':       ['<F7>'],
+			\ 'CreateNewFile()':      ['<c-y>'],
+			\ 'MarkToOpen()':         ['<c-z>'],
+			\ 'OpenMulti()':          ['<c-o>'],
+			\ 'PrtExit()':            ['<esc>', '<c-c>', '<c-g>'],
+			\ }
+
+let g:ctrlp_clear_cache_on_exit = 0	" Use F5 in CtrlP for refresh, calls CtrlPClear{,All}Caches
+									" TODO remap this to something that is not F5 or use manual function
+let g:ctrlp_cache_dir = $HOME.'/.cache/ctrlp'
+let g:ctrlp_show_hidden = 1	" will not search .git because of wildignore
+let g:ctrlp_max_files = 30000
+let g:ctrlp_max_depth = 40	" max dirs
+let g:ctrlp_match_current_file = 1	" show current file when searching
+
+" MRU options
+let g:ctrlp_mruf_max = 250
+let g:ctrlp_mruf_exclude = '/tmp/.*\|/temp/.*' " MacOSX/Linux
+
+
+" extension, should be enabled
+let g:ctrlp_buftag_ctags_bin = ''
+
+" TODO Ctrl-S open in split (instead Ctrl-X)
+" TODO ignore .o
+""""""""""""""""""""""""""""""""""""}}}
 
 "		lastplace															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " INFO reopen files where you left off
-let g:lastplace_open_folds = 1 " auto open folder, default: 1
+let g:lastplace_open_folds = 1 " auto open folder, default: 1 XXX don't work for nested folds
 let g:lastplace_ignore = "gitcommit,gitrebase,svn,hgcommit"
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		FixWhiteSpace															{{{
@@ -1079,103 +1246,54 @@ let g:tagbar_previewwin_pos = "aboveleft"
 autocmd BufWinEnter * if &previewwindow | setlocal nonumber norelativenumber | endif
 let g:tagbar_autopreview = 0
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		git plugins					{{{
+"""""""""""""""""""""""""""""""""""""""
+" INFO show +-~ on the left of line if line is added/removed/changed
+" GitGutter{Enable,Disable,Toggle}
+" update: GitGutter{,All}	current/all buffers
+" keys: [c ]c goto prev/next
+
+
+let g:gitgutter_enabled = 0				" default
+"let g:gitgutter_highlight_lines = 1
+" Required after having changed the colorscheme
+"hi clear SignColumn
+
+
+" In vim-airline, only display "hunks" if the diff is non-zero
+let g:airline#extensions#hunks#non_zero_only = 1
+
+let g:gitgutter_sign_added = '+'
+let g:gitgutter_sign_removed = 'x'
+let g:gitgutter_sign_modified = 'm'
+let g:gitgutter_sign_modified_removed = 'xm'
+
+
+"let g:gitgutter_override_sign_column_highlight = 0
+highlight GitGutterAdd			ctermfg=green	ctermbg=236
+highlight GitGutterChange		ctermfg=14		ctermbg=236
+highlight GitGutterDelete		ctermfg=red		ctermbg=236
+highlight GitGutterChangeDelete	ctermfg=11		ctermbg=236
+
+
+" TODO disable this plugin in non active split
+
+" used only for SVN:
+let g:signify_vcs_list = [ 'git', 'svn', 'hg' ]
+let g:signify_update_on_focusgained = 0
+let g:signify_sign_add               = '+'
+let g:signify_sign_delete            = '-'
+let g:signify_sign_delete_first_line = '‾'
+let g:signify_sign_change            = '!'
+let g:signify_sign_changedelete      = g:signify_sign_change
+let g:signify_sign_show_count = 1
+""""""""""""""""""""""""""""""""""""}}}
 
 
 "		clang						{{{
 """""""""""""""""""""""""""""""""""""""
 let g:clang_auto = 1	" auto complete after -> . ::
 let g:clang_exec = 'clang-3.6'
-""""""""""""""""""""""""""""""""""""}}}
-"		CtrlP						{{{
-"""""""""""""""""""""""""""""""""""""""
-let g:ctrlp_map = '<leader>o'	" disable default Ctrl-P
-"let g:ctrlp_cmd = 'CtrlP'
-
-let g:ctrlp_arg_map = 0		" Stop CtrlP from using Ctrl-O as his shortcut
-" Disable Ctrl-o as CtrlP shortcut, he has better things to do
-let g:ctrlp_prompt_mappings = {
-			\ 'OpenMulti()':          [''],
-			\ }
-
-" don't let ctrlp take over the screen!
-let g:ctrlp_max_height=30
-" TODO provjerit
-"let g:ctrlp_by_filename = 1
-"let g:ctrlp_regex_search = 1
-"let g:ctrlp_use_caching = 1
-
-" Search from current directory instead of project root
-let g:ctrlp_working_path_mode = 0
-
-"let g:ctrlp_user_command = 'find %s -type f'	" Use a custom file listing command
-let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files -co --exclude-standard']	" Ignore files in .gitignore
-
-" This is already set in Vim's wildignore
-let g:ctrlp_custom_ignore = {
-			\ 'dir':  '\v[\/]\.(git|hg|svn)$',
-			\ 'file': '\v\.(exe|so|dll|o)$',
-			\ 'link': 'some_bad_symbolic_links',
-			\ }
-
-
-" CtrlP Emacs shortcuts
-" INFO older shortcuts with used keys need to be removed
-" TODO mozda jos nesta, zasad samo "j" i "k" dodani Emacs
-let g:ctrlp_prompt_mappings = {
-			\ 'PrtBS()':              ['<bs>', '<c-]>'],
-			\ 'PrtDelete()':          ['<del>'],
-			\ 'PrtDeleteWord()':      ['<c-w>'],
-			\ 'PrtClear()':           ['<c-u>'],
-			\ 'PrtSelectMove("j")':   ['<c-n>', '<c-j>', '<down>'],
-			\ 'PrtSelectMove("k")':   ['<c-p>', '<c-k>', '<up>'],
-			\ 'PrtSelectMove("t")':   ['<Home>', '<kHome>'],
-			\ 'PrtSelectMove("b")':   ['<End>', '<kEnd>'],
-			\ 'PrtSelectMove("u")':   ['<PageUp>', '<kPageUp>'],
-			\ 'PrtSelectMove("d")':   ['<PageDown>', '<kPageDown>'],
-			\ 'PrtHistory(-1)':       [''],
-			\ 'PrtHistory(1)':        [''],
-			\ 'AcceptSelection("e")': ['<cr>', '<2-LeftMouse>'],
-			\ 'AcceptSelection("h")': ['<c-x>', '<c-cr>', '<c-s>'],
-			\ 'AcceptSelection("t")': ['<c-t>'],
-			\ 'AcceptSelection("v")': ['<c-v>', '<RightMouse>'],
-			\ 'ToggleFocus()':        ['<s-tab>'],
-			\ 'ToggleRegex()':        ['<c-r>'],
-			\ 'ToggleByFname()':      ['<c-d>'],
-			\ 'ToggleType(1)':        ['<c-f>', '<c-up>'],
-			\ 'ToggleType(-1)':       ['<c-b>', '<c-down>'],
-			\ 'PrtExpandDir()':       ['<tab>'],
-			\ 'PrtInsert("c")':       ['<MiddleMouse>', '<insert>'],
-			\ 'PrtInsert()':          ['<c-\>'],
-			\ 'PrtCurStart()':        ['<c-a>'],
-			\ 'PrtCurEnd()':          ['<c-e>'],
-			\ 'PrtCurLeft()':         ['<c-h>', '<left>', '<c-^>'],
-			\ 'PrtCurRight()':        ['<c-l>', '<right>'],
-			\ 'PrtClearCache()':      ['<F5>'],
-			\ 'PrtDeleteEnt()':       ['<F7>'],
-			\ 'CreateNewFile()':      ['<c-y>'],
-			\ 'MarkToOpen()':         ['<c-z>'],
-			\ 'OpenMulti()':          ['<c-o>'],
-			\ 'PrtExit()':            ['<esc>', '<c-c>', '<c-g>'],
-			\ }
-
-let g:ctrlp_clear_cache_on_exit = 0	" Use F5 in CtrlP for refresh, calls CtrlPClear{,All}Caches
-									" TODO remap this to something that is not F5 or use manual function
-let g:ctrlp_cache_dir = $HOME.'/.cache/ctrlp'
-let g:ctrlp_show_hidden = 1	" will not search .git because of wildignore
-let g:ctrlp_max_files = 30000
-let g:ctrlp_max_depth = 40	" max dirs
-let g:ctrlp_match_current_file = 1	" show current file when searching
-
-" MRU options
-let g:ctrlp_mruf_max = 250
-let g:ctrlp_mruf_exclude = '/tmp/.*\|/temp/.*' " MacOSX/Linux
-
-
-" extension, should be enabled
-let g:ctrlp_buftag_ctags_bin = ''
-
-" TODO Ctrl-S open in split (instead Ctrl-X)
-" TODO ignore .o
 """"""""""""""""""""""""""""""""""""}}}
 "		Syntastic					{{{
 """""""""""""""""""""""""""""""""""""""
@@ -1264,25 +1382,6 @@ let g:indentLine_char = '¦'
 "let g:indentLine_char = '┊'	" like subl2
 "let g:indentLine_indentLevel=1
 """"""""""""""""""""""""""""""""""""}}}
-"		git plugins					{{{
-"""""""""""""""""""""""""""""""""""""""
-" INFO show +-~ on the left of line if line is added/removed/changed
-" GitGutter{Enable,Disable,Toggle}
-" update: GitGutter{,All}	current/all buffers
-" keys: [c ]c goto prev/next
-
-
-let g:gitgutter_enabled = 1				" default
-"let g:gitgutter_highlight_lines = 1
-let g:gitgutter_sign_modified_removed = 'xx'
-" Required after having changed the colorscheme
-hi clear SignColumn
-
-" In vim-airline, only display "hunks" if the diff is non-zero
-let g:airline#extensions#hunks#non_zero_only = 1
-
-" TODO disable in non active split
-""""""""""""""""""""""""""""""""""""}}}
 "		Tabularize					{{{
 """""""""""""""""""""""""""""""""""""""
 " INFO
@@ -1334,52 +1433,6 @@ let g:NERDTreeMinimalUI = 1
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
-" 					colors and TERM setup									{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" colors as sublime
-" INFO need to be after plugin load
-colorscheme molokai
-" original molokai bg
-"let g:molokai_original = 1
-" make cterm close as possible to GUI version
-"let g:rehash256 = 1 " too bright
-
-set t_Co=256	" already set, probably in a theme file
-
-" for base16 theme (and green linenubmers)
-let base16colorspace=256
-
-" INFO need to be after loading the theme
-" Search         xxx term=reverse ctermfg=0 ctermbg=222 guifg=#000000 guibg=#FFE792
-highlight Todo	term=standout	cterm=bold ctermfg=196 ctermbg=232 gui=bold guifg=#FFFFFF guibg=bg
-highlight Debug 				cterm=bold ctermfg=226 ctermbg=234 gui=bold guibg=Purple
-"highlight Search term=reverse			   ctermfg=0   ctermbg=222 guifg=#000000 guibg=#FFE792
-
-" color of tw bar at right
-highlight ColorColumn ctermbg=93 guibg=DarkMagenta
-
-"highlight CursorLine     term=underline ctermbg=235 guibg=#293739	" default
-" change background
-" INFO this will fuckup colors, need to be set in a theme file, default is 233. 234 is a little darker
-"highlight Normal ctermbg=234
-
-"		  VertSplit xxx term=reverse cterm=bold ctermfg=244 ctermbg=232 gui=bold guifg=#808080 guibg=#080808
-highlight VertSplit		term=reverse cterm=bold ctermfg=202 ctermbg=232 gui=bold guifg=#808080 guibg=#080808
-
-" change color of tab chars (:set list)
-highlight SpecialKey	ctermfg=236 gui=italic guifg=#465457
-"highlight SpecialKey	ctermfg=95 gui=italic guifg=#465457
-
-" change concel to match background
-"Conceal        xxx ctermfg=7 ctermbg=242 guifg=LightGrey guibg=DarkGrey
-highlight Conceal	ctermfg=7 ctermbg=233 guifg=LightGrey guibg=DarkGrey
-
-
-"set fillchars=vert:|,fold:- " default
-"set fillchars=vert:\│,fold:·
-" longer vertical bar for vertical splits, space for folds
-set fillchars=vert:\│,fold:\ 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "				GUI settings												{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if has("gui_running")
@@ -1398,14 +1451,13 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "				custom functions											{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-function! AppendModeline()
+function! AppendModeline() " {{{
 	let l:modeline = printf(" vim: set ft=%s ts=%d sw=%d tw=%d foldmethod=%s %set :", &filetype, &tabstop, &shiftwidth, &textwidth, &foldmethod, &expandtab ? '' : 'no')
 	let l:modeline = substitute(&commentstring, "%s", l:modeline, "")
 	call append(line("$"), l:modeline)
 endfunction
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"function! s:CursorEdge()	" 's:' for script (vimrc in this case) function only
-function! CursorEdge()	" 's:' for script (vimrc in this case) function only
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+function! CursorEdge()	" {{{
 	" check if cursor is EDGE_LINES from end of the screen
 	let l:CURSOR_EDGE = 5
 	let l:from_start = winline()
@@ -1432,9 +1484,9 @@ function! CursorEdge()	" 's:' for script (vimrc in this case) function only
 	endif
 	" XXX uzima u obzir trenutnu lokaciju kursora, a ne gdje se nalazi iduci hit
 endfunction
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+function! s:VSetSearch() " {{{
 " visual mode */#
-function! s:VSetSearch()
 	let temp = @@
 	norm! gvy
 	let @/ = '\V' . substitute(escape(@@, '\'), '\n', '\\n', 'g')
@@ -1445,12 +1497,9 @@ vnoremap * :<C-u>call <SID>VSetSearch()<CR>//<CR>
 vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR>
 
 " TODO combo with indexed_search
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Don't show ^M in DOS files
-command! FixDos edit ++ff=dos
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+function! ZeroMove()														 "{{{
 " INFO toggle between ^ and 0
-function! ZeroMove()
 	let l:column_old = col('.')
 
 	" goto first non blank char
@@ -1463,6 +1512,23 @@ function! ZeroMove()
 		execute "normal! 0"
 	endif
 endfunction
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+function! NeatFoldText() "{{{
+	" http://dhruvasagar.com/2013/03/28/vim-better-foldtext
+	let line = ' ' . substitute(getline(v:foldstart), '^\s*"\?\s*\|\s*"\?\s*{{' . '{\d*\s*', '', 'g') . ' '
+	let lines_count = v:foldend - v:foldstart + 1
+	let lines_count_text = '| ' . printf("%10s", lines_count . ' lines') . ' |'
+	let foldchar = matchstr(&fillchars, 'fold:\zs.')
+	let foldtextstart = strpart('+' . repeat(foldchar, v:foldlevel*2) . line, 0, (winwidth(0)*2)/3)"{{{"}}}
+	let foldtextend = lines_count_text . repeat(foldchar, 8)
+	let foldtextlength = strlen(substitute(foldtextstart . foldtextend, '.', 'x', 'g')) + &foldcolumn
+	" return foldtextstart . repeat(foldchar, winwidth(0)-foldtextlength) . foldtextend
+	" my dirty hack, don't show how many lines are fold at the right end of the screen, but close to end of &textwidth
+	"return foldtextstart . repeat(foldchar, winwidth(0)/2-foldtextlength) . foldtextend
+	return foldtextstart . repeat(foldchar, &textwidth+10-foldtextlength) . foldtextend " XXX ugly
+endfunction
+set foldtext=NeatFoldText()
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 if executable('ag')
@@ -1488,6 +1554,7 @@ endif
 " open tag in a new tab
 map <C-\> :tab split<cr>:exec("tag ".expand("<cword>"))<CR>
 " open tag in a new split
+" XXX will open split when tag is not found
 map <A-]> :vsp <cr>:exec("tag ".expand("<cword>"))<CR>
 
 "		work specific stuff												{{{
@@ -1583,6 +1650,7 @@ nnoremap <tab> :wincmd p<cr>
 " '. goto place of last edit
 
 " reselect last visually selected block: gv
+" goto preview window Ctrl-W Ctrl-P
 "##########################################################################}}}
 " tips and tricks 															{{{
 " TODO jednom sredit:
@@ -1628,6 +1696,12 @@ nnoremap <tab> :wincmd p<cr>
 " current buffer number: bufnr('%')
 " get line under the cursors: getline('.')
 "									}}}
+
+
+" variables:
+" % - buffer (or file) TODO
+" ^ - alternate file
+" TODO :h pattern-atoms
 
 " Vim debug:
 " vim -V9myVimLog
