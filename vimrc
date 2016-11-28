@@ -233,40 +233,6 @@ endif
 
 "autocmd WinEnter * if &previewwindow | ... | endif
 """"""""""""""""""""""""""""""""""""}}}
-" 					colors and TERM setup									{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" colors as sublime
-colorscheme molokai
-
-highlight Todo			ctermfg=196 ctermbg=232
-highlight Debug			ctermfg=226 ctermbg=234
-
-" color of tw bar at right (funny color for bad LCD panels)
-"highlight ColorColumn ctermbg=93 guibg=DarkMagenta
-" a little bit brighter than bg
-highlight ColorColumn	ctermbg=234
-" highlight all afer 80 chars
-let &colorcolumn=join(range(81,999),",")
-" double highlight, 80 and 120 chars:
-"let &colorcolumn="80,".join(range(120,999),",")
-
-"highlight CursorLine     term=underline ctermbg=235 guibg=#293739	" default
-
-highlight VertSplit		ctermfg=202 ctermbg=232
-
-" change color of tab chars (:set list)
-highlight SpecialKey	ctermfg=236
-
-" change concel to match background
-highlight Conceal		ctermfg=7 ctermbg=233
-
-" longer vertical bar for vertical splits, space for folds (default was -)
-set fillchars=vert:\│,fold:\ 
-
-" change the colors in diff mode
-highlight DiffAdded		ctermfg=81
-highlight DiffRemoved	ctermfg=208
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "				keymaps
 "		cmd aliases						{{{
 """""""""""""""""""""""""""""""""""""""""""
@@ -1426,6 +1392,40 @@ if has("gui_running")
 	set winaltkeys=no		" Turn off <Alt>/<Meta> pulling down GUI menu
 endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" 					colors and TERM setup									{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" colors as sublime
+colorscheme molokai
+
+highlight Todo			ctermfg=196 ctermbg=232
+highlight Debug			ctermfg=226 ctermbg=234
+
+" color of tw bar at right (funny color for bad LCD panels)
+"highlight ColorColumn ctermbg=93 guibg=DarkMagenta
+" a little bit brighter than bg
+highlight ColorColumn	ctermbg=234
+" highlight all afer 80 chars
+let &colorcolumn=join(range(81,999),",")
+" double highlight, 80 and 120 chars:
+"let &colorcolumn="80,".join(range(120,999),",")
+
+"highlight CursorLine     term=underline ctermbg=235 guibg=#293739	" default
+
+highlight VertSplit		ctermfg=202 ctermbg=232
+
+" change color of tab chars (:set list)
+highlight SpecialKey	ctermfg=236
+
+" change concel to match background
+highlight Conceal		ctermfg=7 ctermbg=233
+
+" longer vertical bar for vertical splits, space for folds (default was -)
+set fillchars=vert:\│,fold:\ 
+
+" change the colors in diff mode
+highlight DiffAdded		ctermfg=81
+highlight DiffRemoved	ctermfg=208
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "				custom functions											{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! AppendModeline() " {{{
@@ -1627,6 +1627,14 @@ nnoremap <tab> :wincmd p<cr>
 
 " reselect last visually selected block: gv
 " goto preview window Ctrl-W Ctrl-P
+
+" delete lines that do NOT match pattern: :v/pattern/d
+" change direction of select in visual mode: 'o'
+
+set viewoptions-=options	" for mkview, don't store current file
+set viewdir=~/.vim/view
+" :mkview :loadview
+
 "##########################################################################}}}
 " tips and tricks 															{{{
 " TODO jednom sredit:
@@ -1717,5 +1725,6 @@ nnoremap <tab> :wincmd p<cr>
 " TODO code snippets
 " TODO dont' autocomplete second " in Vim (probably some plugin)
 " TODO Ag skip tags file
+" TODO disable swap file in paste mode (otherwise very slow on copying multiple lines)
 
 " vim: set ts=4 sw=4 tw=0 foldmethod=marker noet :
