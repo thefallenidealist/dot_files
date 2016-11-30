@@ -293,8 +293,11 @@ command! FixDos edit ++ff=dos
 " :we to write and reload file TODO
 "cabbrev we write | edit
 
+" XXX CtrlSpace won't restore tabs with only one tab
 cabbrev css CtrlSpaceSaveWorkspace
 cabbrev csl CtrlSpaceLoadWorkspace
+
+cabbrev ccc call ToggleColorColumn()
 """"""""""""""""""""""""""""""""""""""""}}}
 "		generic mappings				{{{
 """""""""""""""""""""""""""""""""""""""""""
@@ -665,6 +668,9 @@ vnoremap <2-LeftMouse> *N
 
 " TODO Shift and/or Alt + 2 mouse click: goto tag
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+if has('unix')
+	let s:uname = substitute(system("uname"), '\n', '', '')
+endif
 "				Plugins
 "				Plugins														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -673,13 +679,14 @@ call plug#begin('~/.vim/plugged')
 if has("nvim")
 	" Autocomplete for nvim (needs python3)
 	Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-	"Plug 'zchee/deoplete-clang'	" show functions arguments
+	Plug 'zchee/deoplete-clang'	" show functions arguments
+	" Plug 'Rip-Rip/clang_complete'
 
 else
 	Plug 'Shougo/neocomplete.vim' " Needs Lua
 endif
-"Plug 'Shougo/neoinclude.vim'	" headers autocomplete
 Plug 'Shougo/neoinclude.vim', {'for': 'c,cpp'}	" headers autocomplete
+Plug 'Shougo/echodoc.vim'	" show functions in commad line window (:) insted of in preview
 
 " INFO ne svidja mi se bas, nekad zna bit previse pametan i iritantan,
 " svejedno ne pokazuje argumente funkcijama
@@ -706,7 +713,7 @@ Plug 'kshenoy/vim-signature'		" show marks visually
 Plug 'majutsushi/tagbar'			" show tags in the window at the right
 
 
-Plug 'mhinz/vim-signify'			" svn, git, ...
+"Plug 'mhinz/vim-signify'			" svn, git, ...
 
 Plug 'ciaranm/securemodelines'
 Plug 'rking/ag.vim'			" multifile grep - faster version of ack
@@ -716,11 +723,11 @@ Plug 'rking/ag.vim'			" multifile grep - faster version of ack
 
 
 "Plug 'vim-scripts/ZoomWin'		" toggle between one window and multi-window (Ctrl-W o)
-Plug 'tpope/vim-fugitive'			" plugin on GitHub repo
-Plug 'airblade/vim-gitgutter'	" Show +-~ left of number column
+"Plug 'tpope/vim-fugitive'			" plugin on GitHub repo
+"Plug 'airblade/vim-gitgutter'	" Show +-~ left of number column
 
 Plug 'xolox/vim-misc'				" Needed for easytags and vim-session
-Plug 'xolox/vim-easytags'			" TODO
+Plug 'xolox/vim-easytags'			" XXX XXX XXX XXX XXX fucking slow on work PC
 Plug 'Raimondi/delimitMate'		" automatic closing quotes, brackets, ...
 Plug 'scrooloose/nerdcommenter'	" comments
 " Project tree (file explorer) in the window at the left
@@ -851,8 +858,8 @@ call plug#end()
 ""let g:clang_c_completeopt = 'preview,longest,menuone'
 
 """"""""""""""""""""""""""""""""""""}}}
-"		deoplete "					{{{
-"""""""""""""""""""""""""""""""""""""""
+"		autocomplete - deoplete "											{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " NeoVim autocomplete
 let g:deoplete#enable_at_startup = 1
 let g:deoplete#enable_ignore_case = 1	" ignore case
@@ -872,21 +879,42 @@ let g:deoplete#delimiters = ['/', '.', '::', ':', '#', '->']
 "let g:deoplete#sources.h = ['buffer', 'tag']
 
 " deoplete-clang
-" if system("uname") == "Linux"
-	" " let g:deoplete#sources#clang#libclang_path = "/usr/lib/llvm-3.6/lib/libclang.so"
-	" " let g:deoplete#sources#clang#clang_header = "/usr/include/clang/"
-" endif
-" if system("uname") == "FreeBSD"
-	" let g:deoplete#sources#clang#libclang_path = "/usr/local/llvm38/lib/libclang.so"
-	" let g:deoplete#sources#clang#clang_header = "/usr/local/llvm38/include/clang"
-" endif
-" "let g:deoplete#sources#clang#std = {'c': 'c11', 'cpp': 'c++11'}		" prefered version
+" :h deoplete-
+if s:uname == "Linux"
+	let g:deoplete#sources#clang#libclang_path = "/usr/lib/llvm-3.6/lib/libclang.so"
+	let g:deoplete#sources#clang#clang_header = "/usr/include/clang/"
+endif
+if s:uname == "FreeBSD"
+	let g:deoplete#sources#clang#libclang_path = "/usr/local/llvm38/lib/libclang.so"
+	let g:deoplete#sources#clang#clang_header = "/usr/local/llvm38/include/clang"
+endif
+"let g:deoplete#sources#clang#std = {'c': 'c11', 'cpp': 'c++11'}		" prefered version
 " "let g:deoplete#sources#clang#flags = 
 " let g:deoplete#sources#clang#std#c = 'c11'
 " let g:deoplete#sources#clang#std#cpp = 'c++14'
 " let g:deoplete#sources#clang#sort_algo = 'priority'
 
 
+" clang_complete
+let g:clang_complete_auto = 0
+let g:clang_complete_auto = 1
+let g:clang_auto_select = 0
+"let g:clang_omnicppcomplete_compliance = 0 " Now it's possible to use just Omni's C-X C-U
+let g:clang_make_default_keymappings = 0
+let g:clang_use_library = 1		" faster than using clang
+
+
+if s:uname == "Linux"
+	let g:clang_library_path='/usr/lib/llvm-3.6/lib/libclang.so'
+endif
+
+if s:uname == "FreeBSD"
+	let g:clang_library_path='/usr/lib/llvm-3.6/lib/libclang.so'
+endif
+
+let g:clang_complete_copen = 1	" open quickfix window on error
+let g:clang_hl_errors = 1		" highlight errors and warnining
+let g:clang_close_preview = 1	" autoclose preview window
 """"""""""""""""""""""""""""""""""""}}}
 "		airline						{{{
 """""""""""""""""""""""""""""""""""""""
@@ -1009,14 +1037,14 @@ let g:ctrlp_max_height=30
 let g:ctrlp_working_path_mode = 0
 
 "let g:ctrlp_user_command = 'find %s -type f'	" Use a custom file listing command
-let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files -co --exclude-standard']	" Ignore files in .gitignore
+"let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files -co --exclude-standard']	" Ignore files in .gitignore
 
 " This is already set in Vim's wildignore
-let g:ctrlp_custom_ignore = {
-			\ 'dir':  '\v[\/]\.(git|hg|svn)$',
-			\ 'file': '\v\.(exe|so|dll|o)$',
-			\ 'link': 'some_bad_symbolic_links',
-			\ }
+" let g:ctrlp_custom_ignore = {
+			" \ 'dir':  '\v[\/]\.(git|hg|svn)$',
+			" \ 'file': '\v\.(exe|so|dll|o)$',
+			" \ 'link': 'some_bad_symbolic_links',
+			" \ }
 
 
 " CtrlP Emacs shortcuts
@@ -1219,16 +1247,15 @@ highlight GitGutterChangeDelete	ctermfg=11		ctermbg=236
 
 
 " TODO disable this plugin in non active split
-
-" used only for SVN:
+" used only git and SVN
 let g:signify_vcs_list = [ 'git', 'svn', 'hg' ]
 let g:signify_update_on_focusgained = 0
 let g:signify_sign_add               = '+'
 let g:signify_sign_delete            = '-'
 let g:signify_sign_delete_first_line = '‾'
-let g:signify_sign_change            = '!'
-let g:signify_sign_changedelete      = g:signify_sign_change
-let g:signify_sign_show_count = 1
+let g:signify_sign_change            = 'm'
+"let g:signify_sign_changedelete      = g:signify_sign_change
+let g:signify_sign_show_count = 0
 """"""""""""""""""""""""""""""""""""}}}
 
 
@@ -1347,11 +1374,14 @@ let g:easytags_async = 1
 "let g:easytags_dynamic_files = 2
 "let g:easytags_resolve_links = 1
 "let g:easytags_suppress_ctags_warning = 1
-let g:easytags_file = "~/.vim/tags"
+"let g:easytags_file = "~/.vim/tags"
 
 if system("uname") == "FreeBSD"
 	let g:tagbar_ctags_bin=system("which exctags")
 endif
+
+"set regexpengine=1 " old engine, faster (maybe), no changes
+let g:easytags_auto_highlight=0		" fix slowiness
 """"""""""""""""""""""""""""""""""""}}}
 "		delimitMate					{{{
 """""""""""""""""""""""""""""""""""""""
@@ -1402,13 +1432,15 @@ highlight Debug			ctermfg=226 ctermbg=234
 " color of tw bar at right (funny color for bad LCD panels)
 "highlight ColorColumn ctermbg=93 guibg=DarkMagenta
 " a little bit brighter than bg
-highlight ColorColumn	ctermbg=234
+"highlight ColorColumn	ctermbg=234
+"let s:color_ColorColumn = 234
+let g:color_ColorColumn = 234 " must be global (otherwise function ToggleColorColumn won't see it)
+execute "highlight ColorColumn ctermbg=".color_ColorColumn
+
 " highlight all afer 80 chars
 let &colorcolumn=join(range(81,999),",")
 " double highlight, 80 and 120 chars:
 "let &colorcolumn="80,".join(range(120,999),",")
-
-"highlight CursorLine     term=underline ctermbg=235 guibg=#293739	" default
 
 highlight VertSplit		ctermfg=202 ctermbg=232
 
@@ -1505,6 +1537,30 @@ function! NeatFoldText() "{{{
 endfunction
 set foldtext=NeatFoldText()
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" toggle ColorColumn														{{{
+" http://vim.1045645.n5.nabble.com/Check-if-highlight-exists-and-not-quot-cleared-quot-td1185235.html
+func! HlExists(hl)
+		if !hlexists(a:hl)
+			return 0
+		endif
+		redir => hlstatus
+		exe "silent hi" a:hl
+		redir END
+		return (hlstatus !~ "cleared")
+endfunc
+
+function! ToggleColorColumn()
+	let l:state = HlExists('ColorColumn')
+
+	if (l:state == 1)
+		highlight clear ColorColumn
+		"let l:state = 1
+	elseif (l:state == 0)
+		"highlight ColorColumn ctermbg=234
+		execute "highlight ColorColumn ctermbg=".g:color_ColorColumn
+	endif
+endfunction
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 if executable('ag')
 	" Note we extract the column as well as the file and line number
@@ -1527,10 +1583,11 @@ endif
 "" Add set path=.,<relative include dir> for searching for header in particular directories. For more information do ":help file-searching".
 
 " open tag in a new tab TEST modified line
-map <C-\> :tab split<cr>:exec("tag ".expand("<cword>"))<CR>
+"map <C-\> :tab split<cr>:exec("tag ".expand("<cword>"))<CR>
+" this is remapped to C-]
 " open tag in a new split
 " XXX will open split when tag is not found
-map <A-]> :vsp <cr>:exec("tag ".expand("<cword>"))<CR>
+"map <A-]> :vsp <cr>:exec("tag ".expand("<cword>"))<CR>
 
 "		work specific stuff												{{{
 let g:work_pc=system('is_work_pc')
@@ -1542,6 +1599,7 @@ if work_pc == 1
 	if work_dir == 1
 		" expand only if we are working on work stuff
 		set expandtab
+		highlight clear ColorColumn	" don't color background after textwidth
 	endif
 endif
 "=======================================================================}}}
@@ -1636,6 +1694,15 @@ set viewdir=~/.vim/view
 
 "##########################################################################}}}
 " tips and tricks 															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" profiling: http://stackoverflow.com/questions/12213597/how-to-see-which-plugins-are-making-vim-slow
+	" :profile start profile.log
+	" :profile func *
+	" :profile file *
+	" " At this point do slow actions
+	" :profile pause
+	" :noautocmd qall!
+
 " TODO jednom sredit:
 " plugin tslime		:vnoremap <buffer> \t <Plug>SendSelectionToTmux			" puts selected text to neighbors pane
 
