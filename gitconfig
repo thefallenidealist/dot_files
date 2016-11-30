@@ -25,6 +25,7 @@
 	d = diff
 	s = status
 	b = branch
+	a = add
 [log]
 	decorate = full
 [color]

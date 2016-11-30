@@ -171,7 +171,6 @@ syntax match Ignore /\%o33\[[0-9]\{0,5}m/ conceal
 set conceallevel=2	" hide until cursor is on that line
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		autocmd																{{{
-"
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 augroup my_group_with_a_very_uniq_name
 	" this is executed every time when vimrc is sourced, so clear it at the beggining:
@@ -182,12 +181,14 @@ augroup my_group_with_a_very_uniq_name
 	autocmd Filetype help NumbersDisable
 	autocmd BufEnter help norelativenumber
 	autocmd BufEnter help IndentLinesDisable
-	" TODO FixWhiteSpace is controler from its option
+	" TODO FixWhiteSpace is controled from its option
 
 	" map q as kill only in help window
 	autocmd Filetype help nnoremap <buffer> q :wincmd c<cr>
 	" unmap enter in help and man window
-	autocmd Filetype help nnoremap <buffer> <cr> <cr>
+	"autocmd Filetype help nnoremap <buffer> <cr> <cr>
+	" Enter is "goto tag" TODO: if not tag map to *
+	autocmd Filetype help nnoremap <buffer> <cr> <C-]>
 	autocmd Filetype man nnoremap <buffer> <cr> <cr>
 
 	" unmap enter in QuickFix window (window at the bottom which isn't preview)
@@ -208,10 +209,6 @@ augroup my_group_with_a_very_uniq_name
 	" in case I ever open a python file
 	autocmd Filetype python set expandtab
 
-	" hide all ^M in DOS file
-	" INFO this need conceallevel higher than 1
-	"autocmd Filetype * syntax match Ignore /\r$/ conceal containedin=ALL
-	" autocmd Filetype * FixDos
 augroup END
 
 " setup when in diff mode:
@@ -293,9 +290,11 @@ cabbrev zoa %foldopen!
 " Don't show ^M in DOS files
 command! FixDos edit ++ff=dos
 
-" :we to write and reload file
-" TODO:
-"command! we write edit
+" :we to write and reload file TODO
+"cabbrev we write | edit
+
+cabbrev css CtrlSpaceSaveWorkspace
+cabbrev csl CtrlSpaceLoadWorkspace
 """"""""""""""""""""""""""""""""""""""""}}}
 "		generic mappings				{{{
 """""""""""""""""""""""""""""""""""""""""""
@@ -350,6 +349,8 @@ nnoremap <S-Tab> <<
 inoremap <expr><cr>		pumvisible() ? "\<C-y>" : "\<C-g>u\<cr>"
 inoremap <expr><tab> 	pumvisible() ? "\<C-n>" : "\<tab>"
 inoremap <expr><S-tab>	pumvisible() ? "\<C-p>" : "\<S-tab>"
+
+nnoremap <C-\> :tag <indent>
 """"""""""""""""""""""""""""""""""""""""}}}
 "		buffers/windows/tabs keymaps	{{{
 """""""""""""""""""""""""""""""""""""""""""
@@ -357,10 +358,14 @@ nnoremap tn :tabnew<cr>
 nnoremap th :tabprev<cr>
 nnoremap tl :tabnext<cr>
 " XXX very short message duration time
-nnoremap - :tabprev<cr>:echom "going to the previous tab"<cr>
-nnoremap + :tabnext<cr>:echom "going to the next tab"<cr>
-"nnoremap = :tabnext<cr>
+" nnoremap - :tabprev<cr>:echom "going to the previous tab"<cr>
+" nnoremap + :tabnext<cr>:echom "going to the next tab"<cr>
+" nnoremap = :tabnext<cr>:echom "going to the next tab"<cr>
 
+nnoremap <A-h> :tabprev<cr>
+nnoremap <A-l> :tabnext<cr>
+nnoremap <A-j> :CtrlSpaceGoDown<cr>
+nnoremap <A-k> :CtrlSpaceGoUp<cr>
 
 nnoremap t1 :tabfirst<cr>
 nnoremap t2 :tabn 2<cr>
@@ -373,10 +378,6 @@ nnoremap t8 :tabn 8<cr>
 nnoremap t9 :tabn 9<cr>
 nnoremap t0 :tablast<cr>
 
-" move tab to the left/right
-nnoremap tH :tabmove -1<cr>
-nnoremap tL :tabmove +1<cr>
-
 nnoremap <leader>1 :tabfirst<cr>
 nnoremap <leader>2 :tabn 2<cr>
 nnoremap <leader>3 :tabn 3<cr>
@@ -387,6 +388,10 @@ nnoremap <leader>7 :tabn 7<cr>
 nnoremap <leader>8 :tabn 8<cr>
 nnoremap <leader>9 :tabn 9<cr>
 nnoremap <leader>0 :tablast<cr>
+
+" move tab to the left/right
+nnoremap tH :tabmove -1<cr>
+nnoremap tL :tabmove +1<cr>
 
 " holy fucking gods of Vim, browse only buffers for current tab
 nnoremap tj :CtrlSpaceGoDown<cr>
@@ -669,6 +674,7 @@ if has("nvim")
 	" Autocomplete for nvim (needs python3)
 	Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 	"Plug 'zchee/deoplete-clang'	" show functions arguments
+
 else
 	Plug 'Shougo/neocomplete.vim' " Needs Lua
 endif
@@ -714,7 +720,7 @@ Plug 'tpope/vim-fugitive'			" plugin on GitHub repo
 Plug 'airblade/vim-gitgutter'	" Show +-~ left of number column
 
 Plug 'xolox/vim-misc'				" Needed for easytags and vim-session
-"Plug 'xolox/vim-easytags'			" TODO
+Plug 'xolox/vim-easytags'			" TODO
 Plug 'Raimondi/delimitMate'		" automatic closing quotes, brackets, ...
 Plug 'scrooloose/nerdcommenter'	" comments
 " Project tree (file explorer) in the window at the left
@@ -896,23 +902,19 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#show_splits = 1
 
 " switch position of buffers and tabs on splited tabline (c)
-let g:airline#extensions#tabline#switch_buffers_and_tabs = 1
+let g:airline#extensions#tabline#switch_buffers_and_tabs = 0
 " INFO doesn't seems to have any effect
 
-" enable/disable displaying buffers with a single tab. (c)
 " show tabline even when there is only one tab
 let g:airline#extensions#tabline#show_buffers = 1
 "
 " enable/disable displaying tabs, regardless of number. (c)
-" INFO will only be displayer if there is more than one tab
+" INFO will only be displayed if there is more than one tab
 let g:airline#extensions#tabline#show_tabs = 1
 
 " enable/disable display preview window buffer in the tabline. >
 let g:airline#extensions#tabline#exclude_preview = 1
 
-" enable/disable displaying tab number in tabs mode
-let g:airline#extensions#tabline#show_tab_nr = 1
-" configure how numbers are displayed in tab mode
 "let g:airline#extensions#tabline#tab_nr_type = 0 " # of splits (default)
 let g:airline#extensions#tabline#tab_nr_type = 1 " tab number
 "let g:airline#extensions#tabline#tab_nr_type = 2 " splits and tab number
@@ -973,20 +975,17 @@ let g:Powerline_symbols = 'fancy'
 """"""""""""""""""""""""""""""""""""}}}
 "		Ctrl-Space					{{{
 """""""""""""""""""""""""""""""""""""""
+" Plugin for tabs/buffers/file/sessions/bookmarks
+" only used for binding buffers to specific tabs and saving that layout
+
 " Should Vim-CtrlSpace change your default tabline to its own?
 let g:CtrlSpaceUseTabline = 1	" default 1
-
-" Plugin for tabs/buffers/file/sessions/bookmarks
-" only used for binding buffers to specific tabs
-" TODO UTF8
 let g:CtrlSpaceSymbols = { "File": "F", "CTab": "ct", "Tabs": "T" }
 if executable("ag")
 	let g:CtrlSpaceGlobCommand = 'ag -l --nocolor -g ""'
 endif
-" custom tabline
-let g:CtrlSpaceUseTabline = 1
-"" *ctrlspace-single-mode*
-" Displays only buffers related to the current tab. By related I mean
+
+let g:CtrlSpaceUseUnicode = 0 " unicode will show just 1 and 2
 """"""""""""""""""""""""""""""""""""}}}
 "		CtrlP						{{{
 """""""""""""""""""""""""""""""""""""""
@@ -1726,5 +1725,6 @@ set viewdir=~/.vim/view
 " TODO dont' autocomplete second " in Vim (probably some plugin)
 " TODO Ag skip tags file
 " TODO disable swap file in paste mode (otherwise very slow on copying multiple lines)
+" TODO <Tab>/<C-i> switch window if there are multiple windows, othervise normal Ctrl-I
 
 " vim: set ts=4 sw=4 tw=0 foldmethod=marker noet :
