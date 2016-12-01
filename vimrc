@@ -55,7 +55,8 @@ endif
 set gdefault "applies substitutions globally on lines. For example, instead of :%s/foo/bar/g you just type :%s/foo/bar/
 
 "set completeopt=menu,menuone,preview
-set completeopt=menuone,preview		" default
+"set completeopt=menuone,preview		" default
+set completeopt=menuone				" f(); can be view in command line with plugin
 set noshowmode                  "Don't show the mode(airline is handling this)
 """"""""""""""""""""""""""""""""""""""""
 "		<tab> and wrapping
@@ -196,7 +197,8 @@ augroup my_group_with_a_very_uniq_name
 	"autocmd BufReadPost quickfix nnoremap <buffer> q :q<cr>
 	" autocmd FileType quickfix nnoremap <buffer> q :q<cr>
 	" INFO qf and quickfix aren't the same
-	autocmd FileType qf nnoremap <buffer> q :q<cr>
+	autocmd FileType qf,netrw nnoremap <buffer> q :q<cr>
+	autocmd Filetype qf set nolist
 
 	" force Vim to threat .md files as markdown and not Modula
 	" or use tpope/vim-markdown plugin
@@ -278,6 +280,9 @@ cabbrev rsyn syntax sync fromstart
 " TODO put this inf function (:e ++ff=dos) ili tako nekako
 cabbrev cc set cursorcolumn!
 
+" folds help: zo zc za, zO, zC, zA (open, close, toggle)
+"	zf create fold (marker/manual)
+"	zd, zD delete fold
 " close all folds
 cabbrev foldcloseall %foldclose!
 cabbrev foldca %foldclose!
@@ -286,6 +291,7 @@ cabbrev foa %foldopen!
 "because standard Vim fold shortcuts are starting with z
 cabbrev zca %foldclose!
 cabbrev zoa %foldopen!
+" close all other folds
 
 " Don't show ^M in DOS files
 command! FixDos edit ++ff=dos
@@ -293,7 +299,7 @@ command! FixDos edit ++ff=dos
 " :we to write and reload file TODO
 "cabbrev we write | edit
 
-" XXX CtrlSpace won't restore tabs with only one tab
+" XXX CtrlSpace won't restore tabs with only one tab (only at PC on the work, on my everything works™)
 cabbrev css CtrlSpaceSaveWorkspace
 cabbrev csl CtrlSpaceLoadWorkspace
 
@@ -329,14 +335,15 @@ nnoremap gk k
 nnoremap <silent>0 :call ZeroMove()<cr>
 
 " verbose folding
-nnoremap zi zi:echo "fold all toggle"<cr>
 nnoremap za za:echo "fold current toggle"<cr>
 nnoremap zc zc:echo "fold current close"<cr>
+nnoremap zi zi:echo "fold all toggle"<cr>
 nnoremap zR zR:echo "fold all open"<cr>
 nnoremap zM zM:echo "fold all close"<cr>
-" INFO it's seems that this will cause problems for indexed-search (N)
-"nnoremap zv zv :echo "fold reveal cursor"<cr>
-nnoremap <space> za
+nnoremap zv zv:echo "fold reveal cursor"<cr>
+"nnoremap <space> za
+nnoremap <silent> <Space> @=(foldlevel('.')?'za':"\<Space>")<CR>
+vnoremap <Space> zf
 
 " don't quit visual mode after first indent/deindent
 vnoremap < <gv
@@ -353,7 +360,8 @@ inoremap <expr><cr>		pumvisible() ? "\<C-y>" : "\<C-g>u\<cr>"
 inoremap <expr><tab> 	pumvisible() ? "\<C-n>" : "\<tab>"
 inoremap <expr><S-tab>	pumvisible() ? "\<C-p>" : "\<S-tab>"
 
-nnoremap <C-\> :tag <indent>
+"nnoremap <C-]> TODO TODO
+"nnoremap <C-\> :tag <C-r><C-w><cr>
 """"""""""""""""""""""""""""""""""""""""}}}
 "		buffers/windows/tabs keymaps	{{{
 """""""""""""""""""""""""""""""""""""""""""
@@ -531,15 +539,19 @@ nnoremap <silent> <leader>ML :call AppendModeline()<cr>
 """""""""""""""""""""""""""""""""""""""""""
 nnoremap <leader>t :TagbarToggle<cr>
 nnoremap <leader>f :NERDTreeToggle<cr>
+nnoremap <leader>ff :NERDTreeToggle<cr>
 nnoremap <leader>c :SyntasticToggleMode<cr>
 nnoremap <leader>o :CtrlP<cr>
 nnoremap <leader>m :CtrlPMRUFiles<cr>
 nnoremap <leader>M :CtrlPMixed<cr>
 nnoremap <leader>b :CtrlPBuffer<cr>
 " Open a new tab and search for something
-map <leader>a :tab split<cr>:Ag ""<Left>
+" map <leader>a :tab split<cr>:Ag ""<Left>
 "Immediately search for the word under the cursor in a new tab
-map <leader>A :tab split<cr>:Ag <C-r><C-w><CR>
+" map <leader>A :tab split<cr>:Ag <C-r><C-w><CR>
+"
+" TODO open new tab (duplicate), there open Ack!
+nnoremap <leader>a :tab split<cr>:Ack! <C-r><C-w><CR>
 
 " not too useful
 "nnoremap <leader>1 <Plug>AirlineSelectTab1
@@ -681,12 +693,13 @@ if has("nvim")
 	Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 	Plug 'zchee/deoplete-clang'	" show functions arguments
 	" Plug 'Rip-Rip/clang_complete'
-
+	Plug 'wellle/tmux-complete.vim'	" autocomplete text from tmux buffer (eg git commit hash)
 else
 	Plug 'Shougo/neocomplete.vim' " Needs Lua
 endif
 Plug 'Shougo/neoinclude.vim', {'for': 'c,cpp'}	" headers autocomplete
 Plug 'Shougo/echodoc.vim'	" show functions in commad line window (:) insted of in preview
+Plug 'Shougo/neopairs.vim'	" Auto insert pairs when complete done
 
 " INFO ne svidja mi se bas, nekad zna bit previse pametan i iritantan,
 " svejedno ne pokazuje argumente funkcijama
@@ -716,11 +729,14 @@ Plug 'majutsushi/tagbar'			" show tags in the window at the right
 "Plug 'mhinz/vim-signify'			" svn, git, ...
 
 Plug 'ciaranm/securemodelines'
-Plug 'rking/ag.vim'			" multifile grep - faster version of ack
+"Plug 'rking/ag.vim'			" multifile grep - faster version of ack
+Plug 'mileszs/ack.vim'			" ack plugin, but for 'ag'
+
 
 "Plug 'tpope/vim-characterize'	" show dec/hex/oct for char under the cursos, (ga), unicode style
 " čć
 
+Plug 'brookhong/cscope.vim'		" cscope
 
 "Plug 'vim-scripts/ZoomWin'		" toggle between one window and multi-window (Ctrl-W o)
 "Plug 'tpope/vim-fugitive'			" plugin on GitHub repo
@@ -728,7 +744,7 @@ Plug 'rking/ag.vim'			" multifile grep - faster version of ack
 
 Plug 'xolox/vim-misc'				" Needed for easytags and vim-session
 Plug 'xolox/vim-easytags'			" XXX XXX XXX XXX XXX fucking slow on work PC
-Plug 'Raimondi/delimitMate'		" automatic closing quotes, brackets, ...
+"Plug 'Raimondi/delimitMate'		" automatic closing quotes, brackets, ...  remaps <BS>
 Plug 'scrooloose/nerdcommenter'	" comments
 " Project tree (file explorer) in the window at the left
 Plug 'scrooloose/nerdtree',		{ 'on': 'NERDTreeToggle' }
@@ -808,10 +824,9 @@ Plug 'jpo/vim-railscasts-theme'
 Plug 'morhetz/gruvbox'				" too little contrast
 Plug 'chriskempson/tomorrow-theme'
 Plug 'sheerun/vim-wombat-scheme'
+Plug 'kristijanhusak/vim-hybrid-material'
 
 
-
-" neki test{()}
 
 Plug 'kien/rainbow_parentheses.vim'
 Plug 'myusuf3/numbers.vim'		" disable relative numbers in insert mode and other windows
@@ -867,35 +882,43 @@ let g:deoplete#enable_smart_case = 1	" but use smart case
 "let g:deoplete#enable_camel_case = 1 " INFO only with deoplete-matcher*fuzzy
 let g:neocomplete#enable_fuzzy_completion = 1
 " let g:deoplete#auto_complete_start_length = 1	" default: 2
-let g:deoplete#auto_complete_start_length = 1
+let g:deoplete#auto_complete_start_length = 1	" deprecated
+let g:deoplete#source#attribute#min_pattern_length = 0
 "let g:deoplete#max_abbr_width = 0 " disable, default: 80
 "-> is added
 let g:deoplete#delimiters = ['/', '.', '::', ':', '#', '->']
+let g:deoplete#max_list = 20					" max number of items in list
+let g:deoplete#auto_complete_delay = 20		" ms, defalu 150, still slow
 
 "let g:deoplete#sources = {} " init of the variable
 "let g:deoplete#sources._ = ['buffer'] " default files
 "let g:deoplete#sources.cpp = ['buffer', 'tag']
+"let g:deoplete#sources.cpp = ['buffer']			" + deoplete-clang
 "let g:deoplete#sources.c = ['buffer', 'tag']
 "let g:deoplete#sources.h = ['buffer', 'tag']
 
-" deoplete-clang
-" :h deoplete-
-if s:uname == "Linux"
-	let g:deoplete#sources#clang#libclang_path = "/usr/lib/llvm-3.6/lib/libclang.so"
-	let g:deoplete#sources#clang#clang_header = "/usr/include/clang/"
-endif
 if s:uname == "FreeBSD"
 	let g:deoplete#sources#clang#libclang_path = "/usr/local/llvm38/lib/libclang.so"
 	let g:deoplete#sources#clang#clang_header = "/usr/local/llvm38/include/clang"
 endif
-"let g:deoplete#sources#clang#std = {'c': 'c11', 'cpp': 'c++11'}		" prefered version
+if s:uname == "Linux"
+	let g:deoplete#sources#clang#libclang_path = "/usr/lib/llvm-3.6/lib/libclang.so"
+	let g:deoplete#sources#clang#clang_header = "/usr/include/clang/"
+endif
+let g:deoplete#sources#clang#std = {'c': 'c11', 'cpp': 'c++11'}		" prefered version
 " "let g:deoplete#sources#clang#flags = 
 " let g:deoplete#sources#clang#std#c = 'c11'
 " let g:deoplete#sources#clang#std#cpp = 'c++14'
 " let g:deoplete#sources#clang#sort_algo = 'priority'
 
+let g:deoplete#tag#cache_limit_size = 50000000 " 50 MB
+inoremap <expr><C-_> deoplete#undo_completion()
+call deoplete#custom#set('_', 'matchers', ['matcher_length', 'matcher_full_fuzzy'])	" don't auto complete basing on the first char
 
-" clang_complete
+let g:deoplete#sources#clang#sort_algo = 'priority'	" or alphabetical
+let g:echodoc_enable_at_startup = 1			" show info in cmd line instead in preview window
+
+" clang_complete {{{
 let g:clang_complete_auto = 0
 let g:clang_complete_auto = 1
 let g:clang_auto_select = 0
@@ -903,18 +926,17 @@ let g:clang_auto_select = 0
 let g:clang_make_default_keymappings = 0
 let g:clang_use_library = 1		" faster than using clang
 
-
-if s:uname == "Linux"
+if s:uname == "FreeBSD"
 	let g:clang_library_path='/usr/lib/llvm-3.6/lib/libclang.so'
 endif
-
-if s:uname == "FreeBSD"
+if s:uname == "Linux"
 	let g:clang_library_path='/usr/lib/llvm-3.6/lib/libclang.so'
 endif
 
 let g:clang_complete_copen = 1	" open quickfix window on error
 let g:clang_hl_errors = 1		" highlight errors and warnining
 let g:clang_close_preview = 1	" autoclose preview window
+" }}}
 """"""""""""""""""""""""""""""""""""}}}
 "		airline						{{{
 """""""""""""""""""""""""""""""""""""""
@@ -1118,7 +1140,7 @@ let g:lastplace_ignore = "gitcommit,gitrebase,svn,hgcommit"
 " INFO highlight trailing spaces in red
 " disable plugin on this filetypes
 let g:extra_whitespace_ignored_filetypes = ['help', 'Help', 'quickfix', 'vim-plug', 'man', 'diff']
-" XXX still will work on help filetype
+" XXX still will work on help filetype and vim-plug
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		indexed search														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1257,6 +1279,35 @@ let g:signify_sign_change            = 'm'
 "let g:signify_sign_changedelete      = g:signify_sign_change
 let g:signify_sign_show_count = 0
 """"""""""""""""""""""""""""""""""""}}}
+"		ack																	{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" INFO ack Vim plugin but system bin 'ag' will be used
+if executable('ag')
+	let g:ackprg = 'ag --vimgrep --path-to-ignore ~/.agignore'
+endif
+
+let g:ack_apply_qmappings = 0	" disable QuickFix mappings
+let g:ack_apply_lmappings = 0
+" let g:ack_mappings
+" Default: {
+	  " \ "t": "<C-W><CR><C-W>T",
+	  " \ "T": "<C-W><CR><C-W>TgT<C-W>j",
+	  " \ "o": "<CR>",
+	  " \ "O": "<CR><C-W><C-W>:ccl<CR>",
+	  " \ "go": "<CR><C-W>j",
+	  " \ "h": "<C-W><CR><C-W>K",
+	  " \ "H": "<C-W><CR><C-W>K<C-W>b",
+	  " \ "v": "<C-W><CR><C-W>H<C-W>b<C-W>J<C-W>t",
+	  " \ "gv": "<C-W><CR><C-W>H<C-W>b<C-W>J" }
+let g:ack_mappings = {
+	\ "p": ":pedit ' . expand('<cfile>')"} " TODO open in preview window
+let g:ackhighlight = 1		" highlight the searched term.
+"let g:ack_autoclose = 1		" specify whether to close the quickfix window after using any of the shortcuts.
+"let g:ack_autofold_results = 1	" fold results in QF window, they are be auto unfolder when cursor is on them
+"let g:ackpreview = 1		" autopreview file under cursor
+	" INFO default mapping must be enabled, not really preview but open
+"let g:ack_use_dispatch = 1		" XXX syntax error when enabled
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 
 "		clang						{{{
@@ -1289,24 +1340,24 @@ set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
 """"""""""""""""""""""""""""""""""""}}}
-"		ag	The Silver Searcher		{{{
+" "		ag	The Silver Searcher		{{{
 """""""""""""""""""""""""""""""""""""""
-if executable('ag')
-	" Use Ag over Grep
-	set grepprg=ag\ --nogroup\ --nocolor
+" if executable('ag')
+	" " Use Ag over Grep
+	" set grepprg=ag\ --nogroup\ --nocolor
 
-	" Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
-	"let g:ctrlp_user_command = 'ag -Q -l --nocolor --hidden -g "" %s'
-	" INFO well, mine is not lightining fast
+	" " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
+	" "let g:ctrlp_user_command = 'ag -Q -l --nocolor --hidden -g "" %s'
+	" " INFO well, mine is not lightining fast
 
-	" ag is fast enough that CtrlP doesn't need to cache
-	"LET g:ctrlp_use_caching = 0
+	" " ag is fast enough that CtrlP doesn't need to cache
+	" "LET g:ctrlp_use_caching = 0
 
-	if !exists(":Ag")
-		command -nargs=+ -complete=file -bar Ag silent! grep! <args>|cwindow|redraw!
-		"nnoremap \ :Ag<SPACE>
-	endif
-endif
+	" if !exists(":Ag")
+		" command -nargs=+ -complete=file -bar Ag silent! grep! <args>|cwindow|redraw!
+		" "nnoremap \ :Ag<SPACE>
+	" endif
+" endif
 """"""""""""""""""""""""""""""""""""}}}
 "		Golden View					{{{
 """""""""""""""""""""""""""""""""""""""
@@ -1431,11 +1482,9 @@ highlight Debug			ctermfg=226 ctermbg=234
 
 " color of tw bar at right (funny color for bad LCD panels)
 "highlight ColorColumn ctermbg=93 guibg=DarkMagenta
-" a little bit brighter than bg
-"highlight ColorColumn	ctermbg=234
-"let s:color_ColorColumn = 234
 let g:color_ColorColumn = 234 " must be global (otherwise function ToggleColorColumn won't see it)
 execute "highlight ColorColumn ctermbg=".color_ColorColumn
+highlight clear ColorColumn		" disable on default
 
 " highlight all afer 80 chars
 let &colorcolumn=join(range(81,999),",")
@@ -1456,6 +1505,9 @@ set fillchars=vert:\│,fold:\
 " change the colors in diff mode
 highlight DiffAdded		ctermfg=81
 highlight DiffRemoved	ctermfg=208
+
+" auto completion menu
+highlight pmenu			ctermfg=white ctermbg=52
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "				custom functions											{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1562,7 +1614,8 @@ function! ToggleColorColumn()
 endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-if executable('ag')
+
+if executable('ag')"{{{
 	" Note we extract the column as well as the file and line number
 	set grepprg=ag\ --nogroup\ --nocolor\ --column
 	" f file name
@@ -1571,14 +1624,15 @@ if executable('ag')
 	" c column number
 	" m error message
 	" TODO dosredit ovo da ne pokazuje novu liniju izmedju fajlova u quickfix windowu
-	set grepformat=%f:%l:%c%m
+	" set grepformat=%f:%l:%c%m
+	" let g:ag_format="%f:%l:%m"
 
 	" Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
 	let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
 
 	" ag is fast enough that CtrlP doesn't need to cache
 	let g:ctrlp_use_caching = 0
-endif
+endif"}}}
 
 "" Add set path=.,<relative include dir> for searching for header in particular directories. For more information do ":help file-searching".
 
@@ -1588,6 +1642,25 @@ endif
 " open tag in a new split
 " XXX will open split when tag is not found
 "map <A-]> :vsp <cr>:exec("tag ".expand("<cword>"))<CR>
+
+if has('cscope')
+	" include cscope when searching for tag (Ctrl-])
+	" show verbose info when loading cscope DB
+	set cscopetag cscopeverbose
+
+	if has('quickfix')
+	set cscopequickfix=s-,c-,d-,i-,t-,e-
+	endif
+
+	cnoreabbrev csa cs add
+	cnoreabbrev csf cs find
+	cnoreabbrev csk cs kill
+	cnoreabbrev csr cs reset
+	cnoreabbrev css cs show
+	cnoreabbrev csh cs help
+
+	command! -nargs=0 Cscope cs add $VIMSRC/src/cscope.out $VIMSRC/src
+endif
 
 "		work specific stuff												{{{
 let g:work_pc=system('is_work_pc')
@@ -1793,5 +1866,9 @@ set viewdir=~/.vim/view
 " TODO Ag skip tags file
 " TODO disable swap file in paste mode (otherwise very slow on copying multiple lines)
 " TODO <Tab>/<C-i> switch window if there are multiple windows, othervise normal Ctrl-I
+" TODO another '*' should disable highlight
+" TODO <enter> - if it's link under cursor then "gx", if it's tag under cursor then :tag... othervise "o"
+
+" INFO cscope cmd: cscope -R -b
 
 " vim: set ts=4 sw=4 tw=0 foldmethod=marker noet :
