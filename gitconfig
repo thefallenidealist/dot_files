@@ -43,3 +43,5 @@
 	added = yellow
 	changed = cyan
 	untracked = magenta
+[core]
+	pager = less -F -X

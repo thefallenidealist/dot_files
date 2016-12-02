@@ -211,6 +211,8 @@ augroup my_group_with_a_very_uniq_name
 	" in case I ever open a python file
 	autocmd Filetype python set expandtab
 
+	autocmd FileType qf nnoremap <buffer> p <plug>(quickr_preview)
+	"autocmd FileType qf nnoremap <buffer> q <plug>(quickr_preview_qf_close)
 augroup END
 
 " setup when in diff mode:
@@ -701,13 +703,9 @@ Plug 'Shougo/neoinclude.vim', {'for': 'c,cpp'}	" headers autocomplete
 Plug 'Shougo/echodoc.vim'	" show functions in commad line window (:) insted of in preview
 Plug 'Shougo/neopairs.vim'	" Auto insert pairs when complete done
 
-" INFO ne svidja mi se bas, nekad zna bit previse pametan i iritantan,
-" svejedno ne pokazuje argumente funkcijama
-"Plug 'justmao945/vim-clang'   " complete after . -> ::
-
-"Plug 'Shougo/neosnippet.vim' 	" dodatak za neocomplete
 "Plug 'Shougo/neosnippet-snippets' " needed for neosnippet
-"Plug 'Shougo/echodoc.vim'  " show preview in echo area
+"Plug 'Shougo/neosnippet.vim' 	" dodatak za neocomplete
+"Plug 'garbas/vim-snipmate' 	" autocomplete for loops and etc
 
 Plug 'vim-airline/vim-airline'
 "Plug 'vim-airline/vim-airline-themes'
@@ -719,6 +717,7 @@ Plug 'henrik/vim-indexed-search'	" show search as: result 123 of 456
 Plug 'bronson/vim-trailing-whitespace'	" show red block when there is a trailing whitespace  :FixWhiteSpace
 Plug 'kshenoy/vim-signature'		" show marks visually
 "Plug 'romgrk/winteract.vim'
+Plug 'ronakg/quickr-preview.vim'	" preview file without opening
 
 "Plug 'tpope/vim-speeddating'		" Ctrl-A/X now works on dates	XXX TODO
 
@@ -726,21 +725,21 @@ Plug 'kshenoy/vim-signature'		" show marks visually
 Plug 'majutsushi/tagbar'			" show tags in the window at the right
 
 
-"Plug 'mhinz/vim-signify'			" svn, git, ...
-
 Plug 'ciaranm/securemodelines'
 "Plug 'rking/ag.vim'			" multifile grep - faster version of ack
 Plug 'mileszs/ack.vim'			" ack plugin, but for 'ag'
-
+"Plug 'gcmt/taboo.vim'			" rename tabs XXX don't work with CtrlSpace and AirLine
+"Plug 'ronakg/quickr-cscope.vim'	" cscope XXX
+Plug 'brookhong/cscope.vim'		" cscope
 
 "Plug 'tpope/vim-characterize'	" show dec/hex/oct for char under the cursos, (ga), unicode style
 " čć
 
-Plug 'brookhong/cscope.vim'		" cscope
 
-"Plug 'vim-scripts/ZoomWin'		" toggle between one window and multi-window (Ctrl-W o)
-"Plug 'tpope/vim-fugitive'			" plugin on GitHub repo
+"Plug 'tpope/vim-fugitive'		" plugin on GitHub repo
 "Plug 'airblade/vim-gitgutter'	" Show +-~ left of number column
+Plug 'mhinz/vim-signify'		" svn, git, ...
+
 
 Plug 'xolox/vim-misc'				" Needed for easytags and vim-session
 Plug 'xolox/vim-easytags'			" XXX XXX XXX XXX XXX fucking slow on work PC
@@ -759,24 +758,17 @@ Plug 'gioele/vim-autoswap'
 Plug 'chrisbra/NrrwRgn'				" plugin for focussing on a selected region
 Plug 'MarcWeber/vim-addon-mw-utils'	" Needed for snipmate
 Plug 'tomtom/tlib_vim'				" Needed for snipmate
-"Plug 'garbas/vim-snipmate' 	" autocomplete for loops and etc
-"Plug 'bling/vim-bufferline' 	" show the list of buffers in the command bar
-" INFO not needed, airline already covered that
-Plug 'dyng/ctrlsf.vim'		" Like sublimes Ctrl-Shift-f
-"Plug 'edkolev/tmuxline.vim'	" enable tmux to pickup Vim airline style
+Plug 'dyng/ctrlsf.vim'				" search and replace in multiple files
 Plug 'vim-scripts/a.vim'		" open headers
 "Plug 'jez/vim-superman'		" man pages
-Plug 'altercation/vim-colors-solarized'
 "Plug 'xolox/vim-session'		" won't restore multiple buffers in a tab
 Plug 'Shougo/vimshell.vim'
-
-" INFO autocomplete playground
-"Plug 'ervandew/supertab' 			" use <Tab> for autocomplete
 
 Plug 'vim-ctrlspace/vim-ctrlspace'	" tabs/buffer/file management, sessions, bookmarks		:CtrlSpaceGo{Up,Down}
 "Plug '~/.vim/plugged/vim-ctrlspace2'
 Plug 'sheerun/vim-polyglot'			" A collection of language packs for Vim. won't affect your startup time
 Plug 'easymotion/vim-easymotion'		" leader leader and magic begins
+Plug 'myusuf3/numbers.vim'		" disable relative numbers in insert mode and other windows
 
 
 "Plug 'tpope/vim-surround'
@@ -814,11 +806,13 @@ Plug 'vim-scripts/AutoTag'
 Plug 'tpope/vim-obsession'	" restore session, needed for tmux ressurect
 
 "			themes
+"Plug 'edkolev/tmuxline.vim'	" enable tmux to pickup Vim airline style
 Plug 'tpope/vim-vividchalk'
 Plug 'gosukiwi/vim-atom-dark'	" not-to-high contrast
 Plug 'lisposter/vim-blackboard'	" pretty ugly
-Plug 'dracula/vim'	" this 
+Plug 'dracula/vim'
 Plug 'tomasr/molokai'
+Plug 'altercation/vim-colors-solarized'
 Plug 'chriskempson/base16-vim'
 Plug 'jpo/vim-railscasts-theme'
 Plug 'morhetz/gruvbox'				" too little contrast
@@ -829,7 +823,6 @@ Plug 'kristijanhusak/vim-hybrid-material'
 
 
 Plug 'kien/rainbow_parentheses.vim'
-Plug 'myusuf3/numbers.vim'		" disable relative numbers in insert mode and other windows
 Plug 'vim-scripts/TagHighlight'	" color typedefs as variables
 
 call plug#end()
@@ -1135,7 +1128,7 @@ let g:ctrlp_buftag_ctags_bin = ''
 let g:lastplace_open_folds = 1 " auto open folder, default: 1 XXX don't work for nested folds
 let g:lastplace_ignore = "gitcommit,gitrebase,svn,hgcommit"
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		FixWhiteSpace															{{{
+"		FixWhiteSpace														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " INFO highlight trailing spaces in red
 " disable plugin on this filetypes
@@ -1145,9 +1138,9 @@ let g:extra_whitespace_ignored_filetypes = ['help', 'Help', 'quickfix', 'vim-plu
 "		indexed search														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " INFO shows search 1 of 123
-let g:indexed_search_center = 1 " center the screen, default 0
-let g:indexed_search_max_lines = 10000 " default 3000
-let g:indexed_search_shortmess = 1 " shorter messages, default 0
+let g:indexed_search_center = 1			" center the screen, default 0
+let g:indexed_search_max_lines = 10000	" default 3000
+let g:indexed_search_shortmess = 1		" shorter messages, default 0
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		NERD commenter														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1194,8 +1187,6 @@ nnoremap <C-w>M :SignatureListGlobalMarks<cr>
 
 " TODO guard
 autocmd QuickFixCmdPost * pclose
-
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		speed dating														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1219,20 +1210,21 @@ augroup END
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " don't create various <leader>b* mapping (which will slowdown <leader>b for CtrlPBuffer)
 let g:BufKillCreateMappings = 0
+" To move backwards/forwards through recently accessed buffers, use: :BB/:BF
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		tagbar																{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " INFO shows tags (variables, enums, typedes, functions on the windows on the right)
 " :TagbarToggle
 " :TagbarOpenAutoClose - useful for jumping to the function (with preview window)
-let g:tagbar_width = 50	" default: 40
+let g:tagbar_width = 50		" default: 40
 "let g:tagbar_zoomwidth = 0	" default: 0 (Use the width of the longest currently visible tag)
 "let g:tagbar_autoclose = 1	" default: 0
 let g:tagbar_autofocus = 1	" auto jump to the Tagbar	default: 0
 let g:tagbar_sort = 0		" default: 1
 let g:tagbar_show_linenumbers = 2	" show relative
 "let g:tagbar_singleclick = 1
-let g:tagbar_iconchars = ['►', '▼']	" changed first symbol because powerline font
+let g:tagbar_iconchars = ['►', '▼']		" changed first symbol because powerline font
 let g:tagbar_previewwin_pos = "aboveleft"
 " Don't show numbers in preview window
 autocmd BufWinEnter * if &previewwindow | setlocal nonumber norelativenumber | endif
@@ -1290,15 +1282,15 @@ let g:ack_apply_qmappings = 0	" disable QuickFix mappings
 let g:ack_apply_lmappings = 0
 " let g:ack_mappings
 " Default: {
-	  " \ "t": "<C-W><CR><C-W>T",
-	  " \ "T": "<C-W><CR><C-W>TgT<C-W>j",
-	  " \ "o": "<CR>",
-	  " \ "O": "<CR><C-W><C-W>:ccl<CR>",
-	  " \ "go": "<CR><C-W>j",
-	  " \ "h": "<C-W><CR><C-W>K",
-	  " \ "H": "<C-W><CR><C-W>K<C-W>b",
-	  " \ "v": "<C-W><CR><C-W>H<C-W>b<C-W>J<C-W>t",
-	  " \ "gv": "<C-W><CR><C-W>H<C-W>b<C-W>J" }
+	" \ "t": "<C-W><CR><C-W>T",
+	" \ "T": "<C-W><CR><C-W>TgT<C-W>j",
+	" \ "o": "<CR>",
+	" \ "O": "<CR><C-W><C-W>:ccl<CR>",
+	" \ "go": "<CR><C-W>j",
+	" \ "h": "<C-W><CR><C-W>K",
+	" \ "H": "<C-W><CR><C-W>K<C-W>b",
+	" \ "v": "<C-W><CR><C-W>H<C-W>b<C-W>J<C-W>t",
+	" \ "gv": "<C-W><CR><C-W>H<C-W>b<C-W>J" }
 let g:ack_mappings = {
 	\ "p": ":pedit ' . expand('<cfile>')"} " TODO open in preview window
 let g:ackhighlight = 1		" highlight the searched term.
@@ -1308,12 +1300,65 @@ let g:ackhighlight = 1		" highlight the searched term.
 	" INFO default mapping must be enabled, not really preview but open
 "let g:ack_use_dispatch = 1		" XXX syntax error when enabled
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		quickr-preview														{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" INFO show preview without opening
+
+"let g:quickr_preview_keymaps = 0
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		taboo																{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" INFO rename tabs XXX don't work with CtrlSpace (which manages Airline tabline)
+
+" remember tab names after restore
+"set sessionoptions+=tabpages,globals
+
+let g:taboo_tabline = 0		" AirLine is OK for this purpose
+let g:airline#extensions#taboo#enabled = 1
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		cscope																{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" " quickr-cscope.vim
+
+" let g:quickr_cscope_keymaps = 0
+" nnoremap <leader>cs <plug>(quickr_cscope_symbols)
+" nnoremap <leader>cg <plug>(quickr_cscope_global)
+" nnoremap <leader>cc <plug>(quickr_cscope_callers)
+" nnoremap <leader>cF <plug>(quickr_cscope_files)
+" nnoremap <leader>ci <plug>(quickr_cscope_includes)
+" nnoremap <leader>ct <plug>(quickr_cscope_text)
+" nnoremap <leader>ce <plug>(quickr_cscope_egrep)
+" nnoremap <leader>cf <plug>(quickr_cscope_functions)
+" " meh, XXX, doesn;t work
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		cscope																{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" " rookhong/cscope.vim
+
+" s: Find this C symbol
+nnoremap  <leader>fs :call CscopeFind('s', expand('<cword>'))<CR>
+" g: Find this definition
+nnoremap  <leader>fg :call CscopeFind('g', expand('<cword>'))<CR>
+" d: Find functions called by this function
+nnoremap  <leader>fd :call CscopeFind('d', expand('<cword>'))<CR>
+" c: Find functions calling this function
+nnoremap  <leader>fc :call CscopeFind('c', expand('<cword>'))<CR>
+" t: Find this text string
+nnoremap  <leader>ft :call CscopeFind('t', expand('<cword>'))<CR>
+" e: Find this egrep pattern
+nnoremap  <leader>fe :call CscopeFind('e', expand('<cword>'))<CR>
+" f: Find this file
+nnoremap  <leader>ff :call CscopeFind('f', expand('<cword>'))<CR>
+" i: Find files #including this file
+nnoremap  <leader>fi :call CscopeFind('i', expand('<cword>'))<CR>
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 
 "		clang						{{{
 """""""""""""""""""""""""""""""""""""""
-let g:clang_auto = 1	" auto complete after -> . ::
-let g:clang_exec = 'clang-3.6'
+" let g:clang_auto = 1	" auto complete after -> . ::
+" let g:clang_exec = 'clang-3.6'
 """"""""""""""""""""""""""""""""""""}}}
 "		Syntastic					{{{
 """""""""""""""""""""""""""""""""""""""
@@ -1340,24 +1385,6 @@ set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
 """"""""""""""""""""""""""""""""""""}}}
-" "		ag	The Silver Searcher		{{{
-"""""""""""""""""""""""""""""""""""""""
-" if executable('ag')
-	" " Use Ag over Grep
-	" set grepprg=ag\ --nogroup\ --nocolor
-
-	" " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
-	" "let g:ctrlp_user_command = 'ag -Q -l --nocolor --hidden -g "" %s'
-	" " INFO well, mine is not lightining fast
-
-	" " ag is fast enough that CtrlP doesn't need to cache
-	" "LET g:ctrlp_use_caching = 0
-
-	" if !exists(":Ag")
-		" command -nargs=+ -complete=file -bar Ag silent! grep! <args>|cwindow|redraw!
-		" "nnoremap \ :Ag<SPACE>
-	" endif
-" endif
 """"""""""""""""""""""""""""""""""""}}}
 "		Golden View					{{{
 """""""""""""""""""""""""""""""""""""""
@@ -1380,27 +1407,6 @@ let g:multi_cursor_use_default_mapping=0
 let g:multi_cursor_prev_key='<c-p>'
 let g:multi_cursor_skip_key='<c-x>'
 let g:multi_cursor_quit_key='<c-c>'
-""""""""""""""""""""""""""""""""""""}}}
-"		indentLine					{{{
-"""""""""""""""""""""""""""""""""""""""
-" INFO plugin that will show indenting spaces (for tabs use builtin Vim's listchars)
-" TODO this is one plugin with some magic behaviour
-"let g:indentLine_loaded = 1 " XXX holy Jeebus on a stick, this will actually disable the plugin
-            "sdfsdffss TEST
-
-let g:indentLine_enabled = 1
-let g:indentLine_leadingSpaceEnabled = 1 " first space on the line
-let g:indentLine_leadingSpaceChar = '¦'
-let g:indentLine_char = '¦'
-"let g:indentLine_first_char = '¦'
-"let g:indentLine_leadingSpaceChar = '·'
-"let g:indentLine_color_term = 239	" default
-"let g:indentLine_color_term = 197
-"let g:indentLine_concealcursor = 'inc' " default
-"let g:indentLine_conceallevel = 2 " default
-
-"let g:indentLine_char = '┊'	" like subl2
-"let g:indentLine_indentLevel=1
 """"""""""""""""""""""""""""""""""""}}}
 "		Tabularize					{{{
 """""""""""""""""""""""""""""""""""""""
@@ -1427,7 +1433,7 @@ let g:easytags_async = 1
 "let g:easytags_suppress_ctags_warning = 1
 "let g:easytags_file = "~/.vim/tags"
 
-if system("uname") == "FreeBSD"
+if s:uname == "FreeBSD"
 	let g:tagbar_ctags_bin=system("which exctags")
 endif
 
@@ -1469,6 +1475,7 @@ if has("gui_running")
 	"Invisible character colors
 	highlight NonText guifg=#2a4a59
 	highlight SpecialKey guifg=#2a4a59
+
 	set winaltkeys=no		" Turn off <Alt>/<Meta> pulling down GUI menu
 endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
@@ -1760,6 +1767,7 @@ nnoremap <tab> :wincmd p<cr>
 
 " delete lines that do NOT match pattern: :v/pattern/d
 " change direction of select in visual mode: 'o'
+" :mkview :loadview to save folds
 
 set viewoptions-=options	" for mkview, don't store current file
 set viewdir=~/.vim/view
@@ -1810,6 +1818,19 @@ set viewdir=~/.vim/view
 " U/u/~ in visual mode to upper/lower/toggle case
 
 " startup profiling:  vim --startuptime startup.log, visuasilation: https://github.com/hyiltiz/vim-plugins-profile
+
+" load file without loading it :bad file.txt
+"##########################################################################}}}
+" moving		 															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" '[ '] jump to the beggining or end of last change
+" ]s [s jump to next/prev spell mistake
+" {} goto prev/next empty line
+
+
+
+
+" move split to tab: Ctrl-W T
 "##########################################################################}}}
 " vimL misc							{{{
 " number of tabs: tabpagenr('$')
