@@ -42,6 +42,7 @@
 [color "status"]
 	added = yellow
 	changed = cyan
-	untracked = magenta
+	#untracked = magenta
+	untracked = red
 [core]
 	pager = less -F -X

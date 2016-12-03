@@ -55,9 +55,9 @@ endif
 set gdefault "applies substitutions globally on lines. For example, instead of :%s/foo/bar/g you just type :%s/foo/bar/
 
 "set completeopt=menu,menuone,preview
-"set completeopt=menuone,preview		" default
+"set completeopt=menuone,preview	" default
 set completeopt=menuone				" f(); can be view in command line with plugin
-set noshowmode                  "Don't show the mode(airline is handling this)
+set noshowmode						"Don't show the mode(airline is handling this)
 """"""""""""""""""""""""""""""""""""""""
 "		<tab> and wrapping
 """"""""""""""""""""""""""""""""""""""""
@@ -79,17 +79,21 @@ set tabstop=4		" tab size
 set shiftwidth=4 	" when indenting with '>'
 "set expandtab		" convert tab to spaces
 
-""""""""""""
 set shortmess-=I	" don't show intro	XXX seems that is doesn't work
 set cursorline		" color the line when the cursor is
 
 " shell like autocompletition of commands
 "set wildmode=longest,list,full
 " bash like
-set wildmenu
+set wildmenu		" cmd completion with wildchar (<tab>)
 "set wildmode=longest,list	" at first tab show all comands
 " When you type the first tab hit will complete as much as possible, the second tab hit will provide a list, the third and subsequent tabs will cycle through completion options so you can complete the file without further keys
 set wildmode=list:longest,list,full
+"list: full "menu" of possible matches, <tab> will not complete anything
+"full: only one bar at botom with all matches
+"longest: nothing will be completed
+
+
 " Don't complete this file types
 set wildignore+=*.a,*.o,*.elf,*.bin,*.dd,*.img
 set wildignore+=*.bmp,*.gif,*.ico,*.jpg,*.png
@@ -108,9 +112,7 @@ set listchars=tab:\│·,extends:>,precedes:<
 " show ALL spaces:
 " set listchars+=space:║
 "set listchars+=trail:◊
-
-"set nolist "default: not showing invisible chars
-set list
+set list	" show invisible chars (tabs and others defined in listchars)
 
 " directory for swap files
 set directory=$HOME/.vim/swap/,/tmp
@@ -159,17 +161,16 @@ let &path.="src/include,/usr/include/AL,"
 	" endif
 " endif
 
-set tags=tags;
+" tags file in CWD
+" search for $CWD/tags, $CWD/.tags and go level up until $HOME
+set tags=tags,.tags;$HOME
 
 set binary	" TODO
 set equalalways
 """"""""""""""""""""""""""""""""""""}}}
 
-
-" hide ANSCI escape chars
-syntax match Ignore /\%o33\[[0-9]\{0,5}m/ conceal
-
-set conceallevel=2	" hide until cursor is on that line
+set conceallevel=2	" hide concealed chars until cursor is on that line
+"set foldcolumn=2	" will show clickable '+' in column at the left (which is wide $foldcolumn chars)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		autocmd																{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -238,6 +239,10 @@ endif
 "		cmd aliases						{{{
 """""""""""""""""""""""""""""""""""""""""""
 " INFO all abbrev commands are non recursive
+
+" alias only triggered if it's on the start of the line
+cnoreabbrev <expr> csa ((getcmdtype() == ':' && getcmdpos() <= 4)? 'cs add'  : 'csa')
+
 " annoying misspell:
 cabbrev W w
 cabbrev Q q
@@ -361,10 +366,13 @@ nnoremap <S-Tab> <<
 inoremap <expr><cr>		pumvisible() ? "\<C-y>" : "\<C-g>u\<cr>"
 inoremap <expr><tab> 	pumvisible() ? "\<C-n>" : "\<tab>"
 inoremap <expr><S-tab>	pumvisible() ? "\<C-p>" : "\<S-tab>"
-
-"nnoremap <C-]> TODO TODO
-"nnoremap <C-\> :tag <C-r><C-w><cr>
-""""""""""""""""""""""""""""""""""""""""}}}
+" <CR>: close popup and save indent.
+" enter to break autocomplete and put new line (previous this action needed 2x enter)
+inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+function! s:my_cr_function() abort
+	return deoplete#mappings#close_popup() . "\<CR>"
+endfunction
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		buffers/windows/tabs keymaps	{{{
 """""""""""""""""""""""""""""""""""""""""""
 nnoremap tn :tabnew<cr>
@@ -675,17 +683,20 @@ endif
 "		mouse mappings														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " double click select all occurrences
-nnoremap <2-LeftMouse> *N
-inoremap <2-LeftMouse> <c-o>*N
-vnoremap <2-LeftMouse> *N
+" nnoremap <2-LeftMouse> *N
+" inoremap <2-LeftMouse> <c-o>*N
+" vnoremap <2-LeftMouse> *N
 " TODO interface with indexed search plugin
-
 " TODO Shift and/or Alt + 2 mouse click: goto tag
+
+" triple click to toggle fold
+nnoremap <3-LeftMouse> za
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 if has('unix')
 	let s:uname = substitute(system("uname"), '\n', '', '')
 endif
 "				Plugins
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "				Plugins														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 call plug#begin('~/.vim/plugged')
@@ -693,19 +704,20 @@ call plug#begin('~/.vim/plugged')
 if has("nvim")
 	" Autocomplete for nvim (needs python3)
 	Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-	Plug 'zchee/deoplete-clang'	" show functions arguments
+	Plug 'zchee/deoplete-clang'	" show functions arguments, slows down j/k
 	" Plug 'Rip-Rip/clang_complete'
-	Plug 'wellle/tmux-complete.vim'	" autocomplete text from tmux buffer (eg git commit hash)
+	"Plug 'wellle/tmux-complete.vim'	" autocomplete text from tmux buffer (eg git commit hash)
 else
 	Plug 'Shougo/neocomplete.vim' " Needs Lua
 endif
-Plug 'Shougo/neoinclude.vim', {'for': 'c,cpp'}	" headers autocomplete
+"Plug 'Shougo/neoinclude.vim', {'for': 'c,cpp'}	" headers autocomplete
 Plug 'Shougo/echodoc.vim'	" show functions in commad line window (:) insted of in preview
 Plug 'Shougo/neopairs.vim'	" Auto insert pairs when complete done
+"Plug 'ervandew/supertab'
 
-"Plug 'Shougo/neosnippet-snippets' " needed for neosnippet
-"Plug 'Shougo/neosnippet.vim' 	" dodatak za neocomplete
-"Plug 'garbas/vim-snipmate' 	" autocomplete for loops and etc
+"Plug 'Shougo/neosnippet-snippets'	" needed for neosnippet
+"Plug 'Shougo/neosnippet.vim' 		" dodatak za neocomplete
+"Plug 'garbas/vim-snipmate' 		" autocomplete for loops and etc
 
 Plug 'vim-airline/vim-airline'
 "Plug 'vim-airline/vim-airline-themes'
@@ -729,7 +741,7 @@ Plug 'ciaranm/securemodelines'
 "Plug 'rking/ag.vim'			" multifile grep - faster version of ack
 Plug 'mileszs/ack.vim'			" ack plugin, but for 'ag'
 "Plug 'gcmt/taboo.vim'			" rename tabs XXX don't work with CtrlSpace and AirLine
-"Plug 'ronakg/quickr-cscope.vim'	" cscope XXX
+"Plug 'ronakg/quickr-cscope.vim'" cscope XXX
 Plug 'brookhong/cscope.vim'		" cscope
 
 "Plug 'tpope/vim-characterize'	" show dec/hex/oct for char under the cursos, (ga), unicode style
@@ -744,9 +756,8 @@ Plug 'mhinz/vim-signify'		" svn, git, ...
 Plug 'xolox/vim-misc'				" Needed for easytags and vim-session
 Plug 'xolox/vim-easytags'			" XXX XXX XXX XXX XXX fucking slow on work PC
 "Plug 'Raimondi/delimitMate'		" automatic closing quotes, brackets, ...  remaps <BS>
-Plug 'scrooloose/nerdcommenter'	" comments
-" Project tree (file explorer) in the window at the left
-Plug 'scrooloose/nerdtree',		{ 'on': 'NERDTreeToggle' }
+Plug 'scrooloose/nerdcommenter'		" comments
+Plug 'scrooloose/nerdtree',		{ 'on': 'NERDTreeToggle' }	" project tree (file explorer)
 "Plug 'jistr/vin-nerdtree-tabs' 	" Nerdtree for all tabs
 Plug 'Xuyuanp/nerdtree-git-plugin'
 "Plug 'scrooloose/syntastic'		" synthax checker in the window at the bottom
@@ -758,7 +769,7 @@ Plug 'gioele/vim-autoswap'
 Plug 'chrisbra/NrrwRgn'				" plugin for focussing on a selected region
 Plug 'MarcWeber/vim-addon-mw-utils'	" Needed for snipmate
 Plug 'tomtom/tlib_vim'				" Needed for snipmate
-Plug 'dyng/ctrlsf.vim'				" search and replace in multiple files
+"Plug 'dyng/ctrlsf.vim'				" search and replace in multiple files
 Plug 'vim-scripts/a.vim'		" open headers
 "Plug 'jez/vim-superman'		" man pages
 "Plug 'xolox/vim-session'		" won't restore multiple buffers in a tab
@@ -804,8 +815,9 @@ Plug 'vim-scripts/AutoTag'
 "Plug 'plasticboy/vim-markdown'
 
 Plug 'tpope/vim-obsession'	" restore session, needed for tmux ressurect
+"Plug 'vim-scripts/CCTree'	" C call graph doesn't work, and it's for C only
 
-"			themes
+"			themes {{{
 "Plug 'edkolev/tmuxline.vim'	" enable tmux to pickup Vim airline style
 Plug 'tpope/vim-vividchalk'
 Plug 'gosukiwi/vim-atom-dark'	" not-to-high contrast
@@ -819,53 +831,21 @@ Plug 'morhetz/gruvbox'				" too little contrast
 Plug 'chriskempson/tomorrow-theme'
 Plug 'sheerun/vim-wombat-scheme'
 Plug 'kristijanhusak/vim-hybrid-material'
-
+" Plug 'sjl/badwolf'
+" Plug 'vim-scripts/asu1dark.vim'
+" Plug 'vim-scripts/borland.vim'
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 
 
 Plug 'kien/rainbow_parentheses.vim'
 Plug 'vim-scripts/TagHighlight'	" color typedefs as variables
+Plug 'octol/vim-cpp-enhanced-highlight'
+
 
 call plug#end()
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "				Plugins setup												{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"		YCM conf					{{{
-"""""""""""""""""""""""""""""""""""""""
-"let g:ycm_min_num_of_chars_for_completion = 2	" default 2
-"let g:ycm_error_symbol = 'x>'
-"let g:ycm_warniing_symbol = 'w>'
-"let g:ycm_enable_diagnostic_signs = 1	" fall back to the value of the 'g:syntastic_enable_signs' option
-"let g:ycm_enable_diagnostic_highlighting = 1	" fall back to the value of the 'g:syntastic_enable_highlighting'
-"let g:ycm_collect_identifiers_from_comments_and_strings = 0	" default: 0
-"let g:ycm_collect_identifiers_from_tags_files = 1	" default: 0
-"" INFO exctags -R --fields=+l
-"let g:ycm_add_preview_to_completeopt = 1	" show function preview INFO doesn't seem that changes anything
-"" completeopt already have a preview
-"let g:ycm_autoclose_preview_window_after_completion = 1	" default: 0
-"let g:ycm_autoclose_preview_window_after_insertion = 1	" default: 0
-"" INFO iritantno bude kad se doda Enter, Enter nece napravit novi red nego togglat selekciju
-""let g:ycm_key_list_select_completion = ['<TAB>', '<Down>', '<Enter>']	" Added Enter
-"" Shift-TAB. That mapping will probably only work in GUI Vim (Gvim or MacVim) and not in plain console Vim because the terminal usually does not forward modifier key combinations to Vim.
-"let g:ycm_complete_in_comments=1
-"let g:ycm_key_invoke_completion = '' " manual invoke, default <C-Space>
-"let g:ycm_key_detailed_diagnostics = '' " :YcmShowDetailedDiagnostic default: '<leader>d'
-"" config file to use when there is no local .ycm_extra_conf.py:
-"let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
-""let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/.ycm_extra_conf.py' " doesn't exist
-""let g:ycm_confirm_extra_conf = 0	" don't ask for permission to loader local conf default 1
-"let g:ycm_extra_conf_globlist = ['~/c/*','!/tmp/*']
-	"" load conf from ~/c folder, but don't load from /tmp/
-	"" ycm_confirm_extra_conf should be 1 for this to work
-"let g:ycm_use_ultisnips_completer = 1	" default: 1
-""let g:ycm_goto_buffer_command = 'horizontal-split' "default: 'same-buffer'
-							"" INFO goto declaration is better in the same buffer
-
-""let g:ycm_open_loclist_on_ycm_diags = 1	" This should open XXX todo FixIt
-"" TODO YCM instead Syntastic - error checking on the fly instead on save
-"" TODO YCM + UltiSnips
-""let g:clang_c_completeopt = 'preview,longest,menuone'
-
-""""""""""""""""""""""""""""""""""""}}}
 "		autocomplete - deoplete "											{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " NeoVim autocomplete
@@ -1269,7 +1249,7 @@ let g:signify_sign_delete            = '-'
 let g:signify_sign_delete_first_line = '‾'
 let g:signify_sign_change            = 'm'
 "let g:signify_sign_changedelete      = g:signify_sign_change
-let g:signify_sign_show_count = 0
+let g:signify_sign_show_count = 1
 """"""""""""""""""""""""""""""""""""}}}
 "		ack																	{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1317,49 +1297,7 @@ let g:ackhighlight = 1		" highlight the searched term.
 let g:taboo_tabline = 0		" AirLine is OK for this purpose
 let g:airline#extensions#taboo#enabled = 1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		cscope																{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" " quickr-cscope.vim
 
-" let g:quickr_cscope_keymaps = 0
-" nnoremap <leader>cs <plug>(quickr_cscope_symbols)
-" nnoremap <leader>cg <plug>(quickr_cscope_global)
-" nnoremap <leader>cc <plug>(quickr_cscope_callers)
-" nnoremap <leader>cF <plug>(quickr_cscope_files)
-" nnoremap <leader>ci <plug>(quickr_cscope_includes)
-" nnoremap <leader>ct <plug>(quickr_cscope_text)
-" nnoremap <leader>ce <plug>(quickr_cscope_egrep)
-" nnoremap <leader>cf <plug>(quickr_cscope_functions)
-" " meh, XXX, doesn;t work
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		cscope																{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" " rookhong/cscope.vim
-
-" s: Find this C symbol
-nnoremap  <leader>fs :call CscopeFind('s', expand('<cword>'))<CR>
-" g: Find this definition
-nnoremap  <leader>fg :call CscopeFind('g', expand('<cword>'))<CR>
-" d: Find functions called by this function
-nnoremap  <leader>fd :call CscopeFind('d', expand('<cword>'))<CR>
-" c: Find functions calling this function
-nnoremap  <leader>fc :call CscopeFind('c', expand('<cword>'))<CR>
-" t: Find this text string
-nnoremap  <leader>ft :call CscopeFind('t', expand('<cword>'))<CR>
-" e: Find this egrep pattern
-nnoremap  <leader>fe :call CscopeFind('e', expand('<cword>'))<CR>
-" f: Find this file
-nnoremap  <leader>ff :call CscopeFind('f', expand('<cword>'))<CR>
-" i: Find files #including this file
-nnoremap  <leader>fi :call CscopeFind('i', expand('<cword>'))<CR>
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-
-
-"		clang						{{{
-"""""""""""""""""""""""""""""""""""""""
-" let g:clang_auto = 1	" auto complete after -> . ::
-" let g:clang_exec = 'clang-3.6'
-""""""""""""""""""""""""""""""""""""}}}
 "		Syntastic					{{{
 """""""""""""""""""""""""""""""""""""""
 " TODO disable YCM checkers for this to work
@@ -1384,7 +1322,6 @@ let g:syntastic_cpp_include_dirs = ["includes", "headers"]
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
-""""""""""""""""""""""""""""""""""""}}}
 """"""""""""""""""""""""""""""""""""}}}
 "		Golden View					{{{
 """""""""""""""""""""""""""""""""""""""
@@ -1460,6 +1397,7 @@ let g:NERDTreeMinimalUI = 1
 "noremap <leader>. :NERDTreeFind<cr>
 """"""""""""""""""""""""""""""""""""}}}
 
+let g:SuperTabDefaultCompletionType = "context"
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 "				GUI settings												{{{
@@ -1483,6 +1421,8 @@ endif
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " colors as sublime
 colorscheme molokai
+"colorscheme badwolf
+"colorscheme dracula
 
 highlight Todo			ctermfg=196 ctermbg=232
 highlight Debug			ctermfg=226 ctermbg=234
@@ -1515,6 +1455,12 @@ highlight DiffRemoved	ctermfg=208
 
 " auto completion menu
 highlight pmenu			ctermfg=white ctermbg=52
+
+" hide ANSCI escape chars
+syntax match Ignore /\%o33\[[0-9]\{0,5}m/ conceal
+
+" ugly but easier to read
+highlight Comment		ctermfg=101
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "				custom functions											{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1622,7 +1568,9 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
-if executable('ag')"{{{
+" ag																		{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if executable('ag')
 	" Note we extract the column as well as the file and line number
 	set grepprg=ag\ --nogroup\ --nocolor\ --column
 	" f file name
@@ -1639,7 +1587,8 @@ if executable('ag')"{{{
 
 	" ag is fast enough that CtrlP doesn't need to cache
 	let g:ctrlp_use_caching = 0
-endif"}}}
+endif							"}}}
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 "" Add set path=.,<relative include dir> for searching for header in particular directories. For more information do ":help file-searching".
 
@@ -1650,26 +1599,41 @@ endif"}}}
 " XXX will open split when tag is not found
 "map <A-]> :vsp <cr>:exec("tag ".expand("<cword>"))<CR>
 
+" cscope "																	{{{
 if has('cscope')
 	" include cscope when searching for tag (Ctrl-])
 	" show verbose info when loading cscope DB
 	set cscopetag cscopeverbose
 
 	if has('quickfix')
-	set cscopequickfix=s-,c-,d-,i-,t-,e-
+		set cscopequickfix=s-,c-,d-,i-,t-,e-
 	endif
 
-	cnoreabbrev csa cs add
-	cnoreabbrev csf cs find
-	cnoreabbrev csk cs kill
-	cnoreabbrev csr cs reset
-	cnoreabbrev css cs show
-	cnoreabbrev csh cs help
-
 	command! -nargs=0 Cscope cs add $VIMSRC/src/cscope.out $VIMSRC/src
+
+	nnoremap <leader>fs :cs find s <C-r><C-w><cr>:echo "cscope searching symbol"<cr>
+	nnoremap <leader>fg :cs find g <C-r><C-w><cr>:echo "cscope searching definition"<cr>
+	nnoremap <leader>fd :cs find g <C-r><C-w><cr>:echo "cscope searching definition"<cr>
+	"nnoremap <leader>fd :cs find d <C-r><C-w><cr>:echo "cscope searching functions called by"<cr>
+	nnoremap <leader>fC :cs find d <C-r><C-w><cr>:echo "cscope searching functions called by"<cr>
+	nnoremap <leader>fc :cs find c <C-r><C-w><cr>:echo "cscope searching functions calling this"<cr>
+	nnoremap <leader>ft :cs find t <C-r><C-w><cr>:echo "cscope searching text"<cr>
+	nnoremap <leader>ff :cs find f <C-r><C-w><cr>:echo "cscope searching file"<cr>
+	nnoremap <leader>fh :cs find i <C-r><C-w><cr>:echo "cscope searching header/include"<cr>
+	nnoremap <leader>fa :cs find a <C-r><C-w><cr>:echo "cscope searching where assigned"<cr>
+	nnoremap <C-g> :cs find find c <C-r><C-w><cr>:echo "cscope searching functions calling this"<cr>
+
+	let g:cscope_silent = 1	" don't show message when autoupdating DB
 endif
 
-"		work specific stuff												{{{
+" Ctrl-\ to jump to the tag (like Ctrl-] but easier to type on ANSI keyboard)
+" nnoremap <C-\> :tag <C-r><C-w><cr>
+" from help:
+map g<C-]> :cs find 3 <C-R>=expand("<cword>")<CR><CR>
+map g<C-\> :cs find 0 <C-R>=expand("<cword>")<CR><CR>
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+
+" work specific stuff														{{{
 let g:work_pc=system('is_work_pc')
 let g:work_dir=system('is_work_dir')
 
@@ -1682,7 +1646,7 @@ if work_pc == 1
 		highlight clear ColorColumn	" don't color background after textwidth
 	endif
 endif
-"=======================================================================}}}
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 " tab jumps to the previous active window
 " TODO make this to call wincmd w when there is no previous active window
@@ -1694,13 +1658,12 @@ nnoremap <tab> :wincmd p<cr>
 
 
 " TODO
-" when Ag quickfix window is active: <space> for preview file (now is "go")
+" when Ag quickfix window is active: <space> (or p) for preview file (now is "go")
 " Ag ignore: .o tags
 " when quickfix is active: Ctrl-W c should close main buffer and quickfix
 " put cursor at the end of the pasted part
 
-
-"" TODO <leader>cn to uncomment {{{
+" tab_complete example " 													{{{
 ""I'm using tab for cycling over the items in a completion menu (instead of c-n). But I also use tab when there is no completion menu to expand a snippet, and jump to the next placeholder inside the snippet. So the tab key needed some love:
 "function! s:tab_complete()
   "" is completion menu open? cycle to next item
@@ -1718,25 +1681,22 @@ nnoremap <tab> :wincmd p<cr>
   "return "\<tab>"
 "endfunction
 " from https://github.com/fatih/dotfiles/blob/master/vimrc
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 "imap <silent><expr><TAB> <SID>tab_complete()
-"		useful stuff													}}}
-"		useful stuff													{{{
 " U in visual mode will convert to UPPERCASE
 " 10| will move to the 10-th column
 " g* like * but will not search only whole words
 " C-W T window to tab
 " gx open an URL/image/something from Vim
 " q/ open search history in command window
-" ccl[ose]  close QuickFix window
 " // to quickly search again, works in substitution mode also (s//b/g)
 " :lcd	cd only for current window
 
-"=======================================================================}}}
 " TODO :help sort
 
 " programmers vim 															{{{
-"#############################################################################
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " @: repeat last : command
 " @@ for next repeat
 " Just type & to repeat the last substitution on the current line. You can repeat it on all lines by typing g&.
@@ -1748,10 +1708,6 @@ nnoremap <tab> :wincmd p<cr>
 " :pc	close preview window
 " C delete to the end of the line and go to insert mode
 
-" quick fix list prev/next: 	[q	]q
-" prev/next file:				[f	]f
-" prev/next misspell			[s	]s
-" prev/next file in args list	[a	]a (A for first/last)
 
 " ga: show char under the cursor in decimal, hex, and oct, for unicode: tpope/vim-characterize XXX works without plugin
 " gCtrl-] If there is only one match, it will take you there. If there are multiple matches, it will list them all, letting you choose the one you want, just like :tselect
@@ -1772,6 +1728,30 @@ nnoremap <tab> :wincmd p<cr>
 set viewoptions-=options	" for mkview, don't store current file
 set viewdir=~/.vim/view
 " :mkview :loadview
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" move split to tab: Ctrl-W T
+" moving		 															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" '[ '] jump to the beggining or end of last change
+" ]s [s jump to next/prev spell mistake
+" {} goto prev/next empty line
+
+" quick fix list prev/next: 	[q	]q (alse :cn and :cp)
+" prev/next file:				[f	]f
+" prev/next misspell			[s	]s
+" prev/next file in args list	[a	]a (A for first/last)
+
+" gd	will take you to the local declaration.
+" gD	will take you to the global declaration.
+" g*	search for the word under the cursor (like *, but g* on 'rain' will find words like 'rainbow').
+" g#	same as g* but in backward direction.
+" gg	goes to the first line in the buffer (or provide a count before the command for a specific line).
+" G		goes to the last line (or provide a count before the command for a specific line).
+" gf	goto file under cursor
+" g]	jump to a tag definition
+
+" :ccl	close QuickFix window
 
 "##########################################################################}}}
 " tips and tricks 															{{{
@@ -1808,10 +1788,10 @@ set viewdir=~/.vim/view
 " zt put current line on the top of the screen
 " zb put current line on the bottom of the screen
 
-" file/IO redirection
-" redirect to file:
-	" :redir > /tmp/file
-	" :highlight (or something else, eg: :set all)
+" redirect to file (in this example kbd map):
+	":redir! > vim_maps.txt
+	" :map
+	" :map!
 	" :redir END
 
 " R in normal mode: write throught (Replace)-(without need to delete)
@@ -1820,17 +1800,6 @@ set viewdir=~/.vim/view
 " startup profiling:  vim --startuptime startup.log, visuasilation: https://github.com/hyiltiz/vim-plugins-profile
 
 " load file without loading it :bad file.txt
-"##########################################################################}}}
-" moving		 															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" '[ '] jump to the beggining or end of last change
-" ]s [s jump to next/prev spell mistake
-" {} goto prev/next empty line
-
-
-
-
-" move split to tab: Ctrl-W T
 "##########################################################################}}}
 " vimL misc							{{{
 " number of tabs: tabpagenr('$')
@@ -1849,7 +1818,6 @@ set viewdir=~/.vim/view
 
 " Vim debug:
 " vim -V9myVimLog
-"
 " TODO ag sredit da nema praznu liniju ispod svake korisne u quickfix
 " TODO C-w c da zatvori cijeli tab (ukljucujus sve splitove i quickfix window) -> :tabclose
 " TODO napravit da oboja jednako i TODO2
