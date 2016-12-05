@@ -1413,7 +1413,7 @@ highlight SpecialKey	ctermfg=236
 highlight Conceal		ctermfg=7 ctermbg=233
 
 " longer vertical bar for vertical splits, space for folds (default was -)
-set fillchars=vert:\│,fold:\
+set fillchars=vert:\│,fold:\ 
 
 " change the colors in diff mode
 highlight DiffAdded		ctermfg=81
