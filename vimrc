@@ -81,7 +81,8 @@ set shiftwidth=4 	" when indenting with '>'
 
 set shortmess-=I	" don't show intro	XXX seems that is doesn't work
 set cursorline		" color the line when the cursor is
-
+"	commandline completion			{{{
+"""""""""""""""""""""""""""""""""""""""
 " shell like autocompletition of commands
 "set wildmode=longest,list,full
 " bash like
@@ -92,20 +93,13 @@ set wildmode=list:longest,list,full
 "list: full "menu" of possible matches, <tab> will not complete anything
 "full: only one bar at botom with all matches
 "longest: nothing will be completed
-
-
+"
 " Don't complete this file types
 set wildignore+=*.a,*.o,*.elf,*.bin,*.dd,*.img
 set wildignore+=*.bmp,*.gif,*.ico,*.jpg,*.png
 set wildignore+=.git,.hg,.svn
 set wildignore+=*~,*.swp,*.tmp
-
-if !has('gui_running')
-	set showbreak=…		" char to be displayed on the beggining of broken line
-	"set listchars=tab:\|·,eol:¬,trail:·
-	" trail is not needed, plugin take care of that
-	" TODO same font as xterm
-endif
+""""""""""""""""""""""""""""""""""""}}}
 
 " show invisible characters, tab is longer (unicode) pipe char
 set listchars=tab:\│·,extends:>,precedes:<
@@ -122,19 +116,15 @@ set backupdir=$HOME/.vim/swap/,/tmp
 """""""""""""""""""""""""""""""""""""""
 set ignorecase		" case insensitive search, needed for the line below
 set smartcase		" If searched word starts with an uppercase then ... TODO
-set incsearch		" search as you type
-" for caseinsensitive search /something\c
+set incsearch		" search as you type INFO for caseinsensitive search: /something\c
 set showmatch
-set hlsearch        " highlight search
+"set hlsearch        " highlight search - disabled because it will activate themself after reloading vimrc
 """"""""""""""""""""""""""""""""""""}}}
 "		spell						{{{
 """""""""""""""""""""""""""""""""""""""
-" INFO ViM zajeb: Don't use _ in file name
-set spellfile=~/.vim/spelluser.utf-8.add
-"set spelllang=~/.vim/spell/hr.utf-8.spl,en	" hr i en spell check zajedno TODO
-setlocal spell spelllang=en_us
-"setlocal spell spelllang=en_us,hr	" TODO hr
-set nospell
+set spellfile=~/.vim/spelluser.utf-8.add	" don't use '_' in filename
+"set spelllang=~/.vim/spell/hr.utf-8.spl,en	" 
+setlocal spelllang=en_us	" TODO hr
 " set complete+=kspell
 """"""""""""""""""""""""""""""""""""}}}
 "		build/programming			{{{
@@ -214,6 +204,9 @@ augroup my_group_with_a_very_uniq_name
 
 	autocmd FileType qf nnoremap <buffer> p <plug>(quickr_preview)
 	"autocmd FileType qf nnoremap <buffer> q <plug>(quickr_preview_qf_close)
+
+	" Don't show numbers in preview window
+	autocmd BufWinEnter * if &previewwindow | setlocal nonumber norelativenumber | endif
 augroup END
 
 " setup when in diff mode:
@@ -264,14 +257,8 @@ cabbrev wQ wq
 " TODO remap all to this
 "cnoreabbrev <expr> W ((getcmdtype() is# ':' && getcmdline() is# 'W')?('w'):('W'))
 
-" if exists(":Plug")	" vim-plug
-	cabbrev	pi PlugInstall
-	cabbrev pu PlugUpdate
-" endif
-" if exists(":PluginInstall")	" Vundle
-	" cabbrev	pi PluginInstall
-	" cabbrev pu PluginUpdate
-" endif
+command! PU PlugUpdate | PlugUpgrade
+command! PI PlugInstall
 
 " open help in vertical split right
 cabbrev h vert bo help
@@ -363,15 +350,21 @@ nnoremap <S-Tab> <<
 
 " auto-complete 'fix'
 " Enter for breaking autocomplete (when it's active)
+" XXX this will not for if one char is typed and completion is active 		Ctrl-e is for breaking
 inoremap <expr><cr>		pumvisible() ? "\<C-y>" : "\<C-g>u\<cr>"
+" tmp fix: use Ctrl-e
+"inoremap <expr><esc>	pumvisible() ? "\<C-e>" : "\<esc>"
 inoremap <expr><tab> 	pumvisible() ? "\<C-n>" : "\<tab>"
 inoremap <expr><S-tab>	pumvisible() ? "\<C-p>" : "\<S-tab>"
+inoremap <expr><C-_>	deoplete#undo_completion()
+
 " <CR>: close popup and save indent.
 " enter to break autocomplete and put new line (previous this action needed 2x enter)
-inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-function! s:my_cr_function() abort
-	return deoplete#mappings#close_popup() . "\<CR>"
-endfunction
+" inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+" function! s:my_cr_function() abort
+	" return deoplete#mappings#close_popup() . "\<CR>"
+" endfunction
+" INFO 161203 It's seems that default behaviour of enter and deoplete is good enough for me
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		buffers/windows/tabs keymaps	{{{
 """""""""""""""""""""""""""""""""""""""""""
@@ -426,6 +419,7 @@ nnoremap tm :tabnew<cr>:CtrlPMRUFiles<CR>
 nnoremap to :tabnew<cr>:CtrlP<CR>
 " because it's close to O, and sometimes there is a need to just open a file
 nnoremap ti :tabedit<space>
+nnoremap te :tabedit<space>
 
 nnoremap <leader>q :tabprev<cr>
 nnoremap <leader>w :tabnext<cr>
@@ -525,7 +519,7 @@ nnoremap <silent> <esc> :noh<cr><esc>:echo "hlsearch disabled"<cr>
 "temporarily disable search highlighting until the next search.
 " INFO this is NOT the same as set nohlsearch
 nnoremap <leader>h :noh<cr>
-nnoremap <leader>s :set spell!<cr>
+nnoremap <leader>s :setlocal spell!<cr>
 " toggle showing invisible chars
 nnoremap <leader>l :set list!<cr>:set list?<CR>
 nnoremap <leader>n :set relativenumber!<cr>
@@ -692,15 +686,21 @@ endif
 " triple click to toggle fold
 nnoremap <3-LeftMouse> za
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		OS specific															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if has('unix')
 	let s:uname = substitute(system("uname"), '\n', '', '')
 endif
+
+if s:uname == "FreeBSD"
+	let g:tagbar_ctags_bin=substitute(system("which exctags"), '\n', '','')
+endif
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "				Plugins
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "				Plugins														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 call plug#begin('~/.vim/plugged')
-"Plug 'Valloric/YouCompleteMe'
 if has("nvim")
 	" Autocomplete for nvim (needs python3)
 	Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
@@ -726,7 +726,12 @@ Plug 'bogado/file-line'				" open file.txt:123
 Plug 'dietsche/vim-lastplace'		" Open file at last edit position
 Plug 'qpkorr/vim-bufkill'			" kill buffer without killing split :BD :BW
 Plug 'henrik/vim-indexed-search'	" show search as: result 123 of 456
-Plug 'bronson/vim-trailing-whitespace'	" show red block when there is a trailing whitespace  :FixWhiteSpace
+"Plug 'bronson/vim-trailing-whitespace'	" show red block when there is a trailing whitespace  :FixWhiteSpace
+Plug 'bronson/vim-trailing-whitespace', {'for': !'man,help,plug'}
+			"let g:extra_whitespace_ignored_filetypes = ['help', 'Help', 'quickfix', 'vim-plug', 'man', 'diff']
+Plug 'vim-better-whitespace'
+
+" show red block when there is a trailing whitespace  :FixWhiteSpace
 Plug 'kshenoy/vim-signature'		" show marks visually
 "Plug 'romgrk/winteract.vim'
 Plug 'ronakg/quickr-preview.vim'	" preview file without opening
@@ -763,22 +768,23 @@ Plug 'Xuyuanp/nerdtree-git-plugin'
 "Plug 'scrooloose/syntastic'		" synthax checker in the window at the bottom
 Plug 'godlygeek/tabular'			" aligning/tabulating text
 Plug 'regedarek/ZoomWin'			" toggle between one window and multi-window (Ctrl-W o)	newer version than vim-scripts
-"Plug 'terryma/vim-multiple-cursors'		" rename var at multiple places at once
+"Plug 'terryma/vim-multiple-cursors'		" rename var at multiple places at once	 INFO not really useful for me (Vim's ways are OK for me)
 Plug 'tpope/vim-unimpaired'				" TODO
-Plug 'gioele/vim-autoswap'
-Plug 'chrisbra/NrrwRgn'				" plugin for focussing on a selected region
-Plug 'MarcWeber/vim-addon-mw-utils'	" Needed for snipmate
-Plug 'tomtom/tlib_vim'				" Needed for snipmate
+" Plug 'gioele/vim-autoswap'
+" Plug 'chrisbra/NrrwRgn'				" plugin for focussing on a selected region
+" Plug 'MarcWeber/vim-addon-mw-utils'	" Needed for snipmate
+" Plug 'tomtom/tlib_vim'				" Needed for snipmate
 "Plug 'dyng/ctrlsf.vim'				" search and replace in multiple files
 Plug 'vim-scripts/a.vim'		" open headers
 "Plug 'jez/vim-superman'		" man pages
 "Plug 'xolox/vim-session'		" won't restore multiple buffers in a tab
-Plug 'Shougo/vimshell.vim'
+" Plug 'Shougo/vimproc.vim'		" Needed for vim shell
+" Plug 'Shougo/vimshell.vim'
 
 Plug 'vim-ctrlspace/vim-ctrlspace'	" tabs/buffer/file management, sessions, bookmarks		:CtrlSpaceGo{Up,Down}
 "Plug '~/.vim/plugged/vim-ctrlspace2'
 Plug 'sheerun/vim-polyglot'			" A collection of language packs for Vim. won't affect your startup time
-Plug 'easymotion/vim-easymotion'		" leader leader and magic begins
+Plug 'easymotion/vim-easymotion'	" leader leader and magic begins
 Plug 'myusuf3/numbers.vim'		" disable relative numbers in insert mode and other windows
 
 
@@ -815,7 +821,6 @@ Plug 'vim-scripts/AutoTag'
 "Plug 'plasticboy/vim-markdown'
 
 Plug 'tpope/vim-obsession'	" restore session, needed for tmux ressurect
-"Plug 'vim-scripts/CCTree'	" C call graph doesn't work, and it's for C only
 
 "			themes {{{
 "Plug 'edkolev/tmuxline.vim'	" enable tmux to pickup Vim airline style
@@ -846,50 +851,50 @@ call plug#end()
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "				Plugins setup												{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"		autocomplete - deoplete "											{{{
+"		deoplete 															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" NeoVim autocomplete
-let g:deoplete#enable_at_startup = 1
-let g:deoplete#enable_ignore_case = 1	" ignore case
-let g:deoplete#enable_smart_case = 1	" but use smart case
-"let g:deoplete#enable_camel_case = 1 " INFO only with deoplete-matcher*fuzzy
-let g:neocomplete#enable_fuzzy_completion = 1
-" let g:deoplete#auto_complete_start_length = 1	" default: 2
-let g:deoplete#auto_complete_start_length = 1	" deprecated
-let g:deoplete#source#attribute#min_pattern_length = 0
-"let g:deoplete#max_abbr_width = 0 " disable, default: 80
-"-> is added
-let g:deoplete#delimiters = ['/', '.', '::', ':', '#', '->']
-let g:deoplete#max_list = 20					" max number of items in list
-let g:deoplete#auto_complete_delay = 20		" ms, defalu 150, still slow
+if has ('nvim')
+	" NeoVim autocomplete
+	let g:deoplete#enable_at_startup = 1
+	let g:deoplete#enable_ignore_case = 1	" ignore case
+	let g:deoplete#enable_smart_case = 1	" but use smart case
+	"let g:deoplete#enable_camel_case = 1 " INFO only with deoplete-matcher*fuzzy
+	let g:neocomplete#enable_fuzzy_completion = 1
+	" let g:deoplete#auto_complete_start_length = 1	" default: 2
+	let g:deoplete#auto_complete_start_length = 1	" deprecated
+	let g:deoplete#source#attribute#min_pattern_length = 1
+	"let g:deoplete#max_abbr_width = 0 " disable, default: 80
+	"-> is added
+	let g:deoplete#delimiters = ['/', '.', '::', ':', '#', '->']
+	let g:deoplete#max_list = 20					" max number of items in list
+	let g:deoplete#auto_complete_delay = 20		" ms, default 150, still slow
 
-"let g:deoplete#sources = {} " init of the variable
-"let g:deoplete#sources._ = ['buffer'] " default files
-"let g:deoplete#sources.cpp = ['buffer', 'tag']
-"let g:deoplete#sources.cpp = ['buffer']			" + deoplete-clang
-"let g:deoplete#sources.c = ['buffer', 'tag']
-"let g:deoplete#sources.h = ['buffer', 'tag']
+	"let g:deoplete#sources = {} " init of the variable
+	"let g:deoplete#sources._ = ['buffer'] " default files
+	"let g:deoplete#sources.cpp = ['buffer', 'tag']
+	"let g:deoplete#sources.cpp = ['buffer']			" + deoplete-clang
+	"let g:deoplete#sources.c = ['buffer', 'tag']
+	"let g:deoplete#sources.h = ['buffer', 'tag']
 
-if s:uname == "FreeBSD"
-	let g:deoplete#sources#clang#libclang_path = "/usr/local/llvm38/lib/libclang.so"
-	let g:deoplete#sources#clang#clang_header = "/usr/local/llvm38/include/clang"
+	if s:uname == "FreeBSD"
+		let g:deoplete#sources#clang#libclang_path = "/usr/local/llvm38/lib/libclang.so"
+		let g:deoplete#sources#clang#clang_header = "/usr/local/llvm38/include/clang"
+	endif
+	if s:uname == "Linux"
+		let g:deoplete#sources#clang#libclang_path = "/usr/lib/llvm-3.6/lib/libclang.so"
+		let g:deoplete#sources#clang#clang_header = "/usr/include/clang/"
+	endif
+	" "let g:deoplete#sources#clang#flags = '-Wall'
+	let g:deoplete#sources#clang#std#c = 'c11'
+	let g:deoplete#sources#clang#std#cpp = 'c++11'
+	" let g:deoplete#sources#clang#sort_algo = 'priority'
+
+	let g:deoplete#tag#cache_limit_size = 50000000 " 50 MB
+	call deoplete#custom#set('_', 'matchers', ['matcher_length', 'matcher_full_fuzzy'])	" don't auto complete basing on the first char
+
+	let g:deoplete#sources#clang#sort_algo = 'priority'	" or alphabetical
+	let g:echodoc_enable_at_startup = 1			" show info in cmd line instead in preview window
 endif
-if s:uname == "Linux"
-	let g:deoplete#sources#clang#libclang_path = "/usr/lib/llvm-3.6/lib/libclang.so"
-	let g:deoplete#sources#clang#clang_header = "/usr/include/clang/"
-endif
-let g:deoplete#sources#clang#std = {'c': 'c11', 'cpp': 'c++11'}		" prefered version
-" "let g:deoplete#sources#clang#flags = 
-" let g:deoplete#sources#clang#std#c = 'c11'
-" let g:deoplete#sources#clang#std#cpp = 'c++14'
-" let g:deoplete#sources#clang#sort_algo = 'priority'
-
-let g:deoplete#tag#cache_limit_size = 50000000 " 50 MB
-inoremap <expr><C-_> deoplete#undo_completion()
-call deoplete#custom#set('_', 'matchers', ['matcher_length', 'matcher_full_fuzzy'])	" don't auto complete basing on the first char
-
-let g:deoplete#sources#clang#sort_algo = 'priority'	" or alphabetical
-let g:echodoc_enable_at_startup = 1			" show info in cmd line instead in preview window
 
 " clang_complete {{{
 let g:clang_complete_auto = 0
@@ -1010,8 +1015,8 @@ endif
 
 let g:CtrlSpaceUseUnicode = 0 " unicode will show just 1 and 2
 """"""""""""""""""""""""""""""""""""}}}
-"		CtrlP						{{{
-"""""""""""""""""""""""""""""""""""""""
+"		CtrlP																{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:ctrlp_map = '<leader>o'	" disable default Ctrl-P
 "let g:ctrlp_cmd = 'CtrlP'
 
@@ -1100,7 +1105,7 @@ let g:ctrlp_buftag_ctags_bin = ''
 
 " TODO Ctrl-S open in split (instead Ctrl-X)
 " TODO ignore .o
-""""""""""""""""""""""""""""""""""""}}}
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 "		lastplace															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1206,9 +1211,8 @@ let g:tagbar_show_linenumbers = 2	" show relative
 "let g:tagbar_singleclick = 1
 let g:tagbar_iconchars = ['►', '▼']		" changed first symbol because powerline font
 let g:tagbar_previewwin_pos = "aboveleft"
-" Don't show numbers in preview window
-autocmd BufWinEnter * if &previewwindow | setlocal nonumber norelativenumber | endif
 let g:tagbar_autopreview = 0
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		git plugins					{{{
 """""""""""""""""""""""""""""""""""""""
@@ -1323,21 +1327,6 @@ set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
 """"""""""""""""""""""""""""""""""""}}}
-"		Golden View					{{{
-"""""""""""""""""""""""""""""""""""""""
-" 1. split to tiled windows
-"nnoremap <C-;>  <Plug>GoldenViewSplit
-"nnoremap <C-;>  <Plug>GoldenViewSplit
-
-" 2. quickly switch current window with the main pane
-" and toggle back
-"nnoremap <F8>   <Plug>GoldenViewSwitchMain
-"nnoremap <S-F8> <Plug>GoldenViewSwitchToggle
-
-" 3. jump to next and previous window
-"nnoremap <C-w>n  <Plug>GoldenViewNext
-"nnoremap <C-w>p  <Plug>GoldenViewPrevious
-""""""""""""""""""""""""""""""""""""}}}
 "		multicursor					{{{
 let g:multi_cursor_use_default_mapping=0
 "let g:multi_cursor_next_key='D'
@@ -1370,10 +1359,6 @@ let g:easytags_async = 1
 "let g:easytags_suppress_ctags_warning = 1
 "let g:easytags_file = "~/.vim/tags"
 
-if s:uname == "FreeBSD"
-	let g:tagbar_ctags_bin=system("which exctags")
-endif
-
 "set regexpengine=1 " old engine, faster (maybe), no changes
 let g:easytags_auto_highlight=0		" fix slowiness
 """"""""""""""""""""""""""""""""""""}}}
@@ -1397,7 +1382,6 @@ let g:NERDTreeMinimalUI = 1
 "noremap <leader>. :NERDTreeFind<cr>
 """"""""""""""""""""""""""""""""""""}}}
 
-let g:SuperTabDefaultCompletionType = "context"
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 "				GUI settings												{{{
@@ -1415,6 +1399,11 @@ if has("gui_running")
 	highlight SpecialKey guifg=#2a4a59
 
 	set winaltkeys=no		" Turn off <Alt>/<Meta> pulling down GUI menu
+
+	set showbreak=…		" char to be displayed on the beggining of broken line
+	"set listchars=tab:\|·,eol:¬,trail:·
+	" trail is not needed, plugin take care of that
+	" TODO same font as xterm
 endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 " 					colors and TERM setup									{{{
