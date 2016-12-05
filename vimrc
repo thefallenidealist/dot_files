@@ -38,7 +38,7 @@ set splitbelow
 set splitright
 
 set timeoutlen=1000 ttimeoutlen=0		" delay for the esc key, 10ms
-set exrc		" source .vimrc file if it present in working directory
+"set exrc		" source .vimrc file if it present in working directory
 set secure		" This option will restrict usage of some commands in non-default .vimrc files; commands that wrote to file or execute shell commands are not allowed and map commands are displayed.
 
 set nomodeline
@@ -79,7 +79,7 @@ set tabstop=4		" tab size
 set shiftwidth=4 	" when indenting with '>'
 "set expandtab		" convert tab to spaces
 
-set shortmess-=I	" don't show intro	XXX seems that is doesn't work
+set shortmess+=I	" don't show intro message at startup
 set cursorline		" color the line when the cursor is
 "	commandline completion			{{{
 """""""""""""""""""""""""""""""""""""""
@@ -336,7 +336,7 @@ nnoremap zR zR:echo "fold all open"<cr>
 nnoremap zM zM:echo "fold all close"<cr>
 nnoremap zv zv:echo "fold reveal cursor"<cr>
 "nnoremap <space> za
-nnoremap <silent> <Space> @=(foldlevel('.')?'za':"\<Space>")<CR>
+nnoremap <silent> <Space> @=(foldlevel('.')?'zazz':"\<Space>")<CR>
 vnoremap <Space> zf
 
 " don't quit visual mode after first indent/deindent
