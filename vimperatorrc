@@ -43,25 +43,7 @@ cabbrev wQ wq
 " :tabgroups
 abbrev tg tabgroups
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-nnoremap <leader>r :source ~/.vimperatorrc<cr>:echom "config reloaded"<cr>
-
-
-" vimperator default:
-" C-S-p/n prev/next tab group
-" :bn/:tn
-" C-^	goto previous selected tab
-" g0 g$	first/last tab
-
-"colorscheme solarized_dark
-colorscheme seaweed
-"colorscheme ywgx	" XXX matchevi budu crno na crnom
-
-" show link preview
-" set showstatuslinks=1	" show link in the right part of cmd line (where is current page link)
-set showstatuslinks=2	" show link in the left part of cmd_line
-" set showstatuslinks=3	" Firefox default, show link at the end of the window/buffer (not in cmd line)
-
-" buffers/tabgs  														{{{
+" buffers/tabs  														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nnoremap <A-,> :tabprev<CR>
 nnoremap <A-.> :tabnext<CR>
@@ -103,6 +85,23 @@ nnoremap <S-l> :tabnext<cr>
 nnoremap h :tabprev<cr>
 nnoremap l :tabnext<cr>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+nnoremap <leader>r :source ~/.vimperatorrc<cr>:echom "config reloaded"<cr>
+
+
+" vimperator default:
+" C-S-p/n prev/next tab group
+" :bn/:tn
+" C-^	goto previous selected tab
+" g0 g$	first/last tab
+
+"colorscheme solarized_dark
+colorscheme seaweed
+"colorscheme ywgx	" XXX matchevi budu crno na crnom
+
+" show link preview
+" set showstatuslinks=1	" show link in the right part of cmd line (where is current page link)
+set showstatuslinks=2	" show link in the left part of cmd_line
+" set showstatuslinks=3	" Firefox default, show link at the end of the window/buffer (not in cmd line)
 
 " disable iritating default Firefox shortcut for mute
 nnoremap <C-m> <cr>

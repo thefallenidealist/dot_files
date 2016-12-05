@@ -1427,6 +1427,8 @@ syntax match Ignore /\%o33\[[0-9]\{0,5}m/ conceal
 
 " ugly but easier to read
 highlight Comment		ctermfg=101
+
+"highlight ExtraWhitespace ctermbg=202
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "				custom functions											{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
