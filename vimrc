@@ -58,9 +58,9 @@ set gdefault "applies substitutions globally on lines. For example, instead of :
 "set completeopt=menuone,preview	" default
 set completeopt=menuone				" f(); can be view in command line with plugin
 set noshowmode						"Don't show the mode(airline is handling this)
-""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "		<tab> and wrapping
-""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " soft wrap
 set wrap			" soft break when line is wider than Vim window (not tw)
 set linebreak		" break line without breaking the word
@@ -99,7 +99,7 @@ set wildignore+=*.a,*.o,*.elf,*.bin,*.dd,*.img
 set wildignore+=*.bmp,*.gif,*.ico,*.jpg,*.png
 set wildignore+=.git,.hg,.svn
 set wildignore+=*~,*.swp,*.tmp
-""""""""""""""""""""""""""""""""""""}}}
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 " show invisible characters, tab is longer (unicode) pipe char
 set listchars=tab:\│·,extends:>,precedes:<
@@ -112,23 +112,23 @@ set list	" show invisible chars (tabs and others defined in listchars)
 set directory=$HOME/.vim/swap/,/tmp
 " place for: filename.txt~
 set backupdir=$HOME/.vim/swap/,/tmp
-"		search						{{{
-"""""""""""""""""""""""""""""""""""""""
+"		search																{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set ignorecase		" case insensitive search, needed for the line below
 set smartcase		" If searched word starts with an uppercase then ... TODO
 set incsearch		" search as you type INFO for caseinsensitive search: /something\c
 set showmatch
 "set hlsearch        " highlight search - disabled because it will activate themself after reloading vimrc
-""""""""""""""""""""""""""""""""""""}}}
-"		spell						{{{
-"""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		spell																{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set spellfile=~/.vim/spelluser.utf-8.add	" don't use '_' in filename
 "set spelllang=~/.vim/spell/hr.utf-8.spl,en	"
 setlocal spelllang=en_us	" TODO hr
 " set complete+=kspell
-""""""""""""""""""""""""""""""""""""}}}
-"		build/programming			{{{
-"""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		build/programming													{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set makeprg=gmake\ -C\ ../build\ -j4
 " TODO <leader> rr
 nnoremap <F5> :w<cr>:!clear && cc % -o %.elf && ./%.elf<CR>
@@ -157,7 +157,7 @@ set tags=tags,.tags;$HOME
 
 set binary	" TODO
 set equalalways
-""""""""""""""""""""""""""""""""""""}}}
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 set conceallevel=2	" hide concealed chars until cursor is on that line
 "set foldcolumn=2	" will show clickable '+' in column at the left (which is wide $foldcolumn chars)
@@ -227,10 +227,10 @@ endif
 " endif
 
 "autocmd WinEnter * if &previewwindow | ... | endif
-""""""""""""""""""""""""""""""""""""}}}
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "				keymaps
-"		cmd aliases						{{{
-"""""""""""""""""""""""""""""""""""""""""""
+"		cmd aliases															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " INFO all abbrev commands are non recursive
 
 " alias only triggered if it's on the start of the line
@@ -298,9 +298,9 @@ cabbrev css CtrlSpaceSaveWorkspace
 cabbrev csl CtrlSpaceLoadWorkspace
 
 cabbrev ccc call ToggleColorColumn()
-""""""""""""""""""""""""""""""""""""""""}}}
-"		generic mappings				{{{
-"""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		generic mappings													{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " disable ed mode:
 nnoremap Q <nop>
 " no more ćevap-fingers
@@ -367,8 +367,8 @@ inoremap <expr><C-_>	deoplete#undo_completion()
 " endfunction
 " INFO 161203 It's seems that default behaviour of enter and deoplete is good enough for me
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		buffers/windows/tabs keymaps	{{{
-"""""""""""""""""""""""""""""""""""""""""""
+"		buffers/windows/tabs keymaps										{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nnoremap tn :tabnew<cr>
 nnoremap th :tabprev<cr>
 nnoremap tl :tabnext<cr>
@@ -450,8 +450,8 @@ nnoremap <C-w>d :tab split<cr>:echom "tab duplicated"<cr>
 " close all windows in current tab
 nnoremap <C-w>C :tabclose<cr>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		Emacs shortcuts					{{{
-"""""""""""""""""""""""""""""""""""""""""""
+"		Emacs shortcuts														{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " blasphemy, Emacs shortcuts in Vim
 " INFO C-BS won't work in xterm
 inoremap <C-a> <Home>
@@ -496,8 +496,8 @@ if has('nvim')
 	cnoremap <A-f> <S-Right>
 endif
 """"""""""""""""""""""""""""""""""""""""}}}
-"		hardko mode						{{{
-"""""""""""""""""""""""""""""""""""""""""""
+"		hardko mode															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nnoremap <Left>		:echoe "Use h"<cr>
 nnoremap <Right>	:echoe "Use l"<cr>
 nnoremap <Up>		:echoe "Use k"<cr>
@@ -508,11 +508,11 @@ nnoremap <esc>[ <esc>[
 
 " breaking the habit
 imap <C-c> <C-o>:echoe "Use esc, bogajebo"<cr>
-""""""""""""""""""""""""""""""""""""""""}}}
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 " TODO better, check if highlight is active (HOW?):
 nnoremap <silent> <esc> :noh<cr><esc>:echo "hlsearch disabled"<cr>
-"		leader mappings					{{{
-"""""""""""""""""""""""""""""""""""""""""""
+"		leader mappings														{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " muliple leader (just in case, not really needed in my case):
 "nmap , \
 "nmap <space> \ " won't work because space is used for fold toggle
@@ -539,9 +539,9 @@ nnoremap <silent> <leader>ML :call AppendModeline()<cr>
 
 
 " INFO there are some leader mappings <leader>0..9 in tabs section
-""""""""""""""""""""""""""""""""""""""""}}}
-"		leader plugin mappings			{{{
-"""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		plugin mappings														{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nnoremap <leader>t :TagbarToggle<cr>
 nnoremap <leader>f :NERDTreeToggle<cr>
 nnoremap <leader>ff :NERDTreeToggle<cr>
@@ -557,6 +557,7 @@ nnoremap <leader>b :CtrlPBuffer<cr>
 "
 " TODO open new tab (duplicate), there open Ack!
 nnoremap <leader>a :tab split<cr>:Ack! <C-r><C-w><CR>
+command! FixWhiteSpace StripWhitespace
 
 " not too useful
 "nnoremap <leader>1 <Plug>AirlineSelectTab1
@@ -571,10 +572,10 @@ nnoremap <leader>a :tab split<cr>:Ack! <C-r><C-w><CR>
 "nnoremap <leader>- <Plug>AirlineSelectPrevTab
 "nnoremap <leader>+ <Plug>AirlineSelectNextTab
 "nnoremap <leader>= <Plug>AirlineSelectNextTab
-""""""""""""""""""""""""""""""""""""""""}}}
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
-"		copy paste mappings				{{{
-"""""""""""""""""""""""""""""""""""""""""""
+"		copy paste mappings													{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " paste and indent
 " this will sometimes fail
 nnoremap p ]p
@@ -674,7 +675,7 @@ if has('clipboard')	" not really needed for all options under this
 	nnoremap <leader>FFP :let @* = expand("%:p")<cr>:echo		"full path of the file copied to the X11 1st clipboard"<CR>
 	nnoremap <leader>ffp :let @+ = expand("%:p")<cr>:echo		"full path of the file copied to the X11 2nd clipboard"<CR>
 endif
-""""""""""""""""""""""""""""""""""""""""}}}
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		mouse mappings														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " double click select all occurrences
@@ -819,7 +820,7 @@ Plug 'vim-scripts/AutoTag'
 
 Plug 'tpope/vim-obsession'	" restore session, needed for tmux ressurect
 
-"			themes {{{
+"			themes 															{{{
 "Plug 'edkolev/tmuxline.vim'	" enable tmux to pickup Vim airline style
 Plug 'tpope/vim-vividchalk'
 Plug 'gosukiwi/vim-atom-dark'	" not-to-high contrast
@@ -836,7 +837,7 @@ Plug 'kristijanhusak/vim-hybrid-material'
 " Plug 'sjl/badwolf'
 " Plug 'vim-scripts/asu1dark.vim'
 " Plug 'vim-scripts/borland.vim'
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 
 Plug 'kien/rainbow_parentheses.vim'
@@ -892,29 +893,9 @@ if has ('nvim')
 	let g:deoplete#sources#clang#sort_algo = 'priority'	" or alphabetical
 	let g:echodoc_enable_at_startup = 1			" show info in cmd line instead in preview window
 endif
-
-" clang_complete {{{
-let g:clang_complete_auto = 0
-let g:clang_complete_auto = 1
-let g:clang_auto_select = 0
-"let g:clang_omnicppcomplete_compliance = 0 " Now it's possible to use just Omni's C-X C-U
-let g:clang_make_default_keymappings = 0
-let g:clang_use_library = 1		" faster than using clang
-
-if s:uname == "FreeBSD"
-	let g:clang_library_path='/usr/lib/llvm-3.6/lib/libclang.so'
-endif
-if s:uname == "Linux"
-	let g:clang_library_path='/usr/lib/llvm-3.6/lib/libclang.so'
-endif
-
-let g:clang_complete_copen = 1	" open quickfix window on error
-let g:clang_hl_errors = 1		" highlight errors and warnining
-let g:clang_close_preview = 1	" autoclose preview window
-" }}}
-""""""""""""""""""""""""""""""""""""}}}
-"		airline						{{{
-"""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		airline																{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " TODO reenable this when CtrlSpace can be disabled
 
 " INFO nisam uspio nac da radi kao bez CtrlSpace (buffers on the left, tabs on
@@ -997,9 +978,9 @@ let g:airline#extensions#obsession#indicator_text = '$'
 let g:airline_powerline_fonts = 1
 let g:Powerline_symbols = 'fancy'
 
-""""""""""""""""""""""""""""""""""""}}}
-"		Ctrl-Space					{{{
-"""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		Ctrl-Space															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Plugin for tabs/buffers/file/sessions/bookmarks
 " only used for binding buffers to specific tabs and saving that layout
 
@@ -1011,7 +992,7 @@ if executable("ag")
 endif
 
 let g:CtrlSpaceUseUnicode = 0 " unicode will show just 1 and 2
-""""""""""""""""""""""""""""""""""""}}}
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		CtrlP																{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:ctrlp_map = '<leader>o'	" disable default Ctrl-P
@@ -1115,7 +1096,6 @@ let g:lastplace_ignore = "gitcommit,gitrebase,svn,hgcommit"
 " INFO highlight trailing spaces in red
 " :ToggleWhitespace
 let g:better_whitespace_filetypes_blacklist = ['help', 'Help', 'quickfix', 'vim-plug', 'man', 'diff']
-command! FixWhiteSpace StripWhiteSpace
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		indexed search														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1211,8 +1191,8 @@ let g:tagbar_previewwin_pos = "aboveleft"
 let g:tagbar_autopreview = 0
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		git plugins					{{{
-"""""""""""""""""""""""""""""""""""""""
+"		git plugins															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " INFO show +-~ on the left of line if line is added/removed/changed
 " GitGutter{Enable,Disable,Toggle}
 " update: GitGutter{,All}	current/all buffers
@@ -1251,7 +1231,7 @@ let g:signify_sign_delete_first_line = '‾'
 let g:signify_sign_change            = 'm'
 "let g:signify_sign_changedelete      = g:signify_sign_change
 let g:signify_sign_show_count = 1
-""""""""""""""""""""""""""""""""""""}}}
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		ack																	{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " INFO ack Vim plugin but system bin 'ag' will be used
@@ -1299,8 +1279,8 @@ let g:taboo_tabline = 0		" AirLine is OK for this purpose
 let g:airline#extensions#taboo#enabled = 1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
-"		Syntastic					{{{
-"""""""""""""""""""""""""""""""""""""""
+"		Syntastic															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " TODO disable YCM checkers for this to work
 let g:syntastic_always_populate_loc_list = 1	" auto populating window at the bottom
 let g:syntastic_auto_loc_list = 1
@@ -1323,16 +1303,17 @@ let g:syntastic_cpp_include_dirs = ["includes", "headers"]
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
-""""""""""""""""""""""""""""""""""""}}}
-"		multicursor					{{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		multicursor															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:multi_cursor_use_default_mapping=0
 "let g:multi_cursor_next_key='D'
 let g:multi_cursor_prev_key='<c-p>'
 let g:multi_cursor_skip_key='<c-x>'
 let g:multi_cursor_quit_key='<c-c>'
-""""""""""""""""""""""""""""""""""""}}}
-"		Tabularize					{{{
-"""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		Tabularize															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " INFO
 " :Tabularize /,		tabularize at the commas
 " :Tabularize /,/l0r2	tabularize at the commas, left of comma 0 space, right 1
@@ -1346,9 +1327,9 @@ if exists(":Tabularize")
 	"nnoremap <leader>a: :Tabularize /:\zs<cr>
 	"vnoremap <leader>a: :Tabularize /:\zs<cr>
 endif
-""""""""""""""""""""""""""""""""""""}}}
-"		EasyTags					{{{
-"""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		EasyTags															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:easytags_events = ['BufReadPost', 'BufWritePost']
 let g:easytags_async = 1
 "let g:easytags_dynamic_files = 2
@@ -1358,18 +1339,18 @@ let g:easytags_async = 1
 
 "set regexpengine=1 " old engine, faster (maybe), no changes
 let g:easytags_auto_highlight=0		" fix slowiness
-""""""""""""""""""""""""""""""""""""}}}
-"		delimitMate					{{{
-"""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		delimitMate															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "let delimitMate_expand_cr = 1
 augroup mydelimitMate
 	au!
 	au FileType markdown let b:delimitMate_nesting_quotes = ["`"]
 	au FileType python let b:delimitMate_nesting_quotes = ['"', "'"]
 augroup END
-""""""""""""""""""""""""""""""""""""}}}
-"		NERDTree					{{{
-"""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		NERDTree															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:NERDTreeChDirMode=2
 let g:NERDTreeAutoDeleteBuffer=1
 let g:NERDTreeHijackNetrw = 0
@@ -1377,8 +1358,7 @@ let g:NERDTreeShowBookmarks = 1
 let g:NERDTreeMinimalUI = 1
 "noremap <space> :NERDTreeToggle<cr>
 "noremap <leader>. :NERDTreeFind<cr>
-""""""""""""""""""""""""""""""""""""}}}
-
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 "				GUI settings												{{{
@@ -1484,7 +1464,7 @@ function! CursorEdge()	" {{{
 	" XXX uzima u obzir trenutnu lokaciju kursora, a ne gdje se nalazi iduci hit
 endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-function! s:VSetSearch() " {{{
+function! s:VSetSearch() "													{{{
 " visual mode */#
 	let temp = @@
 	norm! gvy
@@ -1497,7 +1477,7 @@ vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR>
 
 " TODO combo with indexed_search
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-function! ZeroMove()														 "{{{
+function! ZeroMove() "														{{{
 " INFO toggle between ^ and 0
 	let l:column_old = col('.')
 
@@ -1512,7 +1492,7 @@ function! ZeroMove()														 "{{{
 	endif
 endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-function! NeatFoldText() "{{{
+function! NeatFoldText() "													{{{
 	" http://dhruvasagar.com/2013/03/28/vim-better-foldtext
 	let line = ' ' . substitute(getline(v:foldstart), '^\s*"\?\s*\|\s*"\?\s*{{' . '{\d*\s*', '', 'g') . ' '
 	let lines_count = v:foldend - v:foldstart + 1
@@ -1554,7 +1534,7 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
-" ag																		{{
+" ag																		{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if executable('ag')
 	" Note we extract the column as well as the file and line number
@@ -1573,7 +1553,7 @@ if executable('ag')
 
 	" ag is fast enough that CtrlP doesn't need to cache
 	let g:ctrlp_use_caching = 0
-endif							"}}}
+endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 "" Add set path=.,<relative include dir> for searching for header in particular directories. For more information do ":help file-searching".
@@ -1586,6 +1566,7 @@ endif							"}}}
 "map <A-]> :vsp <cr>:exec("tag ".expand("<cword>"))<CR>
 
 " cscope "																	{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if has('cscope')
 	" include cscope when searching for tag (Ctrl-])
 	" show verbose info when loading cscope DB
@@ -1620,6 +1601,7 @@ map g<C-\> :cs find 0 <C-R>=expand("<cword>")<CR><CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 " work specific stuff														{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:work_pc=system('is_work_pc')
 let g:work_dir=system('is_work_dir')
 
