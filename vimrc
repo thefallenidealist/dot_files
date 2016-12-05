@@ -123,7 +123,7 @@ set showmatch
 "		spell						{{{
 """""""""""""""""""""""""""""""""""""""
 set spellfile=~/.vim/spelluser.utf-8.add	" don't use '_' in filename
-"set spelllang=~/.vim/spell/hr.utf-8.spl,en	" 
+"set spelllang=~/.vim/spell/hr.utf-8.spl,en	"
 setlocal spelllang=en_us	" TODO hr
 " set complete+=kspell
 """"""""""""""""""""""""""""""""""""}}}
@@ -173,7 +173,7 @@ augroup my_group_with_a_very_uniq_name
 	autocmd Filetype help NumbersDisable
 	autocmd BufEnter help norelativenumber
 	autocmd BufEnter help IndentLinesDisable
-	" TODO FixWhiteSpace is controled from its option
+	" INFO FixWhiteSpace is controled from its option
 
 	" map q as kill only in help window
 	autocmd Filetype help nnoremap <buffer> q :wincmd c<cr>
@@ -346,6 +346,7 @@ vnoremap > >gv
 " deindent from insert mode
 inoremap <S-Tab> <C-o><<
 " INFO maybe more useful shortcut for window management
+" XXX doesn't work
 nnoremap <S-Tab> <<
 
 " auto-complete 'fix'
@@ -719,19 +720,15 @@ Plug 'Shougo/neopairs.vim'	" Auto insert pairs when complete done
 "Plug 'Shougo/neosnippet.vim' 		" dodatak za neocomplete
 "Plug 'garbas/vim-snipmate' 		" autocomplete for loops and etc
 
-Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline'		" fancy status and tabbar
 "Plug 'vim-airline/vim-airline-themes'
 Plug 'ctrlpvim/ctrlp.vim'			" fuzzy file/buffer/MRU finder
 Plug 'bogado/file-line'				" open file.txt:123
 Plug 'dietsche/vim-lastplace'		" Open file at last edit position
 Plug 'qpkorr/vim-bufkill'			" kill buffer without killing split :BD :BW
 Plug 'henrik/vim-indexed-search'	" show search as: result 123 of 456
-"Plug 'bronson/vim-trailing-whitespace'	" show red block when there is a trailing whitespace  :FixWhiteSpace
-Plug 'bronson/vim-trailing-whitespace', {'for': !'man,help,plug'}
-			"let g:extra_whitespace_ignored_filetypes = ['help', 'Help', 'quickfix', 'vim-plug', 'man', 'diff']
-Plug 'vim-better-whitespace'
+Plug 'ntpeters/vim-better-whitespace'	" show red block when there is a trailing whitespace
 
-" show red block when there is a trailing whitespace  :FixWhiteSpace
 Plug 'kshenoy/vim-signature'		" show marks visually
 "Plug 'romgrk/winteract.vim'
 Plug 'ronakg/quickr-preview.vim'	" preview file without opening
@@ -1113,12 +1110,12 @@ let g:ctrlp_buftag_ctags_bin = ''
 let g:lastplace_open_folds = 1 " auto open folder, default: 1 XXX don't work for nested folds
 let g:lastplace_ignore = "gitcommit,gitrebase,svn,hgcommit"
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		FixWhiteSpace														{{{
+"		WhiteSpace															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " INFO highlight trailing spaces in red
-" disable plugin on this filetypes
-let g:extra_whitespace_ignored_filetypes = ['help', 'Help', 'quickfix', 'vim-plug', 'man', 'diff']
-" XXX still will work on help filetype and vim-plug
+" :ToggleWhitespace
+let g:better_whitespace_filetypes_blacklist = ['help', 'Help', 'quickfix', 'vim-plug', 'man', 'diff']
+command! FixWhiteSpace StripWhiteSpace
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		indexed search														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1436,7 +1433,7 @@ highlight SpecialKey	ctermfg=236
 highlight Conceal		ctermfg=7 ctermbg=233
 
 " longer vertical bar for vertical splits, space for folds (default was -)
-set fillchars=vert:\│,fold:\ 
+set fillchars=vert:\│,fold:\
 
 " change the colors in diff mode
 highlight DiffAdded		ctermfg=81
