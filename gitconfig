@@ -1,9 +1,7 @@
 # INFO to view options: git config --list (or -l)
 [user]
-	email = propaliidealist@gmail.com
-	name = Johnny Sorocil
-[github]
-	user = propaliidealist@gmail.com
+	email = pero@firma.kom
+	name = pero
 [merge]
 	tool = vimdiff
 [credential]

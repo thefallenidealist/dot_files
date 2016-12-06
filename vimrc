@@ -334,7 +334,7 @@ nnoremap zc zc:echo "fold current close"<cr>
 nnoremap zi zi:echo "fold all toggle"<cr>
 nnoremap zR zR:echo "fold all open"<cr>
 nnoremap zM zM:echo "fold all close"<cr>
-nnoremap zv zv:echo "fold reveal cursor"<cr>
+"nnoremap zv zv:echo "fold reveal cursor"<cr>
 "nnoremap <space> za
 nnoremap <silent> <Space> @=(foldlevel('.')?'zazz':"\<Space>")<CR>
 vnoremap <Space> zf
@@ -463,9 +463,9 @@ inoremap <C-f> <Right>
 inoremap <C-d> <Delete>
 inoremap <C-k> <C-o>D
 inoremap <C-_> <C-o>u
-" awww, memories    XXX
-"map <C-x> <C-s>    :write<cr>
-"map <C-x> <C-c>    :quit<cr>
+" awww, memories
+" nnoremap <C-x><C-s> :write<cr>
+" nnoremap <C-x><C-c> :quit<cr>
 if has('nvim')
 	inoremap <A-BS> <C-W>
 	inoremap <A-b> <C-o>b
@@ -690,7 +690,7 @@ call plug#begin('~/.vim/plugged')
 if has("nvim")
 	" Autocomplete for nvim (needs python3)
 	Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-	Plug 'zchee/deoplete-clang'	" show functions arguments, slows down j/k
+	" Plug 'zchee/deoplete-clang'	" show functions arguments, slows down j/k
 	" Plug 'Rip-Rip/clang_complete'
 	"Plug 'wellle/tmux-complete.vim'	" autocomplete text from tmux buffer (eg git commit hash)
 else
@@ -730,6 +730,7 @@ Plug 'mileszs/ack.vim'			" ack plugin, but for 'ag'
 "Plug 'gcmt/taboo.vim'			" rename tabs XXX don't work with CtrlSpace and AirLine
 "Plug 'ronakg/quickr-cscope.vim'" cscope XXX
 Plug 'brookhong/cscope.vim'		" cscope
+Plug 'rhysd/vim-clang-format'
 
 "Plug 'tpope/vim-characterize'	" show dec/hex/oct for char under the cursos, (ga), unicode style
 " čć
@@ -827,6 +828,8 @@ Plug 'kristijanhusak/vim-hybrid-material'
 Plug 'kien/rainbow_parentheses.vim'
 Plug 'vim-scripts/TagHighlight'	" color typedefs as variables
 Plug 'octol/vim-cpp-enhanced-highlight'
+
+Plug 'ryanoasis/vim-devicons'		" fonts
 
 
 call plug#end()
@@ -979,16 +982,13 @@ let g:CtrlSpaceUseUnicode = 0 " unicode will show just 1 and 2
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		CtrlP																{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:ctrlp_map = '<leader>o'	" disable default Ctrl-P
-"let g:ctrlp_cmd = 'CtrlP'
-
-let g:ctrlp_arg_map = 0		" Stop CtrlP from using Ctrl-O as his shortcut
+let g:ctrlp_map = '<leader>o'	" override default Ctrl-P
+let g:ctrlp_arg_map = 0			" Stop CtrlP from using Ctrl-O as his shortcut
 " Disable Ctrl-o as CtrlP shortcut, he has better things to do
 let g:ctrlp_prompt_mappings = {
 			\ 'OpenMulti()':          [''],
 			\ }
 
-" don't let ctrlp take over the screen!
 let g:ctrlp_max_height=30
 " TODO provjerit
 "let g:ctrlp_by_filename = 1
@@ -998,9 +998,6 @@ let g:ctrlp_max_height=30
 " Search from current directory instead of project root
 let g:ctrlp_working_path_mode = 0
 
-"let g:ctrlp_user_command = 'find %s -type f'	" Use a custom file listing command
-"let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files -co --exclude-standard']	" Ignore files in .gitignore
-
 " This is already set in Vim's wildignore
 " let g:ctrlp_custom_ignore = {
 			" \ 'dir':  '\v[\/]\.(git|hg|svn)$',
@@ -1008,65 +1005,62 @@ let g:ctrlp_working_path_mode = 0
 			" \ 'link': 'some_bad_symbolic_links',
 			" \ }
 
-
-" CtrlP Emacs shortcuts
-" INFO older shortcuts with used keys need to be removed
-" TODO mozda jos nesta, zasad samo "j" i "k" dodani Emacs
+" CtrlP Emacs shortcuts and some other
 let g:ctrlp_prompt_mappings = {
-			\ 'PrtBS()':              ['<bs>', '<c-]>'],
-			\ 'PrtDelete()':          ['<del>'],
-			\ 'PrtDeleteWord()':      ['<c-w>'],
-			\ 'PrtClear()':           ['<c-u>'],
-			\ 'PrtSelectMove("j")':   ['<c-n>', '<c-j>', '<down>'],
-			\ 'PrtSelectMove("k")':   ['<c-p>', '<c-k>', '<up>'],
-			\ 'PrtSelectMove("t")':   ['<Home>', '<kHome>'],
-			\ 'PrtSelectMove("b")':   ['<End>', '<kEnd>'],
-			\ 'PrtSelectMove("u")':   ['<PageUp>', '<kPageUp>'],
-			\ 'PrtSelectMove("d")':   ['<PageDown>', '<kPageDown>'],
-			\ 'PrtHistory(-1)':       [''],
-			\ 'PrtHistory(1)':        [''],
-			\ 'AcceptSelection("e")': ['<cr>', '<2-LeftMouse>'],
-			\ 'AcceptSelection("h")': ['<c-x>', '<c-cr>', '<c-s>'],
-			\ 'AcceptSelection("t")': ['<c-t>'],
-			\ 'AcceptSelection("v")': ['<c-v>', '<RightMouse>'],
-			\ 'ToggleFocus()':        ['<s-tab>'],
-			\ 'ToggleRegex()':        ['<c-r>'],
-			\ 'ToggleByFname()':      ['<c-d>'],
-			\ 'ToggleType(1)':        ['<c-f>', '<c-up>'],
-			\ 'ToggleType(-1)':       ['<c-b>', '<c-down>'],
-			\ 'PrtExpandDir()':       ['<tab>'],
-			\ 'PrtInsert("c")':       ['<MiddleMouse>', '<insert>'],
-			\ 'PrtInsert()':          ['<c-\>'],
-			\ 'PrtCurStart()':        ['<c-a>'],
-			\ 'PrtCurEnd()':          ['<c-e>'],
-			\ 'PrtCurLeft()':         ['<c-h>', '<left>', '<c-^>'],
-			\ 'PrtCurRight()':        ['<c-l>', '<right>'],
-			\ 'PrtClearCache()':      ['<F5>'],
-			\ 'PrtDeleteEnt()':       ['<F7>'],
-			\ 'CreateNewFile()':      ['<c-y>'],
-			\ 'MarkToOpen()':         ['<c-z>'],
-			\ 'OpenMulti()':          ['<c-o>'],
-			\ 'PrtExit()':            ['<esc>', '<c-c>', '<c-g>'],
-			\ }
+	\ 'PrtBS()':				['<c-h>',	'<bs>',	'<c-]>'],
+	\ 'PrtDelete()':			['<c-d>',	'<del>'],
+	\ 'PrtDeleteWord()':		['<c-w>'],
+	\ 'PrtClear()':				['<c-u>'],
+	\ 'PrtSelectMove("j")':		['<c-n>',	'<c-j>',		'<down>'],
+	\ 'PrtSelectMove("k")':		['<c-p>',	'<c-k>',		'<up>'],
+	\ 'PrtSelectMove("t")':		['<a-a>',	'<Home>',		'<kHome>'],
+	\ 'PrtSelectMove("b")':		['<a-e>',	'<End>',		'<kEnd>'],
+	\ 'PrtSelectMove("u")':		['<a-b>',	'<PageUp>',		'<kPageUp>'],
+	\ 'PrtSelectMove("d")':		['<a-f>',	'<PageDown>',	'<kPageDown>'],
+	\ 'PrtHistory(-1)':			['<a-p>'],
+	\ 'PrtHistory(1)':			['<a-n>'],
+	\ 'AcceptSelection("e")':	['<c-m>',				'<cr>', '<2-LeftMouse>'],
+	\ 'AcceptSelection("h")':	['<c-s>',	'<a-s>',	'<c-cr>'],
+	\ 'AcceptSelection("t")':	[			'<a-t>'],
+	\ 'AcceptSelection("v")':	['<c-v>',	'<a-v>',			'<RightMouse>'],
+	\ 'ToggleFocus()':			['<s-tab>'],
+	\ 'ToggleRegex()':			['<c-r>'],
+	\ 'ToggleByFname()':		[''],
+	\ 'ToggleType(1)':			['<tab>',	'<c-up>'],
+	\ 'ToggleType(-1)':			['',		'<c-down>'],
+	\ 'PrtExpandDir()':			[''],
+	\ 'PrtInsert("c")':			['<MiddleMouse>', '<insert>'],
+	\ 'PrtInsert()':			['<c-\>'],
+	\ 'PrtCurStart()':			['<c-a>'],
+	\ 'PrtCurEnd()':			['<c-e>'],
+	\ 'PrtCurLeft()':			['<c-b>', '<left>', '<c-^>'],
+	\ 'PrtCurRight()':			['<c-l>', '<right>'],
+	\ 'PrtClearCache()':		['<a-r>', '<F5>'],
+	\ 'PrtDeleteEnt()':			['<F7>'],
+	\ 'CreateNewFile()':		['<c-y>'],
+	\ 'MarkToOpen()':			['<c-z>'],
+	\ 'OpenMulti()':			['<c-o>'],
+	\ 'PrtExit()':				['<esc>', '<c-c>', '<c-g>'],
+	\ }
 
 let g:ctrlp_clear_cache_on_exit = 0	" Use F5 in CtrlP for refresh, calls CtrlPClear{,All}Caches
-									" TODO remap this to something that is not F5 or use manual function
 let g:ctrlp_cache_dir = $HOME.'/.cache/ctrlp'
-let g:ctrlp_show_hidden = 1	" will not search .git because of wildignore
+"let g:ctrlp_show_hidden = 1		" will not search .git because of wildignore
 let g:ctrlp_max_files = 30000
-let g:ctrlp_max_depth = 40	" max dirs
+let g:ctrlp_max_depth = 40			" max dirs
 let g:ctrlp_match_current_file = 1	" show current file when searching
 
 " MRU options
 let g:ctrlp_mruf_max = 250
-let g:ctrlp_mruf_exclude = '/tmp/.*\|/temp/.*' " MacOSX/Linux
-
+let g:ctrlp_mruf_exclude = '/tmp/.*\|/temp/.*'
 
 " extension, should be enabled
 let g:ctrlp_buftag_ctags_bin = ''
 
-" TODO Ctrl-S open in split (instead Ctrl-X)
-" TODO ignore .o
+" CtrlP by default use OS find program. Use ag to respect .gitignore, tags,...
+if executable('ag')
+	let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 "		lastplace															{{{
@@ -1218,9 +1212,19 @@ let g:signify_sign_show_count = 1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		ack																	{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" INFO ack Vim plugin but system bin 'ag' will be used
+" INFO ack Vim plugin but systems 'ag' binary will be used
+" :AckAdd:		add results to the current search list in quickfix
+" :AckWindow:	search current tab
 if executable('ag')
-	let g:ackprg = 'ag --vimgrep --path-to-ignore ~/.agignore'
+	if s:uname == "FreeBSD"
+		"let g:ackprg = 'ag --vimgrep --path-to-ignore ~/.agignore'
+		let g:ackprg = 'ag --vimgrep --path-to-ignore ~/.agignore -H --column'
+		" FreeBSD ag version 1.0.1
+	elseif s:uname == "Linux"
+		" Linux ag --version: 0.19.2
+		let g:ackprg = 'ag'
+		" TODO ack-grep?
+	endif
 endif
 
 let g:ack_apply_qmappings = 0	" disable QuickFix mappings
@@ -1261,6 +1265,32 @@ let g:ackhighlight = 1		" highlight the searched term.
 
 let g:taboo_tabline = 0		" AirLine is OK for this purpose
 let g:airline#extensions#taboo#enabled = 1
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		clang-format														{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" INFO reformat code
+let g:clang_format#command="clang-format-3.5"
+let g:clang_format#code_style="mozilla"
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		zoom-win															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" temporary put current split (window) as maximized window
+" default shortcut would report error about unsupported vim options which will be preserved after switching
+" copied s:localoptlist from help and removed parameters that would cause error (key, oft, sn, tx)
+let g:zoomwin_localoptlist   = [
+			\ "ai"  , "ar"  , "bh"  , "bin", "bl"  ,
+			\ "bomb", "bt"  , "cfu" , "ci" , "cin" ,
+			\ "cink", "cino", "cinw", "cms", "com" ,
+			\ "cpt" , "efm" , "eol" , "ep" , "et"  ,
+			\ "fenc", "fex" , "ff"  , "flp", "fo"  ,
+			\ "ft"  , "gp"  , "imi" , "ims", "inde",
+			\ "inex", "indk", "inf" , "isk", 
+			\ "kmp" , "lisp", "mps" , "ml" , "ma"  ,
+			\ "mod" , "nf"  , "ofu" ,         "pi" ,
+			\ "qe"  , "ro"  , "sw"  ,         "si" ,
+			\ "sts" , "spc" , "spf" , "spl", "sua" ,
+			\ "swf" , "smc" , "syn" , "ts" , 
+			\ "tw"  , "udf" , "wm"]
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 "		Syntastic															{{{
@@ -1520,28 +1550,6 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
-" ag																		{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if executable('ag')
-	" Note we extract the column as well as the file and line number
-	set grepprg=ag\ --nogroup\ --nocolor\ --column
-	" f file name
-	" "
-	" l line number
-	" c column number
-	" m error message
-	" TODO dosredit ovo da ne pokazuje novu liniju izmedju fajlova u quickfix windowu
-	" set grepformat=%f:%l:%c%m
-	" let g:ag_format="%f:%l:%m"
-
-	" Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
-	let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
-
-	" ag is fast enough that CtrlP doesn't need to cache
-	let g:ctrlp_use_caching = 0
-endif
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-
 "" Add set path=.,<relative include dir> for searching for header in particular directories. For more information do ":help file-searching".
 
 " open tag in a new tab TEST modified line
@@ -1586,20 +1594,20 @@ map g<C-]> :cs find 3 <C-R>=expand("<cword>")<CR><CR>
 map g<C-\> :cs find 0 <C-R>=expand("<cword>")<CR><CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
-" work specific stuff														{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:work_pc=system('is_work_pc')
-let g:work_dir=system('is_work_dir')
+" " work specific stuff														{{{
+" """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" let g:work_pc=system('is_work_pc')
+" let g:work_dir=system('is_work_dir')
 
-if work_pc == 1
-	set list
+" if work_pc == 1
+	" set list
 
-	if work_dir == 1
-		" expand only if we are working on work stuff
-		set expandtab
-		highlight clear ColorColumn	" don't color background after textwidth
-	endif
-endif
+	" if work_dir == 1
+		" " expand only if we are working on work stuff
+		" set expandtab
+		" highlight clear ColorColumn	" don't color background after textwidth
+	" endif
+" endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 " tab jumps to the previous active window
@@ -1683,6 +1691,13 @@ set viewoptions-=options	" for mkview, don't store current file
 set viewdir=~/.vim/view
 " :mkview :loadview
 
+" diff
+" open original file in one split, open new split and put newer version (no need to save that buffer) and then:
+" :windo diffon
+" :windo diffoff
+
+" args `ag -l SomethingToSearch`
+" argdo s/something/else/g | w
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 " move split to tab: Ctrl-W T
 " moving		 															{{{
@@ -1691,10 +1706,15 @@ set viewdir=~/.vim/view
 " ]s [s jump to next/prev spell mistake
 " {} goto prev/next empty line
 
+" zz put current line on the middle of the screen
+" zt put current line on the top of the screen
+" zb put current line on the bottom of the screen
+
 " quick fix list prev/next: 	[q	]q (alse :cn and :cp)
 " prev/next file:				[f	]f
 " prev/next misspell			[s	]s
 " prev/next file in args list	[a	]a (A for first/last)
+" goto changes (git)			[c	]c
 
 " gd	will take you to the local declaration.
 " gD	will take you to the global declaration.
@@ -1710,6 +1730,7 @@ set viewdir=~/.vim/view
 "##########################################################################}}}
 " tips and tricks 															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" db	delete word backwars
 " profiling: http://stackoverflow.com/questions/12213597/how-to-see-which-plugins-are-making-vim-slow
 	" :profile start profile.log
 	" :profile func *
@@ -1738,10 +1759,6 @@ set viewdir=~/.vim/view
 " load all matching files to buffers: :args `git grep -l <string>`
 " do something on all loaded buffers: :argdo %s/<string>/<replacement>/gce | update 		gce: global, confirm, error ignore
 
-" zz put current line on the middle of the screen
-" zt put current line on the top of the screen
-" zb put current line on the bottom of the screen
-
 " redirect to file (in this example kbd map):
 	":redir! > vim_maps.txt
 	" :map
@@ -1754,6 +1771,20 @@ set viewdir=~/.vim/view
 " startup profiling:  vim --startuptime startup.log, visuasilation: https://github.com/hyiltiz/vim-plugins-profile
 
 " load file without loading it :bad file.txt
+
+" argdo {{{
+    " :arg => list files in arglist
+    " :argdelete * => clean arglist
+    " :argadd **/*.rb => add files to arglist
+    " :argdo %s/foo/bar/gc => replace foo by bar in arglist
+    " :argdo update => save changes to arglist
+    " :argdo undo => undo changes to arglist
+" Navigation in arglist
+    " [a => go to the previous file in arglist
+    " ]a => go to the next file in arglist
+    " [A => go to the first file in arglist
+    " ]A => go to the last file in arglist
+" }}}
 "##########################################################################}}}
 " vimL misc							{{{
 " number of tabs: tabpagenr('$')
@@ -1763,6 +1794,12 @@ set viewdir=~/.vim/view
 " current buffer number: bufnr('%')
 " get line under the cursors: getline('.')
 "									}}}
+" font {{{
+" another patched font
+" mkdir -p ~/.local/share/fonts
+" cd ~/.local/share/fonts && curl -fLo "Droid Sans Mono for Powerline Nerd Font Complete.otf" https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/patched-fonts/DroidSansMono/complete/Droid%20Sans%20Mono%20for%20Powerline%20Nerd%20Font%20Complete.otf
+
+" }}}
 
 
 " variables:
