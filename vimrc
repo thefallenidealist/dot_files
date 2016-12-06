@@ -576,18 +576,16 @@ command! FixWhiteSpace StripWhitespace
 
 "		copy paste mappings													{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" paste and indent
-" this will sometimes fail
-nnoremap p ]p
-nnoremap P ]P
-" TODO try this
-"nnoremap p p=`]
-" TODO enter paste mode, ]p, exit paste mode
+" paste and adjuste indent
+" nnoremap p ]p
+" nnoremap P ]P
+nnoremap p p=`]
+nnoremap P P=`]
 
 if has('clipboard')	" not really needed for all options under this
-	" copy paste from system clipboard (second X11 buffer - Ctrl-C/V)
-	" p paste after the cursor
-	" P paste before the cursor INFO not used here
+	" ": unnamed register (dd/yy)
+	" *: X11 primary	  (select/middle click)
+	" +: X11 secondanry   (Ctrl-C/V)
 
 	" INFO can't have spaces in alias, spaces is aliased to fold toggle TODO
 	" "*	X11 primary buffer
@@ -627,43 +625,29 @@ if has('clipboard')	" not really needed for all options under this
 	" INFO this will slowdown copy to the X11 clipboard (<leader>y)
 	" TODO better naming (it's not a register 1 but q)
 	" TODO :set paste [y/d/p] :set nopaste
-	nnoremap <leader>y1 "qyy :echo "current line copied to the register 1"<cr>
-	nnoremap <leader>y2 "wyy :echo "current line copied to the register 2"<cr>
-	nnoremap <leader>y3 "eyy :echo "current line copied to the register 3"<cr>
-	nnoremap <leader>y4 "ryy :echo "current line copied to the register 4"<cr>
-	nnoremap <leader>y5 "tyy :echo "current line copied to the register 5"<cr>
-	nnoremap <leader>y6 "yyy :echo "current line copied to the register 6"<cr>
-	nnoremap <leader>y7 "uyy :echo "current line copied to the register 7"<cr>
-	nnoremap <leader>y8 "iyy :echo "current line copied to the register 8"<cr>
-	nnoremap <leader>y9 "oyy :echo "current line copied to the register 9"<cr>
-	nnoremap <leader>y0 "pyy :echo "current line copied to the register 0"<cr>
+	" TODO registers: asdfghjkl
 
-	vnoremap <leader>y1 "qy  :echo "selected text copied to the register 1"<cr>
-	vnoremap <leader>y2 "wy  :echo "selected text copied to the register 2"<cr>
-	vnoremap <leader>y3 "ey  :echo "selected text copied to the register 3"<cr>
-	vnoremap <leader>y4 "ry  :echo "selected text copied to the register 4"<cr>
-	vnoremap <leader>y5 "ty  :echo "selected text copied to the register 5"<cr>
-	vnoremap <leader>y6 "yy  :echo "selected text copied to the register 6"<cr>
-	vnoremap <leader>y7 "uy  :echo "selected text copied to the register 7"<cr>
-	vnoremap <leader>y8 "iy  :echo "selected text copied to the register 8"<cr>
-	vnoremap <leader>y9 "oy  :echo "selected text copied to the register 9"<cr>
-	vnoremap <leader>y0 "py  :echo "selected text copied to the register 0"<cr>
+	vnoremap <leader>y1 "qy  :echo "copied to the register 1"<cr>
+	vnoremap <leader>y2 "wy  :echo "copied to the register 2"<cr>
+	vnoremap <leader>y3 "ey  :echo "copied to the register 3"<cr>
+	vnoremap <leader>y4 "ry  :echo "copied to the register 4"<cr>
+	vnoremap <leader>y5 "ty  :echo "copied to the register 5"<cr>
+	vnoremap <leader>y6 "yy  :echo "copied to the register 6"<cr>
+	vnoremap <leader>y7 "uy  :echo "copied to the register 7"<cr>
+	vnoremap <leader>y8 "iy  :echo "copied to the register 8"<cr>
+	vnoremap <leader>y9 "oy  :echo "copied to the register 9"<cr>
+	vnoremap <leader>y0 "py  :echo "copied to the register 0"<cr>
 
-	nnoremap <leader>p1 "q]p  :echo "something pasted from the register 1"<cr>
-	nnoremap <leader>p2 "w]p  :echo "something pasted from the register 2"<cr>
-	nnoremap <leader>p3 "e]p  :echo "something pasted from the register 3"<cr>
-	nnoremap <leader>p4 "r]p  :echo "something pasted from the register 4"<cr>
-	nnoremap <leader>p5 "t]p  :echo "something pasted from the register 5"<cr>
-	nnoremap <leader>p6 "y]p  :echo "something pasted from the register 6"<cr>
-	nnoremap <leader>p7 "u]p  :echo "something pasted from the register 7"<cr>
-	nnoremap <leader>p8 "i]p  :echo "something pasted from the register 8"<cr>
-	nnoremap <leader>p9 "o]p  :echo "something pasted from the register 9"<cr>
-	nnoremap <leader>p0 "p]p  :echo "something pasted from the register 0"<cr>
-
-
-	" ": unnamed register (dd/yy)
-	" *: X11 primary	  (select/middle click)
-	" +: X11 secondanry   (Ctrl-C/V)
+	nnoremap <leader>p1 "q]p  :echo "paste from the register 1"<cr>
+	nnoremap <leader>p2 "w]p  :echo "paste from the register 2"<cr>
+	nnoremap <leader>p3 "e]p  :echo "paste from the register 3"<cr>
+	nnoremap <leader>p4 "r]p  :echo "paste from the register 4"<cr>
+	nnoremap <leader>p5 "t]p  :echo "paste from the register 5"<cr>
+	nnoremap <leader>p6 "y]p  :echo "paste from the register 6"<cr>
+	nnoremap <leader>p7 "u]p  :echo "paste from the register 7"<cr>
+	nnoremap <leader>p8 "i]p  :echo "paste from the register 8"<cr>
+	nnoremap <leader>p9 "o]p  :echo "paste from the register 9"<cr>
+	nnoremap <leader>p0 "p]p  :echo "paste from the register 0"<cr>
 
 	" % 	relative path
 	" %:p	full path
