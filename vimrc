@@ -45,8 +45,6 @@ set nomodeline
 set modelines=0
 " INFO secure-modelines plugin is used which only allows some (secure) modeline options
 
-set matchpairs+=<:>	" Include angle brackets in matching.
-
 " Xorg paste with middle click
 if !has('nvim')
 	set ttymouse=xterm2
@@ -58,9 +56,13 @@ set gdefault "applies substitutions globally on lines. For example, instead of :
 "set completeopt=menuone,preview	" default
 set completeopt=menuone				" f(); can be view in command line with plugin
 set noshowmode						"Don't show the mode(airline is handling this)
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"		<tab> and wrapping
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set shortmess+=I	" don't show intro message at startup
+set cursorline		" color the line when the cursor is
+set matchpairs+=<:>	" Include angle brackets in matching.
+set showmatch
+
+"		<tab> and wrapping			{{{
+"""""""""""""""""""""""""""""""""""""""
 " soft wrap
 set wrap			" soft break when line is wider than Vim window (not tw)
 set linebreak		" break line without breaking the word
@@ -78,9 +80,7 @@ set formatoptions=""
 set tabstop=4		" tab size
 set shiftwidth=4 	" when indenting with '>'
 "set expandtab		" convert tab to spaces
-
-set shortmess+=I	" don't show intro message at startup
-set cursorline		" color the line when the cursor is
+""""""""""""""""""""""""""""""""""""}}}
 "	commandline completion			{{{
 """""""""""""""""""""""""""""""""""""""
 " shell like autocompletition of commands
@@ -99,7 +99,7 @@ set wildignore+=*.a,*.o,*.elf,*.bin,*.dd,*.img
 set wildignore+=*.bmp,*.gif,*.ico,*.jpg,*.png
 set wildignore+=.git,.hg,.svn
 set wildignore+=*~,*.swp,*.tmp
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+""""""""""""""""""""""""""""""""""""}}}
 
 " show invisible characters, tab is longer (unicode) pipe char
 set listchars=tab:\│·,extends:>,precedes:<
@@ -112,56 +112,87 @@ set list	" show invisible chars (tabs and others defined in listchars)
 set directory=$HOME/.vim/swap/,/tmp
 " place for: filename.txt~
 set backupdir=$HOME/.vim/swap/,/tmp
-"		search																{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"		search						{{{
+"""""""""""""""""""""""""""""""""""""""
 set ignorecase		" case insensitive search, needed for the line below
-set smartcase		" If searched word starts with an uppercase then ... TODO
+set smartcase		" If searched word starts with an uppercase then be case sensitive
 set incsearch		" search as you type INFO for caseinsensitive search: /something\c
-set showmatch
 "set hlsearch        " highlight search - disabled because it will activate themself after reloading vimrc
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		spell																{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""}}}
+"		spell						{{{
+"""""""""""""""""""""""""""""""""""""""
 set spellfile=~/.vim/spelluser.utf-8.add	" don't use '_' in filename
 "set spelllang=~/.vim/spell/hr.utf-8.spl,en	"
 setlocal spelllang=en_us	" TODO hr
 " set complete+=kspell
+""""""""""""""""""""""""""""""""""""}}}
+
+set conceallevel=2	" hide concealed chars until cursor is on that line
+"set foldcolumn=2	" will show clickable '+' in column at the left (which is wide $foldcolumn chars)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		build/programming													{{{
+"		OS specific															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set makeprg=gmake\ -C\ ../build\ -j4
-" TODO <leader> rr
-nnoremap <F5> :w<cr>:!clear && cc % -o %.elf && ./%.elf<CR>
-" F5 mejka i pokrene trenutni program
-nnoremap <F5> :<C-U>silent make %:r<cr>:redraw!<CR>:!./%:r<CR>
-" compat with PCmanFM	XXX: inserts 'e' after calling
-nnoremap <F4> :!xterm&<cr>redraw<CR>
-" TODO if Makefile exists, then just call make
+if has('unix')
+	let s:uname = substitute(system("uname"), '\n', '', '')
+endif
+
+if s:uname == "FreeBSD"
+	let g:tagbar_ctags_bin=substitute(system("which exctags"), '\n', '','')
+endif
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		build/programming			{{{
+"""""""""""""""""""""""""""""""""""""""
+" TODO incoporate this as prefix for part below
+" makeprg can't have spaces
+if s:uname == "FreeBSD"
+	set makeprg="gmake -j4"
+elseif s:uname == "Linux"
+	set makeprg="make -j4"
+endif
+
+function! Compile()
+	" TODO wait for user input after compiling and before running
+		" if enter run program, if q/esc don't
+	if file_readable('Makefile')
+		make
+	elseif file_readable('makefile')
+		make
+	elseif file_readable('compile.sh')
+		setlocal makeprg=./compile.sh
+		make
+	elseif file_readable('compile')
+		setlocal makeprg=./compile
+	elseif expand('%:e') == "cpp"
+		setlocal makeprg=c++\ -Wall\ %\ -o\ %:r.elf\ -std=c++11
+		make
+	elseif expand('%:e') == "c"
+		setlocal makeprg=cc\ -Wall\ %\ -o\ %:r.elf\ -std=c99
+		make
+	else
+		echoerr "Don't know how to build :["
+	endif
+endfunction
+nnoremap <F5> :call Compile()<cr>
+nnoremap <leader>rr :call Compile()<cr>
 
 " za gF komandu koja otvori fajl pod kursorom
 let &path.="src/include,/usr/include/AL,"
 
 " XXX XXX XXX only work in first buffer
 " Highlight TODO, FIXME, NOTE, etc. FIXME:
-" if has("autocmd")
-	" if v:version > 701
-		" autocmd Syntax * call matchadd('Todo',  '\W\zs\(TODO\|FIXME\|CHANGED\|XXX\|BUG\|HACK\|ZAJEB\)')
-		" autocmd Syntax * call matchadd('Debug', '\W\zs\(NOTE\|INFO\|IDEA\)')
-		" autocmd Syntax * call matchadd('Debug', '\W\zs\(INFO_START\|INFO_END\|ERROR\|DEBUG_START\|DEBUG_END\|DEBUG_INFO\)')
-	" endif
-" endif
+if has("autocmd")
+	if v:version > 701
+		autocmd Syntax * call matchadd('Todo',  '\W\zs\(TODO\|FIXME\|CHANGED\|XXX\|BUG\|HACK\|ZAJEB\)')
+		autocmd Syntax * call matchadd('Debug', '\W\zs\(NOTE\|INFO\|IDEA\)')
+		autocmd Syntax * call matchadd('Debug', '\W\zs\(INFO_START\|INFO_END\|ERROR\|DEBUG_START\|DEBUG_END\|DEBUG_INFO\)')
+	endif
+endif
 
 " tags file in CWD
 " search for $CWD/tags, $CWD/.tags and go level up until $HOME
 set tags=tags,.tags;$HOME
+""""""""""""""""""""""""""""""""""""}}}
 
-set binary	" TODO
-set equalalways
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-
-set conceallevel=2	" hide concealed chars until cursor is on that line
-"set foldcolumn=2	" will show clickable '+' in column at the left (which is wide $foldcolumn chars)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		autocmd																{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 augroup my_group_with_a_very_uniq_name
@@ -523,8 +554,10 @@ nnoremap <leader>h :noh<cr>
 nnoremap <leader>s :setlocal spell!<cr>
 " toggle showing invisible chars
 nnoremap <leader>l :set list!<cr>:set list?<CR>
-nnoremap <leader>n :set relativenumber!<cr>
-"nnoremap <leader>n :set relativenumber!<cr>:set number!<CR>
+" nnoremap <leader>n :set relativenumber!<cr>
+" nnoremap <leader>N :set number!<cr>
+nnoremap <leader>n :set relativenumber!<cr>:set number!<CR>
+nnoremap <leader>N :set relativenumber!<cr>
 "reload config file
 nnoremap <leader>r :so $MYVIMRC<cr>:echo "vimrc reloaded"<CR>
 nnoremap <leader>e :e $MYVIMRC<cr>
@@ -671,16 +704,6 @@ endif
 
 " triple click to toggle fold
 nnoremap <3-LeftMouse> za
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		OS specific															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if has('unix')
-	let s:uname = substitute(system("uname"), '\n', '', '')
-endif
-
-if s:uname == "FreeBSD"
-	let g:tagbar_ctags_bin=substitute(system("which exctags"), '\n', '','')
-endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "				Plugins
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1818,13 +1841,8 @@ set viewdir=~/.vim/view
 " TODO <leader>n toggle relative numbers and numbers plugin
 " TODO hide ^M in dos files (or at least dont paint them red)
 " TODO map ]p only in .c and .h files
-" TODO 0 vrati na prvi char, ako je vec na prvom charu neka 0 vrati na pravi
-" pocetak
-" TODO (line 145) fix highlight IDEA and similiar in new buffer also
 " TODO K to show tag in preview window, another K to close preview window (:pclose)
 " INFO moglo bi bit korisno jednog dana: "&& bufname("%") != "[Command Line]"
-" TODO <enter> to clear highlighter search if active
-
 
 " TODO make :BD plays nice with CtrlSpace and buffers per tab
 " INFO CtrlSpaceSaveWorspace would work OK for ctrl-space tabs and buffers
@@ -1850,5 +1868,6 @@ set viewdir=~/.vim/view
 " TODO <enter> - if it's link under cursor then "gx", if it's tag under cursor then :tag... othervise "o"
 
 " INFO cscope cmd: cscope -R -b
+" XXX something disables WhiteSpace after reloading vimrc
 
 " vim: set ts=4 sw=4 tw=0 foldmethod=marker noet :
