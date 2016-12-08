@@ -238,6 +238,12 @@ augroup my_group_with_a_very_uniq_name
 
 	" Don't show numbers in preview window
 	autocmd BufWinEnter * if &previewwindow | setlocal nonumber norelativenumber | endif
+
+
+	autocmd BufWinEnter * if bufname("%") == "[Command Line]" | nnoremap <buffer> q :q<cr> | endif
+	autocmd BufEnter * if bufname("%") == "[Command Line]" | nnoremap <buffer> q :q<cr> | endif
+	autocmd BufEnter * if @% == "[Command Line]" | echo "QQQQQQ" | endif
+	autocmd VimEnter * if @% == "[Command Line]" | echo "QQQQQQ" | else | "AAAAAA" | endif
 augroup END
 
 " setup when in diff mode:
@@ -853,7 +859,7 @@ Plug 'vim-scripts/TagHighlight'	" color typedefs as variables
 Plug 'octol/vim-cpp-enhanced-highlight'
 
 Plug 'ryanoasis/vim-devicons'		" fonts
-
+Plug 'vim-scripts/Workspace-Manager'
 
 call plug#end()
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
@@ -1104,6 +1110,7 @@ let g:better_whitespace_filetypes_blacklist = ['help', 'Help', 'quickfix', 'vim-
 let g:indexed_search_center = 1			" center the screen, default 0
 let g:indexed_search_max_lines = 10000	" default 3000
 let g:indexed_search_shortmess = 1		" shorter messages, default 0
+let g:indexed_search_dont_move = 1		" don't move to the next match
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		NERD commenter														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1721,6 +1728,22 @@ set viewdir=~/.vim/view
 
 " args `ag -l SomethingToSearch`
 " argdo s/something/else/g | w
+
+" IDEA smarter jumping (tag/file/...)
+set isfname+=:	" to recognize :123 as filename (for jumping to specific line)
+set isfname+=32	" <space> is part of filename
+" ~/.vimrc:123
+" /tmp/new file.txt
+" file under cursor (like gf uses): echo expand("<cfile>")
+" for tag search (like * uses): echo expand('<cword'>)
+" if not tag, check if declaration: gd, then gD
+" check if www link
+		" map <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
+		" map <A-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
+		" execute("e ".mycurf) opens the file saved in mycurf
+
+
+" TODO replace <C-r><C-w> shortcuts with expand('<cword>')
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 " move split to tab: Ctrl-W T
 " moving		 															{{{
@@ -1869,5 +1892,6 @@ set viewdir=~/.vim/view
 
 " INFO cscope cmd: cscope -R -b
 " XXX something disables WhiteSpace after reloading vimrc
+" See :help function-list for a high-level overview of vimscript functions.
 
 " vim: set ts=4 sw=4 tw=0 foldmethod=marker noet :
