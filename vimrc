@@ -486,6 +486,11 @@ endif
 nnoremap <C-w>d :tab split<cr>:echom "tab duplicated"<cr>
 " close all windows in current tab
 nnoremap <C-w>C :tabclose<cr>
+
+inoremap <C-w>j <esc><C-w>j
+inoremap <C-w>k <esc><C-w>k
+inoremap <C-w>h <esc><C-w>h
+inoremap <C-w>l <esc><C-w>l
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		Emacs shortcuts														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -643,6 +648,7 @@ if has('clipboard')	" not really needed for all options under this
 	" TODO TODO TODO reorganize all this
 	vnoremap <leader>Y :w! /tmp/vim_buffer<cr>:echo "vselection copied to /tmp/vim_buffer"<cr>
 
+
 	" X11 primary buffer		"*
 	"vnoremap <leader>Y "*y:echo "copied to the X11 1nd clipboard"<cr>
 	vnoremap <leader>D "*d:echo "cutted to the X11 1nd clipboard"<cr>
@@ -652,9 +658,9 @@ if has('clipboard')	" not really needed for all options under this
 
 	" X11 secondary buffer		"+
 	"vnoremap <leader>y "+y :echo "copied to the X11 2nd clipboard"<cr>
-	vnoremap <leader>y "+y :echo "copied to the X11 2nd clipboard"<cr>
-	" faster, do not wait
-	vnoremap <leader>yy "+y :echo "copied to the X11 2nd clipboard"<cr>
+	" TODO TODO set paste mode before pasting
+	" vnoremap <leader>y "+y :echo "copied to the X11 2nd clipboard"<cr>
+	" vnoremap <leader>yy "+y :echo "copied to the X11 2nd clipboard"<cr>
 	vnoremap <leader>d "+d :echo "cutted to the X11 2nd clipboard"<cr>
 	vnoremap <leader>x "+d :echo "cutted to the X11 2nd clipboard"<cr>
 	nnoremap <leader>p "+p :echo "pasted from the X11 2nd clipboard"<cr>
@@ -676,6 +682,17 @@ if has('clipboard')	" not really needed for all options under this
 	vnoremap <leader>y8 "iy  :echo "copied to the register 8"<cr>
 	vnoremap <leader>y9 "oy  :echo "copied to the register 9"<cr>
 	vnoremap <leader>y0 "py  :echo "copied to the register 0"<cr>
+	" append
+	vnoremap <leader>y1 "Qy  :echo "copied to the register 1"<cr>
+	vnoremap <leader>y2 "Wy  :echo "copied to the register 2"<cr>
+	vnoremap <leader>y3 "Ey  :echo "copied to the register 3"<cr>
+	vnoremap <leader>y4 "Ry  :echo "copied to the register 4"<cr>
+	vnoremap <leader>y5 "Ty  :echo "copied to the register 5"<cr>
+	vnoremap <leader>y6 "Yy  :echo "copied to the register 6"<cr>
+	vnoremap <leader>y7 "Uy  :echo "copied to the register 7"<cr>
+	vnoremap <leader>y8 "Iy  :echo "copied to the register 8"<cr>
+	vnoremap <leader>y9 "Oy  :echo "copied to the register 9"<cr>
+	vnoremap <leader>y0 "Py  :echo "copied to the register 0"<cr>
 
 	nnoremap <leader>p1 "q]p  :echo "paste from the register 1"<cr>
 	nnoremap <leader>p2 "w]p  :echo "paste from the register 2"<cr>
@@ -711,6 +728,12 @@ endif
 " triple click to toggle fold
 nnoremap <3-LeftMouse> za
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+
+" Map to buttons
+nnoremap <C-w>H :call TmuxResize('h', 1)<CR>
+nnoremap <C-w>J :call TmuxResize('j', 1)<CR>
+nnoremap <C-w>K :call TmuxResize('k', 1)<CR>
+nnoremap <C-w>L :call TmuxResize('l', 1)<CR>
 "				Plugins
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "				Plugins														{{{
@@ -719,7 +742,7 @@ call plug#begin('~/.vim/plugged')
 if has("nvim")
 	" Autocomplete for nvim (needs python3)
 	Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-	" Plug 'zchee/deoplete-clang'	" show functions arguments, slows down j/k
+	Plug 'zchee/deoplete-clang'	" show functions arguments, slows down j/k
 	" Plug 'Rip-Rip/clang_complete'
 	"Plug 'wellle/tmux-complete.vim'	" autocomplete text from tmux buffer (eg git commit hash)
 else
@@ -853,6 +876,7 @@ Plug 'kristijanhusak/vim-hybrid-material'
 " Plug 'vim-scripts/borland.vim'
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
+Plug 'vim-scripts/tinymode.vim'
 
 Plug 'kien/rainbow_parentheses.vim'
 Plug 'vim-scripts/TagHighlight'	" color typedefs as variables
@@ -875,13 +899,14 @@ if has ('nvim')
 	"let g:deoplete#enable_camel_case = 1 " INFO only with deoplete-matcher*fuzzy
 	let g:neocomplete#enable_fuzzy_completion = 1
 	" let g:deoplete#auto_complete_start_length = 1	" default: 2
-	let g:deoplete#auto_complete_start_length = 1	" deprecated
+	" let g:deoplete#auto_complete_start_length = 1	" deprecated
 	let g:deoplete#source#attribute#min_pattern_length = 1
 	"let g:deoplete#max_abbr_width = 0 " disable, default: 80
 	"-> is added
 	let g:deoplete#delimiters = ['/', '.', '::', ':', '#', '->']
-	let g:deoplete#max_list = 20					" max number of items in list
-	let g:deoplete#auto_complete_delay = 20		" ms, default 150, still slow
+	" let g:deoplete#max_list = 20					" max number of items in list
+	" let g:deoplete#auto_complete_delay = 20		" ms, default 150, still slow
+	let g:deoplete#auto_complete_delay = 1		" ms, default 150, still slow
 
 	"let g:deoplete#sources = {} " init of the variable
 	"let g:deoplete#sources._ = ['buffer'] " default files
@@ -903,7 +928,7 @@ if has ('nvim')
 	let g:deoplete#sources#clang#std#cpp = 'c++11'
 	" let g:deoplete#sources#clang#sort_algo = 'priority'
 
-	let g:deoplete#tag#cache_limit_size = 50000000 " 50 MB
+	" let g:deoplete#tag#cache_limit_size = 50000000 " 50 MB
 	call deoplete#custom#set('_', 'matchers', ['matcher_length', 'matcher_full_fuzzy'])	" don't auto complete basing on the first char
 
 	let g:deoplete#sources#clang#sort_algo = 'priority'	" or alphabetical
@@ -1239,6 +1264,13 @@ let g:signify_sign_delete_first_line = '‾'
 let g:signify_sign_change            = 'm'
 "let g:signify_sign_changedelete      = g:signify_sign_change
 let g:signify_sign_show_count = 1
+" TODO interface with indexed search
+" INFO not nnoremap
+nmap ]c <plug>(signify-next-hunk)zz
+nmap [c <plug>(signify-prev-hunk)zz
+nmap ]C <plug>(signify-next-hunk)
+nmap [C <plug>(signify-prev-hunk)
+" TODO wrap around if indexed search is active (now it just stop at the end which is not a bad thing)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		ack																	{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1403,7 +1435,15 @@ let g:NERDTreeMinimalUI = 1
 "noremap <space> :NERDTreeToggle<cr>
 "noremap <leader>. :NERDTreeFind<cr>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		tinymode															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" INFO
+" TODO
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+
+
+" <leader>s search all buffers
 
 "				GUI settings												{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1576,6 +1616,63 @@ function! ToggleColorColumn()
 		"highlight ColorColumn ctermbg=234
 		execute "highlight ColorColumn ctermbg=".g:color_ColorColumn
 	endif
+endfunction
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" Tmux-like window resizing													{{{
+" INFO still need to press multiple time <C-w>hjkl, not really like tmux, but better than Vims default
+" TODO link for sauce of this
+function! IsEdgeWindowSelected(direction)
+	let l:curwindow = winnr()
+	exec "wincmd ".a:direction
+	let l:result = l:curwindow == winnr()
+
+	if (!l:result)
+		" Go back to the previous window
+		exec l:curwindow."wincmd w"
+	endif
+
+	return l:result
+endfunction
+
+function! GetAction(direction)
+	let l:keys = ['h', 'j', 'k', 'l']
+	let l:actions = ['vertical resize -', 'resize +', 'resize -', 'vertical resize +']
+	return get(l:actions, index(l:keys, a:direction))
+endfunction
+
+function! GetOpposite(direction)
+	let l:keys = ['h', 'j', 'k', 'l']
+	let l:opposites = ['l', 'k', 'j', 'h']
+	return get(l:opposites, index(l:keys, a:direction))
+endfunction
+
+function! TmuxResize(direction, amount)
+	" v >
+	if (a:direction == 'j' || a:direction == 'l')
+		if IsEdgeWindowSelected(a:direction)
+			let l:opposite = GetOpposite(a:direction)
+			let l:curwindow = winnr()
+			exec 'wincmd '.l:opposite
+			let l:action = GetAction(a:direction)
+			exec l:action.a:amount
+			exec l:curwindow.'wincmd w'
+			return
+		endif
+		" < ^
+	elseif (a:direction == 'h' || a:direction == 'k')
+		let l:opposite = GetOpposite(a:direction)
+		if IsEdgeWindowSelected(l:opposite)
+			let l:curwindow = winnr()
+			exec 'wincmd '.a:direction
+			let l:action = GetAction(a:direction)
+			exec l:action.a:amount
+			exec l:curwindow.'wincmd w'
+			return
+		endif
+	endif
+
+	let l:action = GetAction(a:direction)
+	exec l:action.a:amount
 endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
@@ -1884,6 +1981,7 @@ set isfname+=32	" <space> is part of filename
 " TODO q for close if it's last file/window in Vim
 " TODO code snippets
 " TODO dont' autocomplete second " in Vim (probably some plugin)
+" INFO set paste! will realign folds text
 " TODO Ag skip tags file
 " TODO disable swap file in paste mode (otherwise very slow on copying multiple lines)
 " TODO <Tab>/<C-i> switch window if there are multiple windows, othervise normal Ctrl-I

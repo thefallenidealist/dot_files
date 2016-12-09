@@ -1,0 +1,11 @@
+# created 161129
+.gitignore
+tags
+gpio*txt
+*.elf
+*.o
+*.core
+*.swp
+cscope.out
+*tags
+*.d
