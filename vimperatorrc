@@ -99,9 +99,10 @@ colorscheme seaweed
 "colorscheme ywgx	" XXX matchevi budu crno na crnom
 
 " show link preview
-" set showstatuslinks=1	" show link in the right part of cmd line (where is current page link)
-set showstatuslinks=2	" show link in the left part of cmd_line
-" set showstatuslinks=3	" Firefox default, show link at the end of the window/buffer (not in cmd line)
+" 1	" show link in the right part of cmd line (where is current page link)
+" 2	" show link in the left part of cmd_line
+" 3	" Firefox default, show link at the end of the window/buffer (not in cmd line)
+set showstatuslinks=2
 
 " disable iritating default Firefox shortcut for mute
 nnoremap <C-m> <cr>

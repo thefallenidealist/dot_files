@@ -562,6 +562,8 @@ nnoremap <silent> <esc> :noh<cr><esc>:echo "hlsearch disabled"<cr>
 "temporarily disable search highlighting until the next search.
 " INFO this is NOT the same as set nohlsearch
 nnoremap <leader>h :noh<cr>
+" TODO make this to toggle highlight, probably will not be possible
+
 nnoremap <leader>s :setlocal spell!<cr>
 " toggle showing invisible chars
 nnoremap <leader>l :set list!<cr>:set list?<CR>
@@ -758,6 +760,11 @@ Plug 'Shougo/neopairs.vim'	" Auto insert pairs when complete done
 "Plug 'garbas/vim-snipmate' 		" autocomplete for loops and etc
 
 Plug 'vim-airline/vim-airline'		" fancy status and tabbar
+" TODO change color of default theme: autoload/airline/themes/dark.vim 
+" "tabs" and "buffers" to blue color, activate tab: orange, active buffer: yellow
+" TODO why sometimes buffers have blue/cyan color?
+
+
 "Plug 'vim-airline/vim-airline-themes'
 Plug 'ctrlpvim/ctrlp.vim'			" fuzzy file/buffer/MRU finder
 Plug 'bogado/file-line'				" open file.txt:123
