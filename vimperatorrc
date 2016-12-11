@@ -74,9 +74,9 @@ inoremap <C-\\> <esc>:tabnext<cr>
 nnoremap ';' <PageUp>
 nnoremap \' <PageDown>
 
-" XXX won't unmap
-unmap <S-h>
-unmap <S-l>
+" XXX won't unmap, "No such mapping: H"
+" unmap <S-h>
+" unmap <S-l>
 nnoremap <S-j> :forward<cr>
 nnoremap <S-k> :back<cr>
 nnoremap <S-h> :tabprev<cr>
