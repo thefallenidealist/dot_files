@@ -661,8 +661,8 @@ if has('clipboard')	" not really needed for all options under this
 	" X11 secondary buffer		"+
 	"vnoremap <leader>y "+y :echo "copied to the X11 2nd clipboard"<cr>
 	" TODO TODO set paste mode before pasting
-	" vnoremap <leader>y "+y :echo "copied to the X11 2nd clipboard"<cr>
-	" vnoremap <leader>yy "+y :echo "copied to the X11 2nd clipboard"<cr>
+	vnoremap <leader>y "+y :echo "copied to the X11 2nd clipboard"<cr>
+	vnoremap <leader>yy "+y :echo "copied to the X11 2nd clipboard"<cr>
 	vnoremap <leader>d "+d :echo "cutted to the X11 2nd clipboard"<cr>
 	vnoremap <leader>x "+d :echo "cutted to the X11 2nd clipboard"<cr>
 	nnoremap <leader>p "+p :echo "pasted from the X11 2nd clipboard"<cr>
@@ -685,16 +685,16 @@ if has('clipboard')	" not really needed for all options under this
 	vnoremap <leader>y9 "oy  :echo "copied to the register 9"<cr>
 	vnoremap <leader>y0 "py  :echo "copied to the register 0"<cr>
 	" append
-	vnoremap <leader>y1 "Qy  :echo "copied to the register 1"<cr>
-	vnoremap <leader>y2 "Wy  :echo "copied to the register 2"<cr>
-	vnoremap <leader>y3 "Ey  :echo "copied to the register 3"<cr>
-	vnoremap <leader>y4 "Ry  :echo "copied to the register 4"<cr>
-	vnoremap <leader>y5 "Ty  :echo "copied to the register 5"<cr>
-	vnoremap <leader>y6 "Yy  :echo "copied to the register 6"<cr>
-	vnoremap <leader>y7 "Uy  :echo "copied to the register 7"<cr>
-	vnoremap <leader>y8 "Iy  :echo "copied to the register 8"<cr>
-	vnoremap <leader>y9 "Oy  :echo "copied to the register 9"<cr>
-	vnoremap <leader>y0 "Py  :echo "copied to the register 0"<cr>
+	vnoremap <leader>Y1 "Qy  :echo "copied to the register 1"<cr>
+	vnoremap <leader>Y2 "Wy  :echo "copied to the register 2"<cr>
+	vnoremap <leader>Y3 "Ey  :echo "copied to the register 3"<cr>
+	vnoremap <leader>Y4 "Ry  :echo "copied to the register 4"<cr>
+	vnoremap <leader>Y5 "Ty  :echo "copied to the register 5"<cr>
+	vnoremap <leader>Y6 "Yy  :echo "copied to the register 6"<cr>
+	vnoremap <leader>Y7 "Uy  :echo "copied to the register 7"<cr>
+	vnoremap <leader>Y8 "Iy  :echo "copied to the register 8"<cr>
+	vnoremap <leader>Y9 "Oy  :echo "copied to the register 9"<cr>
+	vnoremap <leader>Y0 "Py  :echo "copied to the register 0"<cr>
 
 	nnoremap <leader>p1 "q]p  :echo "paste from the register 1"<cr>
 	nnoremap <leader>p2 "w]p  :echo "paste from the register 2"<cr>
@@ -1730,18 +1730,18 @@ map g<C-\> :cs find 0 <C-R>=expand("<cword>")<CR><CR>
 
 " " work specific stuff														{{{
 " """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" let g:work_pc=system('is_work_pc')
-" let g:work_dir=system('is_work_dir')
+let g:work_pc=system('is_work_pc')
+let g:work_dir=system('is_work_dir')
 
-" if work_pc == 1
-	" set list
+if work_pc == 1
+	set list
 
-	" if work_dir == 1
-		" " expand only if we are working on work stuff
-		" set expandtab
-		" highlight clear ColorColumn	" don't color background after textwidth
-	" endif
-" endif
+	if work_dir == 1
+		" expand only if we are working on work stuff
+		set expandtab
+		highlight clear ColorColumn	" don't color background after textwidth
+	endif
+endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 " tab jumps to the previous active window
