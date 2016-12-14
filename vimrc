@@ -276,6 +276,10 @@ cnoreabbrev <expr> csa ((getcmdtype() == ':' && getcmdpos() <= 4)? 'cs add'  : '
 " annoying misspell:
 cabbrev W w
 cabbrev Q q
+cabbrev E e
+cabbrev E! e!
+cabbrev e1 e!
+cabbrev E1 e!
 cabbrev q1 q!
 cabbrev X x
 cabbrev x1 x!
@@ -409,6 +413,7 @@ inoremap <expr><C-_>	deoplete#undo_completion()
 nnoremap tn :tabnew<cr>
 nnoremap th :tabprev<cr>
 nnoremap tl :tabnext<cr>
+nnoremap td :tab split<cr>:echom "tab duplicated"<cr>
 " XXX very short message duration time
 " nnoremap - :tabprev<cr>:echom "going to the previous tab"<cr>
 " nnoremap + :tabnext<cr>:echom "going to the next tab"<cr>
@@ -1846,9 +1851,14 @@ set isfname+=32	" <space> is part of filename
 		" map <A-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
 		" execute("e ".mycurf) opens the file saved in mycurf
 
-
-" TODO replace <C-r><C-w> shortcuts with expand('<cword>')
+":%!/usr/local/bin/zsh!/opt/bin/zsh		-> ! as delimiter (# also works)
+"/some_text.*							-> '.' and wild wildcard starts working
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" searching																{{{
+":%!/usr/local/bin/zsh!/opt/bin/zsh		-> ! as delimiter (# also works)
+"/some_text.*							-> '.' and wild wildcard starts working
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" TODO replace <C-r><C-w> shortcuts with expand('<cword>')
 " move split to tab: Ctrl-W T
 " moving		 															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
