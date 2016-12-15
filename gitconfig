@@ -46,3 +46,5 @@
 	untracked = red
 [core]
 	pager = less -F -X
+[apply]
+    whitespace = nowarn

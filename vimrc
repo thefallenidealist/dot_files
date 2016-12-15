@@ -129,6 +129,10 @@ setlocal spelllang=en_us	" TODO hr
 
 set conceallevel=2	" hide concealed chars until cursor is on that line
 "set foldcolumn=2	" will show clickable '+' in column at the left (which is wide $foldcolumn chars)
+
+" complete from dictionary - Ctrl-x Ctrl-k
+set dictionary+=/usr/share/dict/words
+set complete+=k
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		OS specific															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -138,6 +142,15 @@ endif
 
 if s:uname == "FreeBSD"
 	let g:tagbar_ctags_bin=substitute(system("which exctags"), '\n', '','')
+endif
+
+
+if s:uname == "FreeBSD"
+	let s:libclang_path = "/usr/local/llvm38/lib/libclang.so"
+	let s:clang_header = "/usr/local/llvm38/include/clang"
+elseif s:uname == "Linux"
+	let s:libclang_path = "/usr/lib/llvm-3.6/lib/libclang.so"
+	let s:clang_header = "/usr/include/clang/"
 endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		build/programming			{{{
@@ -917,24 +930,19 @@ if has ('nvim')
 	"-> is added
 	let g:deoplete#delimiters = ['/', '.', '::', ':', '#', '->']
 	" let g:deoplete#max_list = 20					" max number of items in list
-	" let g:deoplete#auto_complete_delay = 20		" ms, default 150, still slow
 	let g:deoplete#auto_complete_delay = 1		" ms, default 150, still slow
 
-	"let g:deoplete#sources = {} " init of the variable
-	"let g:deoplete#sources._ = ['buffer'] " default files
-	"let g:deoplete#sources.cpp = ['buffer', 'tag']
-	"let g:deoplete#sources.cpp = ['buffer']			" + deoplete-clang
-	"let g:deoplete#sources.c = ['buffer', 'tag']
-	"let g:deoplete#sources.h = ['buffer', 'tag']
+	let g:deoplete#sources		= {} " init of the variable
+	let g:deoplete#sources._	= ['buffer', 'file', 'dictionary'] " default files
+	" let g:deoplete#sources.cpp = ['buffer', 'clang', 'tag']
+	let g:deoplete#sources.h	= ['buffer', 'clang', 'tag']
+	" XXX 161215: will fuckup itself if 'file' is present
+	let g:deoplete#sources.cpp	= ['buffer', 'clang', 'tag', 'dictionary']
+	let g:deoplete#sources.c	= ['buffer', 'clang', 'tag']
 
-	if s:uname == "FreeBSD"
-		let g:deoplete#sources#clang#libclang_path = "/usr/local/llvm38/lib/libclang.so"
-		let g:deoplete#sources#clang#clang_header = "/usr/local/llvm38/include/clang"
-	endif
-	if s:uname == "Linux"
-		let g:deoplete#sources#clang#libclang_path = "/usr/lib/llvm-3.6/lib/libclang.so"
-		let g:deoplete#sources#clang#clang_header = "/usr/include/clang/"
-	endif
+	let g:deoplete#sources#clang#libclang_path = s:libclang_path
+	let g:deoplete#sources#clang#clang_header  = s:clang_header
+
 	" "let g:deoplete#sources#clang#flags = '-Wall'
 	let g:deoplete#sources#clang#std#c = 'c11'
 	let g:deoplete#sources#clang#std#cpp = 'c++11'
@@ -1454,7 +1462,6 @@ let g:NERDTreeMinimalUI = 1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
-
 " <leader>s search all buffers
 
 "				GUI settings												{{{
@@ -1516,7 +1523,8 @@ highlight DiffAdded		ctermfg=81
 highlight DiffRemoved	ctermfg=208
 
 " auto completion menu
-highlight pmenu			ctermfg=white ctermbg=52
+" highlight pmenu			ctermfg=white ctermbg=52
+highlight pmenu			ctermfg=120 ctermbg=8
 
 " hide ANSCI escape chars
 syntax match Ignore /\%o33\[[0-9]\{0,5}m/ conceal
@@ -1851,8 +1859,8 @@ set isfname+=32	" <space> is part of filename
 		" map <A-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
 		" execute("e ".mycurf) opens the file saved in mycurf
 
-":%!/usr/local/bin/zsh!/opt/bin/zsh		-> ! as delimiter (# also works)
-"/some_text.*							-> '.' and wild wildcard starts working
+
+"  vib		select inner block (eg inside {})
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 " searching																{{{
 ":%!/usr/local/bin/zsh!/opt/bin/zsh		-> ! as delimiter (# also works)
@@ -1919,6 +1927,9 @@ set isfname+=32	" <space> is part of filename
 " load all matching files to buffers: :args `git grep -l <string>`
 " do something on all loaded buffers: :argdo %s/<string>/<replacement>/gce | update 		gce: global, confirm, error ignore
 
+" :r read file
+" :r! read output of command
+" :so source/execute commands from file<Paste>
 " redirect to file (in this example kbd map):
 	":redir! > vim_maps.txt
 	" :map
