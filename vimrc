@@ -142,10 +142,7 @@ endif
 
 if s:uname == "FreeBSD"
 	let g:tagbar_ctags_bin=substitute(system("which exctags"), '\n', '','')
-endif
 
-
-if s:uname == "FreeBSD"
 	let s:libclang_path = "/usr/local/llvm38/lib/libclang.so"
 	let s:clang_header = "/usr/local/llvm38/include/clang"
 elseif s:uname == "Linux"
@@ -1524,7 +1521,8 @@ highlight DiffRemoved	ctermfg=208
 
 " auto completion menu
 " highlight pmenu			ctermfg=white ctermbg=52
-highlight pmenu			ctermfg=120 ctermbg=8
+" highlight pmenu			ctermfg=120 ctermbg=8
+highlight pmenu 			ctermbg=232 ctermfg=120
 
 " hide ANSCI escape chars
 syntax match Ignore /\%o33\[[0-9]\{0,5}m/ conceal
