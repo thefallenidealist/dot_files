@@ -359,14 +359,6 @@ inoremap <F1> <esc>
 nnoremap <F1> <esc>
 vnoremap <F1> <esc>
 
-" delete to the black hole register
-nnoremap dd "_dd
-nnoremap D "_D
-nnoremap dw "_dw
-" yank and delete
-nnoremap dy yydd
-nnoremap yd yydd
-
 " Enter new line without going to insert mode
 nnoremap <cr> o<esc>
 
@@ -643,6 +635,50 @@ command! FixWhiteSpace StripWhitespace
 nnoremap p p=`]
 nnoremap P P=`]
 
+" delete to the black hole register
+nnoremap dd "_dd
+nnoremap D "_D
+nnoremap dw "_dw
+nnoremap diw "_diw
+" yank and delete
+nnoremap dy yydd
+nnoremap yd yydd
+
+"	named registers															{{{
+vnoremap <leader>y1 "qy  :echo "copied to the register 1"<cr>
+vnoremap <leader>y2 "wy  :echo "copied to the register 2"<cr>
+vnoremap <leader>y3 "ey  :echo "copied to the register 3"<cr>
+vnoremap <leader>y4 "ry  :echo "copied to the register 4"<cr>
+vnoremap <leader>y5 "ty  :echo "copied to the register 5"<cr>
+vnoremap <leader>y6 "yy  :echo "copied to the register 6"<cr>
+vnoremap <leader>y7 "uy  :echo "copied to the register 7"<cr>
+vnoremap <leader>y8 "iy  :echo "copied to the register 8"<cr>
+vnoremap <leader>y9 "oy  :echo "copied to the register 9"<cr>
+vnoremap <leader>y0 "py  :echo "copied to the register 0"<cr>
+" append
+vnoremap <leader>Y1 "Qy  :echo "added to the register 1"<cr>
+vnoremap <leader>Y2 "Wy  :echo "added to the register 2"<cr>
+vnoremap <leader>Y3 "Ey  :echo "added to the register 3"<cr>
+vnoremap <leader>Y4 "Ry  :echo "added to the register 4"<cr>
+vnoremap <leader>Y5 "Ty  :echo "added to the register 5"<cr>
+vnoremap <leader>Y6 "Yy  :echo "added to the register 6"<cr>
+vnoremap <leader>Y7 "Uy  :echo "added to the register 7"<cr>
+vnoremap <leader>Y8 "Iy  :echo "added to the register 8"<cr>
+vnoremap <leader>Y9 "Oy  :echo "added to the register 9"<cr>
+vnoremap <leader>Y0 "Py  :echo "added to the register 0"<cr>
+
+nnoremap <leader>p1 "q]p  :echo "paste from the register 1"<cr>
+nnoremap <leader>p2 "w]p  :echo "paste from the register 2"<cr>
+nnoremap <leader>p3 "e]p  :echo "paste from the register 3"<cr>
+nnoremap <leader>p4 "r]p  :echo "paste from the register 4"<cr>
+nnoremap <leader>p5 "t]p  :echo "paste from the register 5"<cr>
+nnoremap <leader>p6 "y]p  :echo "paste from the register 6"<cr>
+nnoremap <leader>p7 "u]p  :echo "paste from the register 7"<cr>
+nnoremap <leader>p8 "i]p  :echo "paste from the register 8"<cr>
+nnoremap <leader>p9 "o]p  :echo "paste from the register 9"<cr>
+nnoremap <leader>p0 "p]p  :echo "paste from the register 0"<cr>
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"	clipboard																{{{
 if has('clipboard')	" not really needed for all options under this
 	" ": unnamed register (dd/yy)
 	" *: X11 primary	  (select/middle click)
@@ -683,55 +719,24 @@ if has('clipboard')	" not really needed for all options under this
 	nnoremap <leader>p "+p :echo "pasted from the X11 2nd clipboard"<cr>
 	vnoremap <leader>p "+p :echo "pasted from the X11 2nd clipboard"<cr>
 
-	" Easier copy/paste to the named registers
-	" INFO this will slowdown copy to the X11 clipboard (<leader>y)
-	" TODO better naming (it's not a register 1 but q)
-	" TODO :set paste [y/d/p] :set nopaste
-	" TODO registers: asdfghjkl
-
-	vnoremap <leader>y1 "qy  :echo "copied to the register 1"<cr>
-	vnoremap <leader>y2 "wy  :echo "copied to the register 2"<cr>
-	vnoremap <leader>y3 "ey  :echo "copied to the register 3"<cr>
-	vnoremap <leader>y4 "ry  :echo "copied to the register 4"<cr>
-	vnoremap <leader>y5 "ty  :echo "copied to the register 5"<cr>
-	vnoremap <leader>y6 "yy  :echo "copied to the register 6"<cr>
-	vnoremap <leader>y7 "uy  :echo "copied to the register 7"<cr>
-	vnoremap <leader>y8 "iy  :echo "copied to the register 8"<cr>
-	vnoremap <leader>y9 "oy  :echo "copied to the register 9"<cr>
-	vnoremap <leader>y0 "py  :echo "copied to the register 0"<cr>
-	" append
-	vnoremap <leader>Y1 "Qy  :echo "copied to the register 1"<cr>
-	vnoremap <leader>Y2 "Wy  :echo "copied to the register 2"<cr>
-	vnoremap <leader>Y3 "Ey  :echo "copied to the register 3"<cr>
-	vnoremap <leader>Y4 "Ry  :echo "copied to the register 4"<cr>
-	vnoremap <leader>Y5 "Ty  :echo "copied to the register 5"<cr>
-	vnoremap <leader>Y6 "Yy  :echo "copied to the register 6"<cr>
-	vnoremap <leader>Y7 "Uy  :echo "copied to the register 7"<cr>
-	vnoremap <leader>Y8 "Iy  :echo "copied to the register 8"<cr>
-	vnoremap <leader>Y9 "Oy  :echo "copied to the register 9"<cr>
-	vnoremap <leader>Y0 "Py  :echo "copied to the register 0"<cr>
-
-	nnoremap <leader>p1 "q]p  :echo "paste from the register 1"<cr>
-	nnoremap <leader>p2 "w]p  :echo "paste from the register 2"<cr>
-	nnoremap <leader>p3 "e]p  :echo "paste from the register 3"<cr>
-	nnoremap <leader>p4 "r]p  :echo "paste from the register 4"<cr>
-	nnoremap <leader>p5 "t]p  :echo "paste from the register 5"<cr>
-	nnoremap <leader>p6 "y]p  :echo "paste from the register 6"<cr>
-	nnoremap <leader>p7 "u]p  :echo "paste from the register 7"<cr>
-	nnoremap <leader>p8 "i]p  :echo "paste from the register 8"<cr>
-	nnoremap <leader>p9 "o]p  :echo "paste from the register 9"<cr>
-	nnoremap <leader>p0 "p]p  :echo "paste from the register 0"<cr>
-
-	" % 	relative path
-	" %:p	full path
-	" %:t	just filename
-
 	" copy filepath to X11 clipboard
 	nnoremap <leader>FP  :let @* = expand("%")<cr>:echo		"relative path of the file copied to the X11 1st clipboard"<CR>
 	nnoremap <leader>fp  :let @+ = expand("%")<cr>:echo		"relative path of the file copied to the X11 2nd clipboard"<CR>
 	nnoremap <leader>FFP :let @* = expand("%:p")<cr>:echo		"full path of the file copied to the X11 1st clipboard"<CR>
 	nnoremap <leader>ffp :let @+ = expand("%:p")<cr>:echo		"full path of the file copied to the X11 2nd clipboard"<CR>
 endif
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+
+	" Easier copy/paste to the named registers
+	" INFO this will slowdown copy to the X11 clipboard (<leader>y)
+	" TODO better naming (it's not a register 1 but q)
+	" TODO :set paste [y/d/p] :set nopaste
+	" TODO registers: asdfghjkl
+
+	" % 	relative path
+	" %:p	full path
+	" %:t	just filename
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		mouse mappings														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -778,9 +783,8 @@ Plug 'vim-airline/vim-airline'		" fancy status and tabbar
 " TODO change color of default theme: autoload/airline/themes/dark.vim 
 " "tabs" and "buffers" to blue color, activate tab: orange, active buffer: yellow
 " TODO why sometimes buffers have blue/cyan color?
-
-
 "Plug 'vim-airline/vim-airline-themes'
+
 Plug 'ctrlpvim/ctrlp.vim'			" fuzzy file/buffer/MRU finder
 Plug 'bogado/file-line'				" open file.txt:123
 Plug 'dietsche/vim-lastplace'		" Open file at last edit position
@@ -790,7 +794,7 @@ Plug 'ntpeters/vim-better-whitespace'	" show red block when there is a trailing 
 
 Plug 'kshenoy/vim-signature'		" show marks visually
 "Plug 'romgrk/winteract.vim'
-Plug 'ronakg/quickr-preview.vim'	" preview file without opening
+" Plug 'ronakg/quickr-preview.vim'	" preview file without opening
 
 "Plug 'tpope/vim-speeddating'		" Ctrl-A/X now works on dates	XXX TODO
 
@@ -1535,7 +1539,7 @@ highlight Comment		ctermfg=101
 "				custom functions											{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! AppendModeline() " {{{
-	let l:modeline = printf(" vim: set ft=%s ts=%d sw=%d tw=%d foldmethod=%s %set :", &filetype, &tabstop, &shiftwidth, &textwidth, &foldmethod, &expandtab ? '' : 'no')
+	let l:modeline = printf(" vim: set ft=%s ts=%d sw=%d tw=%d fdm=%s %set :", &filetype, &tabstop, &shiftwidth, &textwidth, &foldmethod, &expandtab ? '' : 'no')
 	let l:modeline = substitute(&commentstring, "%s", l:modeline, "")
 	call append(line("$"), l:modeline)
 endfunction
@@ -1881,6 +1885,7 @@ set isfname+=32	" <space> is part of filename
 " prev/next misspell			[s	]s
 " prev/next file in args list	[a	]a (A for first/last)
 " goto changes (git)			[c	]c
+" folds							[z	]z
 
 " gd	will take you to the local declaration.
 " gD	will take you to the global declaration.
