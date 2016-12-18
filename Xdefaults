@@ -1,0 +1,217 @@
+
+UXTerm*faceName: Source Code Pro for Powerline
+UXTerm*faceSize: 12
+
+!XTerm*faceName:		bitstream vera sans mono:pixelsize=12
+!XTerm*faceName:		xft:bitstream vera sans mono:pixelsize=12
+XTerm*faceName:		xft:bitstream vera sans mono:pixelsize=13
+! radi oke, al se xterm+tmux+vim razjebu (nema airline simbola)
+XTerm*faceName:		xft:Literation Mono Powerline:pixelsize=13
+xterm*background:	black
+!xterm*foreground:	grey70
+xterm*foreground:	green
+XTerm*boldMode: 	true
+XTerm*allowBoldFonts: true
+!xterm*cursorColor:	yellow
+!xterm*cursor:		false
+!elegantnije definirano u .fluxbox/apps
+!ali fluxbox slijedi volju bozju pa ne radi na racionalan nacin
+!ovo overridea onu od .fluxboxa
+!xterm*geometry:		118x49+3+23
+!xterm*geometry:		118x49+1+23
+xterm*cursorBlink:	false
+xterm*utf8:			true
+xterm*wideChars:	true
+xterm*locale:		UTF-8
+xterm*scrollBar:	false
+!XTerm*faceName:		bitstream vera sans mono:pixelsize=12
+!XTerm*faceSize:		9
+!*XTerm*deleteIsDEL:              true	
+*XTerm*deleteIsDEL:			false
+xterm*saveLines:             10000
+xterm*jumpScroll:            true
+!xterm*colorBD:               darkblue
+xterm*colorBD:               red
+xterm*colorBDMode:           true
+!xterm*highlightColor:        yellow
+xterm*highlightColor:        gray10
+xterm*activeIcon:            false
+xterm*awaitInput:            true
+xterm*scrollTtyOutput:       false
+xterm*scrollKey:             true
+XTerm*renderFont:               true
+!tamno siva pozadina, korisno za sysinstall
+xterm*color7:		#c0c0c0
+!Da Alt radi
+XTerm*metaSendsEscape: true
+!XTerm*eightBitInput: false
+
+!s Xterm stranice, defaultsi
+XTerm*highlightSelection:	true
+XTerm*VT100.eightBitInput:	true
+XTerm*VT100.eightBitOutput:	true
+! XTerm*scrollBar: 		true
+! XTerm*VT100.titleInhibit:	true
+XTerm*VT100.colorMode:		on
+XTerm*VT100.dynamicColors:	on
+! Uncomment this to use color for underline attribute
+! XTerm*VT100.colorULMode:	on
+! XTerm*VT100.underLine:		off
+
+! Uncomment this to use color for the bold attribute
+! XTerm*VT100.colorBDMode:	on
+! XTerm*VT100.color0:		black
+! Term*VT100.color1:		red3
+! XTerm*VT100.color2:		green3
+! XTerm*VT100.color3:		yellow3
+! XTerm*VT100.color4:		blue3
+! XTerm*VT100.color5:		magenta3
+! XTerm*VT100.color6:		cyan3
+! XTerm*VT100.color7:		gray90
+! XTerm*VT100.color8:		gray30
+! XTerm*VT100.color9:		red
+! XTerm*VT100.color10:		green
+! XTerm*VT100.color11:		yellow
+! XTerm*VT100.color12:		blue
+! XTerm*VT100.color13:		magenta
+! XTerm*VT100.color14:		cyan
+! XTerm*VT100.color15:		white
+! XTerm*VT100.colorUL:		yellow
+! XTerm*VT100.colorBD:		white	
+! XTerm*VT100.cursorColor:	lime green
+
+!!!!!	xpdf
+xpdf*Background: black
+xpdf*Foreground: yellow
+xpdf.paperColor: black
+! boja pozadine iza papira
+xpdf.matteColor: black
+! mora se inace su crna slova na crnom papiru
+xpdf.reverseVideo: true		
+xpdf*geometry:	1024x745+0+23
+
+XCalc.ti.Command.background:  gray10
+XCalc.ti.Command.foreground:  green
+xcalc.ti.bevel.background: red
+xcalc.ti.bevel.screen.background: #000000
+xcalc.ti.bevel.screen.DEG.background: #000000
+xcalc.ti.bevel.screen.DEG.foreground: LightSeaGreen
+xcalc.ti.bevel.screen.GRAD.background: #000000
+xcalc.ti.bevel.screen.GRAD.foreground: LightSeaGreen
+xcalc.ti.bevel.screen.RAD.background: #000000
+xcalc.ti.bevel.screen.RAD.foreground: LightSeaGreen
+xcalc.ti.bevel.screen.INV.background: #000000
+xcalc.ti.bevel.screen.INV.foreground: Red
+xcalc.ti.bevel.screen.LCD.background: #000000
+xcalc.ti.bevel.screen.LCD.foreground: LightSeaGreen
+xcalc.ti.bevel.screen.LCD.shadowWidth: 0
+xcalc.ti.bevel.screen.M.background: #000000
+xcalc.ti.bevel.screen.M.foreground: LightSeaGreen
+xcalc.ti.bevel.screen.P.background: #000000
+xcalc.ti.bevel.screen.P.foreground: Yellow
+
+xmessage*background:		black
+xmessage*foreground:		green
+xmessage.form.okay.shapeStyle:	rectangle
+xmessage.form.okay.background:	grey20
+xmessage.form.okay.foreground:	snow
+xmessage*message*background:	grey10
+xmessage*defaultButton:		okay
+Xmessage.form.message.Scroll:	WhenNeeded
+
+xcalendar*firstDay:		1
+xcalendar*calendar*background:	black
+!xcalendar*daynumbers.foreground:	green
+xcalendar*daynames*foreground:	blue
+xcalendar*daynames*SUN.foreground:	red
+xcalendar*title:		Calendar
+xcalendar*date:			"%y. %m. %d."
+xcalendar*controls.background:	black
+xcalendar*date.background:	black
+xcalendar*date.foreground:	green
+!xcalendar*helpWindow.background: black
+xcalendar*bcontrols.background: black
+!xcalendar*helpButton*vertDistance: 10
+!xcalendar*quitButton*vertDistance: 10
+!xcalendar*editorTitle*vertDistance: 5
+XCalendar.markOnStartup:	true
+!origin: 1,8,15,22,29,36 - green
+!origin: 7,14,21,28,35 - red
+XCalendar*daynumbers.1*Foreground: green
+XCalendar*daynumbers.2*Foreground: green
+XCalendar*daynumbers.3*Foreground: green
+XCalendar*daynumbers.4*Foreground: green
+XCalendar*daynumbers.5*Foreground: green
+XCalendar*daynumbers.6*Foreground: green
+XCalendar*daynumbers.8*Foreground: green
+XCalendar*daynumbers.9*Foreground: green
+XCalendar*daynumbers.10*Foreground: green
+XCalendar*daynumbers.11*Foreground: green
+XCalendar*daynumbers.12*Foreground: green
+XCalendar*daynumbers.13*Foreground: green
+XCalendar*daynumbers.15*Foreground: green
+XCalendar*daynumbers.16*Foreground: green
+XCalendar*daynumbers.17*Foreground: green
+XCalendar*daynumbers.18*Foreground: green
+XCalendar*daynumbers.19*Foreground: green
+XCalendar*daynumbers.20*Foreground: green
+XCalendar*daynumbers.22*Foreground: green
+XCalendar*daynumbers.23*Foreground: green
+XCalendar*daynumbers.24*Foreground: green
+XCalendar*daynumbers.25*Foreground: green
+XCalendar*daynumbers.26*Foreground: green
+XCalendar*daynumbers.27*Foreground: green
+XCalendar*daynumbers.29*Foreground: green
+XCalendar*daynumbers.30*Foreground: green
+XCalendar*daynumbers.31*Foreground: green
+XCalendar*daynumbers.32*Foreground: green
+XCalendar*daynumbers.33*Foreground: green
+XCalendar*daynumbers.34*Foreground: green
+XCalendar*daynumbers.36*Foreground: green
+XCalendar*daynumbers.7*Foreground: Red
+XCalendar*daynumbers.14*Foreground: Red
+XCalendar*daynumbers.21*Foreground: Red
+XCalendar*daynumbers.28*Foreground: Red
+XCalendar*daynumbers.35*Foreground: Red
+
+*VT100.translations: #override\
+!<Key>Prior: scroll-back(1,pages) \n\
+!<Key>Next: scroll-forw(1,pages)\n\
+<Key> plus: larger-vt-font() \n\
+!Shift <Key> C: select-cursor-start() select-cursor-end(PRIMARY, CUT_BUFFER0) \n\
+!Shift <Key> V: insert-selection(PRIMARY, CUT_BUFFER0) \n\
+!s ovim dolje se omogucava da radi PgUp/PgDn u programima poput mocpa
+!Shift <Key>Up:          scroll-back(1,lines) \n\
+!Shift <Key>Down:        scroll-forw(1,lines) \n\
+!Shift <Key>Right:       string(0x1b) string("f") \n\
+!Shift <Key>Left:        string(0x1b) string("b") \n\
+!Shift <Key>Delete:      string(0x1b) string(0x08) \n\
+!Shift <Key>Tab:         string(0x1b) string("*") \n\
+
+aterm*geometry:         118x49+1+23
+aterm*transparent:	true
+aterm*background:	black
+aterm*foreground:	green
+aterm*shading:		60
+aterm*scrollBar:	no
+
+URxvt.background:	black
+URxvt.foreground:	green
+URxvt.font:		xft:Bitstream Vera Sans Mono:pixelsize=12
+URxvt.fading:		80
+URxvt.scrollBar: 	false
+URxvt.url-launcher:      /usr/local/bin/firefox
+URxvt.matcher.button:   1
+!To color all matching text in a blue color for quickly finding links, use the following setting or any color in the form of #RRGGBB you like instead.
+URxvt.colorUL: #4682B4
+URxvt.perl-ext-common:  default,tabbed
+
+
+mupdf*Background: black
+
+
+! TODO igrat se sa ovim u nadi da se Ctrl-Enter moze remapat u nesta (npr Ctrl-J) i onda to remapat u Vimu kao Ctrl-]
+! *VT100.Translations: #override Shift <Key>Up	string("s-up")
+! *VT100.Translations: #override Ctrl <Key>Up	string("c-up")
+
+XTerm*allowSendEvents: true

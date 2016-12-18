@@ -301,6 +301,7 @@ cabbrev qa1 qa!
 cabbrev Qa qa
 cabbrev WQ wq
 cabbrev Wq wq
+cabbrev Wa wq
 cabbrev wQ wq
 " generic aliases
 " TODO :we
@@ -767,13 +768,16 @@ if has("nvim")
 	Plug 'zchee/deoplete-clang'	" show functions arguments, slows down j/k
 	" Plug 'Rip-Rip/clang_complete'
 	"Plug 'wellle/tmux-complete.vim'	" autocomplete text from tmux buffer (eg git commit hash)
+	Plug 'neomake/neomake'
 else
 	Plug 'Shougo/neocomplete.vim' " Needs Lua
+	Plug 'vim-syntastic/syntastic'
 endif
 "Plug 'Shougo/neoinclude.vim', {'for': 'c,cpp'}	" headers autocomplete
 Plug 'Shougo/echodoc.vim'	" show functions in commad line window (:) insted of in preview
 Plug 'Shougo/neopairs.vim'	" Auto insert pairs when complete done
 "Plug 'ervandew/supertab'
+
 
 "Plug 'Shougo/neosnippet-snippets'	" needed for neosnippet
 "Plug 'Shougo/neosnippet.vim' 		" dodatak za neocomplete
@@ -799,7 +803,7 @@ Plug 'kshenoy/vim-signature'		" show marks visually
 "Plug 'tpope/vim-speeddating'		" Ctrl-A/X now works on dates	XXX TODO
 
 "Plug 'vim-scripts/taglist.vim'		" list functions
-Plug 'majutsushi/tagbar'			" show tags in the window at the right
+" Plug 'majutsushi/tagbar'			" show tags in the window at the right
 
 
 Plug 'ciaranm/securemodelines'
@@ -873,7 +877,7 @@ Plug 'tpope/vim-commentary'
 "Plug 'vim-scripts/c.vim'
 "Plug 'mhinz/vim-startify'
 "Plug 'zhaocai/GoldenView.Vim'
-Plug 'vim-scripts/AutoTag'
+" Plug 'vim-scripts/AutoTag'
 "Plug 'ludovicchabant/vim-gutentags' " XXX uspori kad krene sortirat tagove
 "Plug 'gilligan/vim-lldb'
 "Plug 'LucHermitte/vim-refactor'
@@ -1378,7 +1382,7 @@ let g:zoomwin_localoptlist   = [
 
 "		Syntastic															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" TODO disable YCM checkers for this to work
+" This is Vim only?
 let g:syntastic_always_populate_loc_list = 1	" auto populating window at the bottom
 let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
