@@ -160,30 +160,34 @@ elseif s:uname == "Linux"
 	set makeprg="make -j4"
 endif
 
-function! Compile()
-	" TODO wait for user input after compiling and before running
-		" if enter run program, if q/esc don't
-	if file_readable('Makefile')
-		make
-	elseif file_readable('makefile')
-		make
-	elseif file_readable('compile.sh')
-		setlocal makeprg=./compile.sh
-		make
-	elseif file_readable('compile')
-		setlocal makeprg=./compile
-	elseif expand('%:e') == "cpp"
-		setlocal makeprg=c++\ -Wall\ %\ -o\ %:r.elf\ -std=c++11
-		make
-	elseif expand('%:e') == "c"
-		setlocal makeprg=cc\ -Wall\ %\ -o\ %:r.elf\ -std=c99
-		make
-	else
-		echoerr "Don't know how to build :["
-	endif
-endfunction
-nnoremap <F5> :call Compile()<cr>
-nnoremap <leader>rr :call Compile()<cr>
+" function! Compile()
+	" " TODO wait for user input after compiling and before running
+		" " if enter run program, if q/esc don't
+	" if file_readable('Makefile')
+		" make
+	" elseif file_readable('makefile')
+		" make
+	" elseif file_readable('compile.sh')
+		" setlocal makeprg=./compile.sh
+		" make
+	" elseif file_readable('compile')
+		" setlocal makeprg=./compile
+	" elseif expand('%:e') == "cpp"
+		" setlocal makeprg=c++\ -Wall\ %\ -o\ %:r.elf\ -std=c++11
+		" make
+	" elseif expand('%:e') == "c"
+		" setlocal makeprg=cc\ -Wall\ %\ -o\ %:r.elf\ -std=c99
+		" make
+	" elseif expand('%:e') == "rs"
+		" setlocal makeprg=rustc\ %
+		" make
+		" !./%:r
+	" else
+		" echoerr "Don't know how to build :["
+	" endif
+" endfunction
+" nnoremap <F5> :call Compile()<cr>
+" nnoremap <leader>rr :call Compile()<cr>
 
 " za gF komandu koja otvori fajl pod kursorom
 let &path.="src/include,/usr/include/AL,"
@@ -410,6 +414,8 @@ inoremap <expr><C-_>	deoplete#undo_completion()
 	" return deoplete#mappings#close_popup() . "\<CR>"
 " endfunction
 " INFO 161203 It's seems that default behaviour of enter and deoplete is good enough for me
+
+nnoremap <M-x> ga
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		buffers/windows/tabs keymaps										{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -766,17 +772,23 @@ if has("nvim")
 	" Autocomplete for nvim (needs python3)
 	Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 	Plug 'zchee/deoplete-clang'	" show functions arguments, slows down j/k
+	Plug 'sebastianmarkow/deoplete-rust'
 	" Plug 'Rip-Rip/clang_complete'
 	"Plug 'wellle/tmux-complete.vim'	" autocomplete text from tmux buffer (eg git commit hash)
-	Plug 'neomake/neomake'
+	Plug 'neomake/neomake'	" replacement for syntastic
 else
 	Plug 'Shougo/neocomplete.vim' " Needs Lua
-	Plug 'vim-syntastic/syntastic'
+	" Plug 'vim-syntastic/syntastic'
+	" Plug 'scrooloose/syntastic'		" synthax checker in the window at the bottom
 endif
 "Plug 'Shougo/neoinclude.vim', {'for': 'c,cpp'}	" headers autocomplete
 Plug 'Shougo/echodoc.vim'	" show functions in commad line window (:) insted of in preview
 Plug 'Shougo/neopairs.vim'	" Auto insert pairs when complete done
 "Plug 'ervandew/supertab'
+
+Plug 'rust-lang/rust.vim'
+Plug 'racer-rust/vim-racer'	" Rust autocomplete, needs cargo install racer, not really needed for deoplete-rust
+Plug 'timonv/vim-cargo'		" simple plugin, cmds: Cargo{Build, Run, Test, Bench}
 
 
 "Plug 'Shougo/neosnippet-snippets'	" needed for neosnippet
@@ -784,9 +796,9 @@ Plug 'Shougo/neopairs.vim'	" Auto insert pairs when complete done
 "Plug 'garbas/vim-snipmate' 		" autocomplete for loops and etc
 
 Plug 'vim-airline/vim-airline'		" fancy status and tabbar
-" TODO change color of default theme: autoload/airline/themes/dark.vim 
-" "tabs" and "buffers" to blue color, activate tab: orange, active buffer: yellow
-" TODO why sometimes buffers have blue/cyan color?
+	" TODO change color of default theme: autoload/airline/themes/dark.vim
+	" "tabs" and "buffers" to blue color, activate tab: orange, active buffer: yellow
+	" TODO why sometimes buffers have blue/cyan color?
 "Plug 'vim-airline/vim-airline-themes'
 
 Plug 'ctrlpvim/ctrlp.vim'			" fuzzy file/buffer/MRU finder
@@ -818,9 +830,9 @@ Plug 'rhysd/vim-clang-format'
 " čć
 
 
-"Plug 'tpope/vim-fugitive'		" plugin on GitHub repo
+Plug 'tpope/vim-fugitive'		" plugin on GitHub repo
 "Plug 'airblade/vim-gitgutter'	" Show +-~ left of number column
-Plug 'mhinz/vim-signify'		" svn, git, ...
+Plug 'mhinz/vim-signify'		" Show marks for modified/added/removed: svn, git, ...
 
 
 Plug 'xolox/vim-misc'				" Needed for easytags and vim-session
@@ -830,7 +842,6 @@ Plug 'scrooloose/nerdcommenter'		" comments
 Plug 'scrooloose/nerdtree',		{ 'on': 'NERDTreeToggle' }	" project tree (file explorer)
 "Plug 'jistr/vin-nerdtree-tabs' 	" Nerdtree for all tabs
 Plug 'Xuyuanp/nerdtree-git-plugin'
-"Plug 'scrooloose/syntastic'		" synthax checker in the window at the bottom
 Plug 'godlygeek/tabular'			" aligning/tabulating text
 Plug 'regedarek/ZoomWin'			" toggle between one window and multi-window (Ctrl-W o)	newer version than vim-scripts
 "Plug 'terryma/vim-multiple-cursors'		" rename var at multiple places at once	 INFO not really useful for me (Vim's ways are OK for me)
@@ -1141,6 +1152,39 @@ if executable('ag')
 	let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
 endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		rust															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Rust lang support - compiling and running program, not autocomplete
+let g:rustc_path = $HOME."/.cargo/bin/rustc"
+" let g:rustc_path = $HOME."/.cargo/bin/rustc -A non_camel_case"
+" let g:ftplugin_rust_source_path = $HOME.'/dev/rust'
+let g:rust_recommended_style = 0	" don't expandtab and other stuff
+inoremap <A-r> <C-o>:w<cr><C-o>:RustRun<cr>
+nnoremap <A-r> :w<cr>:RustRun<cr>
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		racer															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Rust autocompleter (cargo install racer)
+" plugin 'vim-racer' is not really needed for deoplete-rust, but racer_cmd is.
+let g:racer_cmd = $HOME."/.cargo/bin/racer"
+" let $RUST_SRC_PATH = "/usr/src/rust/src/"
+" if you want completions to show the complete function definition (e.g. its arguments and return type), enable the experimental completer:
+let g:racer_experimental_completer = 1
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		deoplete-rust														{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" rust autocomplete in vim
+" shortcuts: gd and K (view documentation)
+if has ('nvim')
+	let g:deoplete#sources#rust#racer_binary = $HOME."/.cargo/bin/racer"
+	let g:deoplete#sources#rust#rust_source_path = $HOME."/src/rust/rust/src"
+	" let g:deoplete#sources#rust#disable_keymap = 1	" disable gd and K	([i is better)
+	let g:deoplete#sources#rust#documentation_max_height = 20 " default 20
+
+	let g:deoplete#omni_patterns = {}
+	let g:deoplete#omni_patterns.rust = '[(\.)(::)]' " autocomplete without C-x C-o
+endif
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 "		lastplace															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1152,7 +1196,7 @@ let g:lastplace_ignore = "gitcommit,gitrebase,svn,hgcommit"
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " INFO highlight trailing spaces in red
 " :ToggleWhitespace
-let g:better_whitespace_filetypes_blacklist = ['help', 'Help', 'quickfix', 'vim-plug', 'man', 'diff']
+let g:better_whitespace_filetypes_blacklist = ['help', 'Help', 'quickfix', 'vim-plug', 'man', 'diff', 'location']
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		indexed search														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1371,12 +1415,12 @@ let g:zoomwin_localoptlist   = [
 			\ "cpt" , "efm" , "eol" , "ep" , "et"  ,
 			\ "fenc", "fex" , "ff"  , "flp", "fo"  ,
 			\ "ft"  , "gp"  , "imi" , "ims", "inde",
-			\ "inex", "indk", "inf" , "isk", 
+			\ "inex", "indk", "inf" , "isk",
 			\ "kmp" , "lisp", "mps" , "ml" , "ma"  ,
 			\ "mod" , "nf"  , "ofu" ,         "pi" ,
 			\ "qe"  , "ro"  , "sw"  ,         "si" ,
 			\ "sts" , "spc" , "spf" , "spl", "sua" ,
-			\ "swf" , "smc" , "syn" , "ts" , 
+			\ "swf" , "smc" , "syn" , "ts" ,
 			\ "tw"  , "udf" , "wm"]
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
@@ -1401,9 +1445,58 @@ let g:syntastic_cpp_compiler_options = ' -Wall -std=c++11 -stdlib=libc++'
 let g:syntastic_cpp_check_header = 1
 let g:syntastic_cpp_include_dirs = ["includes", "headers"]
 
+" Rust:
+let g:syntastic_rust_checkers = ["rustc"]
+" let g:syntastic_rust_checkers = ["rustc -A non_camel_case"]
+
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		NeoMake															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:neomake_open_list = 2	" auto open list, but don't jump to it
+" :ll
+"
+" autocmd! BufWritePost * Neomake
+
+let g:neomake_error_sign = {'text': 'E'}
+let g:neomake_warning_sign= {'text': 'W'}
+call neomake#signs#RedefineErrorSign()
+call neomake#signs#RedefineWarningSign()
+
+let g:neomake_make_maker = {
+			\ 'exe': 'make',
+			\ 'args': ['--build'],
+			\ 'errorformat': '%f:%l:%c: %m',
+			\ }
+" must be called with Neomake rust
+			 " 'args': ['-A non_camel_case'],
+let g:neomake_rust_rust_maker = {
+			\ 'exe': 'rustc',
+			\ 'errorformat': '%f:%l: %m',
+			\ }
+let g:neomake_rust_enabled_makers = ['rust']
+
+
+" let g:neomake_highlight_columns=0	" don't highlight the first char
+
+" let &errorformat="%f:%l:%c: %m"
+
+" Start of the multi-line error message (%A),
+" %p^ means a string of spaces and then a ^ to
+" get the column number
+let &efm  = '%A%p^' . ','
+" Next is the main bit: continuation of the error line (%C)
+" followed by the filename in quotes, a comma (\,)
+" then the rest of the details
+let &efm .= '%C"%f"\, line %l: error(%n): %m' . ','
+" Next is the last line of the error message, any number
+" of spaces (' %#': equivalent to ' *') followed by a bit
+" more error message
+let &efm .= '%Z %#%m' . ','
+" This just ignores any other lines (must be last!)
+let &efm .= '%-G%.%#'
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		multicursor															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1497,6 +1590,7 @@ endif
 colorscheme molokai
 "colorscheme badwolf
 "colorscheme dracula
+" highlight Normal		ctermbg=233	" XXX change in theme file
 
 highlight Todo			ctermfg=196 ctermbg=232
 highlight Debug			ctermfg=226 ctermbg=234
@@ -1521,7 +1615,7 @@ highlight SpecialKey	ctermfg=236
 highlight Conceal		ctermfg=7 ctermbg=233
 
 " longer vertical bar for vertical splits, space for folds (default was -)
-set fillchars=vert:\│,fold:\ 
+set fillchars=vert:\│,fold:\
 
 " change the colors in diff mode
 highlight DiffAdded		ctermfg=81
