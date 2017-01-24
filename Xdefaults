@@ -4,12 +4,16 @@ UXTerm*faceSize: 12
 
 !XTerm*faceName:		bitstream vera sans mono:pixelsize=12
 !XTerm*faceName:		xft:bitstream vera sans mono:pixelsize=12
-XTerm*faceName:		xft:bitstream vera sans mono:pixelsize=13
+! XTerm*faceName:		xft:bitstream vera sans mono:pixelsize=13
+XTerm*faceName:			xft:Literation Mono Powerline:pixelsize=13
+! XTerm*termName:			screen-256color
+XTerm*termName:			xterm-256color
+
 ! radi oke, al se xterm+tmux+vim razjebu (nema airline simbola)
-XTerm*faceName:		xft:Literation Mono Powerline:pixelsize=13
 xterm*background:	black
 !xterm*foreground:	grey70
-xterm*foreground:	green
+xterm*foreground:	grey
+! xterm*foreground:	green
 XTerm*boldMode: 	true
 XTerm*allowBoldFonts: true
 !xterm*cursorColor:	yellow
@@ -45,15 +49,17 @@ xterm*color7:		#c0c0c0
 !Da Alt radi
 XTerm*metaSendsEscape: true
 !XTerm*eightBitInput: false
+! xterm*termName: xterm-256color
+!xterm*termName: screen-256color
 
 !s Xterm stranice, defaultsi
-XTerm*highlightSelection:	true
-XTerm*VT100.eightBitInput:	true
-XTerm*VT100.eightBitOutput:	true
+! XTerm*highlightSelection:	true
+! XTerm*VT100.eightBitInput:	true
+! XTerm*VT100.eightBitOutput:	true
 ! XTerm*scrollBar: 		true
 ! XTerm*VT100.titleInhibit:	true
-XTerm*VT100.colorMode:		on
-XTerm*VT100.dynamicColors:	on
+! XTerm*VT100.colorMode:		on
+! XTerm*VT100.dynamicColors:	on
 ! Uncomment this to use color for underline attribute
 ! XTerm*VT100.colorULMode:	on
 ! XTerm*VT100.underLine:		off
@@ -179,8 +185,8 @@ XCalendar*daynumbers.35*Foreground: Red
 !<Key>Next: scroll-forw(1,pages)\n\
 <Key> plus: larger-vt-font() \n\
 !Shift <Key> C: select-cursor-start() select-cursor-end(PRIMARY, CUT_BUFFER0) \n\
+! XXX something from below will fuck up =/+ key
 !Shift <Key> V: insert-selection(PRIMARY, CUT_BUFFER0) \n\
-!s ovim dolje se omogucava da radi PgUp/PgDn u programima poput mocpa
 !Shift <Key>Up:          scroll-back(1,lines) \n\
 !Shift <Key>Down:        scroll-forw(1,lines) \n\
 !Shift <Key>Right:       string(0x1b) string("f") \n\
@@ -195,16 +201,44 @@ aterm*foreground:	green
 aterm*shading:		60
 aterm*scrollBar:	no
 
+! URxvt.background:	black
+! URxvt.foreground:	green
+! URxvt.font:		xft:Bitstream Vera Sans Mono:pixelsize=12
+! URxvt.fading:		80
+! URxvt.scrollBar: 	false
+! URxvt.url-launcher:      /usr/local/bin/firefox
+! URxvt.matcher.button:   1
+! !To color all matching text in a blue color for quickly finding links, use the following setting or any color in the form of #RRGGBB you like instead.
+! URxvt.colorUL: #4682B4
+! URxvt.perl-ext-common:  default,tabbed
+
 URxvt.background:	black
-URxvt.foreground:	green
-URxvt.font:		xft:Bitstream Vera Sans Mono:pixelsize=12
-URxvt.fading:		80
-URxvt.scrollBar: 	false
-URxvt.url-launcher:      /usr/local/bin/firefox
-URxvt.matcher.button:   1
-!To color all matching text in a blue color for quickly finding links, use the following setting or any color in the form of #RRGGBB you like instead.
-URxvt.colorUL: #4682B4
-URxvt.perl-ext-common:  default,tabbed
+URxvt.foreground:	grey
+! URxvt.termName:		screen-256color
+URxvt.termName:		xterm-256color
+! URxvt.termName:		rxvt-unicode
+! URxvt.background:       #1E2B20
+! URxvt.foreground:       wheat
+URxvt.font:			xft:Literation Mono Powerline:size=10
+! URxvt.font:			xft:bitstream vera sans mono:pixelsize=10
+URxvt.scrollBar: 	0
+! Font resize extension
+! URxvt.perl-ext-common: ...,font-size
+! URxvt.keysym.C-S-Up:   perl:font-size:increase
+! URxvt.keysym.C-S-Down: perl:font-size:decrease
+urxvt.perl-ext-common: default,tabbed,matcher,resize-font,-tabbed
+! URxvt.keysym.C-minus:		resize-font:smaller
+! URxvt.keysym.C-plus:		resize-font:bigger
+! URxvt.keysym.C-equal:		resize-font:reset
+! URxvt.keysym.C-question:	resize-font:show
+URxvt.keysym.C-minus:		resize-font:smaller
+URxvt.keysym.C-underscore:	resize-font:smaller
+URxvt.keysym.C-plus:		resize-font:bigger
+URxvt.keysym.C-equal:		resize-font:reset
+URxvt.keysym.C-question:	resize-font:show
+! disable something when Ctrl+Shift are pressed
+URxvt.iso14755:			False
+URxvt.iso14755_52:		False
 
 
 mupdf*Background: black
@@ -214,4 +248,6 @@ mupdf*Background: black
 ! *VT100.Translations: #override Shift <Key>Up	string("s-up")
 ! *VT100.Translations: #override Ctrl <Key>Up	string("c-up")
 
-XTerm*allowSendEvents: true
+! comment out to enable tmux to set xterm title
+! allows other processes to send keypress and mouse events to the xterm window. Because of the security risk, do not enable this unless you are very sure you know what you are doing.
+! XTerm*allowSendEvents: true
