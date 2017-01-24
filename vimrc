@@ -328,7 +328,7 @@ cabbrev rsyn syntax sync fromstart
 "cabbrev fix_dos ed ++ff=dos
 "cabbrev fixdos ed ++ff=dos
 " TODO put this inf function (:e ++ff=dos) ili tako nekako
-cabbrev cc set cursorcolumn!
+cabbrev CC set cursorcolumn!
 
 " folds help: zo zc za, zO, zC, zA (open, close, toggle)
 "	zf create fold (marker/manual)
@@ -501,10 +501,10 @@ nnoremap <C-w>d :tab split<cr>:echom "tab duplicated"<cr>
 " close all windows in current tab
 nnoremap <C-w>C :tabclose<cr>
 
-inoremap <C-w>j <esc><C-w>j
-inoremap <C-w>k <esc><C-w>k
-inoremap <C-w>h <esc><C-w>h
-inoremap <C-w>l <esc><C-w>l
+" inoremap <C-w>j <esc><C-w>j
+" inoremap <C-w>k <esc><C-w>k
+" inoremap <C-w>h <esc><C-w>h
+" inoremap <C-w>l <esc><C-w>l
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		Emacs shortcuts														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -583,8 +583,10 @@ nnoremap <leader>s :setlocal spell!<cr>
 nnoremap <leader>l :set list!<cr>:set list?<CR>
 " nnoremap <leader>n :set relativenumber!<cr>
 " nnoremap <leader>N :set number!<cr>
-nnoremap <leader>n :set relativenumber!<cr>:set number!<CR>
-nnoremap <leader>N :set relativenumber!<cr>
+" nnoremap <leader>n :set relativenumber!<cr>:set number!<CR>
+" nnoremap <leader>N :set relativenumber!<cr>
+nnoremap <leader>n :set relativenumber!<cr>
+nnoremap <leader>N :set number!<cr>
 "reload config file
 nnoremap <leader>r :so $MYVIMRC<cr>:echo "vimrc reloaded"<CR>
 nnoremap <leader>e :e $MYVIMRC<cr>
@@ -617,6 +619,8 @@ nnoremap <leader>b :CtrlPBuffer<cr>
 "
 " TODO open new tab (duplicate), there open Ack!
 nnoremap <leader>a :tab split<cr>:Ack! <C-r><C-w><CR>
+" nnoremap <leader>a :tab split<cr>:Ack! -a<C-r><C-w><CR>
+nnoremap <leader>A :tab split<cr>:Ack! ""<left>
 command! FixWhiteSpace StripWhitespace
 
 " not too useful
@@ -650,6 +654,41 @@ nnoremap diw "_diw
 " yank and delete
 nnoremap dy yydd
 nnoremap yd yydd
+
+inoremap <C-r>1 <C-o>"q]p<C-o>:echo "paste from the register 1"<cr>
+" TODO move to clipboard part, maybe
+inoremap <C-r>! <C-o>"*]p<C-o>:echo "paste from the X11 1st"<cr>
+inoremap <C-r>@ <C-o>"+]p<C-o>:echo "paste from the X11 2st"<cr>
+inoremap <C-r>f <C-r>%<C-o>:echo "pasted relative filename"<cr><C-o>l
+inoremap <C-r>F <C-r>%:p<C-o>:echo "pasted full filename"<cr>
+" TODO: remove '\<' and '\>' from paste:
+inoremap <C-r>/ <C-r>/<C-o>:echo "pasted highlighted text"<cr>
+
+" TODO <C-r>f/F in command mode
+" cnoremap <C-r>F <C-r>%:p<C-o>:echo "pasted full filename"<cr>
+
+" easier copying when cursor is not at the beggining of the word:
+nnoremap yw yiw
+" in case that old behaviour is needed:
+nnoremap yW yw
+
+
+map g<C-]> :cs find 3 <C-R>=expand("<cword>")<CR><CR>
+
+
+
+" copy filepath to X11 clipboard
+nnoremap <leader>FP  :let @* = expand("%")<cr>:echo		"relative path of the file copied to the X11 1st clipboard"<CR>
+nnoremap <leader>fp  :let @+ = expand("%")<cr>:echo		"relative path of the file copied to the X11 2nd clipboard"<CR>
+nnoremap <leader>FFP :let @* = expand("%:p")<cr>:echo		"full path of the file copied to the X11 1st clipboard"<CR>
+nnoremap <leader>ffp :let @+ = expand("%:p")<cr>:echo		"full path of the file copied to the X11 2nd clipboard"<CR>
+
+
+inoremap <C-r>c <C-o>":]p<C-o>:echo "pasted last used command"<cr>
+" INFO expression register: in insert mode <C-r>=2+2 // in text "4" will be inserted
+" INFO <C-r>/ is already default
+" TODO: change \<something\> to something		in C-r /
+inoremap <C-r>p <C-o>]p<C-o>:echo "pasted from vim paste buffer"<cr>
 
 "	named registers															{{{
 vnoremap <leader>y1 "qy  :echo "copied to the register 1"<cr>
@@ -783,7 +822,7 @@ else
 endif
 "Plug 'Shougo/neoinclude.vim', {'for': 'c,cpp'}	" headers autocomplete
 Plug 'Shougo/echodoc.vim'	" show functions in commad line window (:) insted of in preview
-Plug 'Shougo/neopairs.vim'	" Auto insert pairs when complete done
+" Plug 'Shougo/neopairs.vim'	" Auto insert pairs when complete done
 "Plug 'ervandew/supertab'
 
 Plug 'rust-lang/rust.vim'
@@ -851,7 +890,6 @@ Plug 'tpope/vim-unimpaired'				" TODO
 " Plug 'MarcWeber/vim-addon-mw-utils'	" Needed for snipmate
 " Plug 'tomtom/tlib_vim'				" Needed for snipmate
 "Plug 'dyng/ctrlsf.vim'				" search and replace in multiple files
-Plug 'vim-scripts/a.vim'		" open headers
 "Plug 'jez/vim-superman'		" man pages
 "Plug 'xolox/vim-session'		" won't restore multiple buffers in a tab
 " Plug 'Shougo/vimproc.vim'		" Needed for vim shell
@@ -941,7 +979,7 @@ if has ('nvim')
 	let g:neocomplete#enable_fuzzy_completion = 1
 	" let g:deoplete#auto_complete_start_length = 1	" default: 2
 	" let g:deoplete#auto_complete_start_length = 1	" deprecated
-	let g:deoplete#source#attribute#min_pattern_length = 1
+	" let g:deoplete#source#attribute#min_pattern_length = 1
 	"let g:deoplete#max_abbr_width = 0 " disable, default: 80
 	"-> is added
 	let g:deoplete#delimiters = ['/', '.', '::', ':', '#', '->']
@@ -967,7 +1005,7 @@ if has ('nvim')
 	" let g:deoplete#tag#cache_limit_size = 50000000 " 50 MB
 	call deoplete#custom#set('_', 'matchers', ['matcher_length', 'matcher_full_fuzzy'])	" don't auto complete basing on the first char
 
-	let g:deoplete#sources#clang#sort_algo = 'priority'	" or alphabetical
+	" let g:deoplete#sources#clang#sort_algo = 'priority'	" or alphabetical " XXX pojebe i krene samo nadopunjavat
 	let g:echodoc_enable_at_startup = 1			" show info in cmd line instead in preview window
 endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
@@ -1349,11 +1387,11 @@ nmap [C <plug>(signify-prev-hunk)
 if executable('ag')
 	if s:uname == "FreeBSD"
 		"let g:ackprg = 'ag --vimgrep --path-to-ignore ~/.agignore'
-		let g:ackprg = 'ag --vimgrep --path-to-ignore ~/.agignore -H --column'
+		let g:ackprg = 'ag --vimgrep --path-to-ignore ~/.agignore -H --column -a'
 		" FreeBSD ag version 1.0.1
 	elseif s:uname == "Linux"
 		" Linux ag --version: 0.19.2
-		let g:ackprg = 'ag'
+		let g:ackprg = 'ag -a'
 		" TODO ack-grep?
 	endif
 endif
@@ -2120,5 +2158,7 @@ set isfname+=32	" <space> is part of filename
 " INFO cscope cmd: cscope -R -b
 " XXX something disables WhiteSpace after reloading vimrc
 " See :help function-list for a high-level overview of vimscript functions.
+"
+" INFO: remmaping Esc will fuckup scroll (scrolling will start to insert chars)
 
 " vim: set ts=4 sw=4 tw=0 foldmethod=marker noet :
