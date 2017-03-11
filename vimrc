@@ -31,15 +31,15 @@ set notitle
 
 set autowrite		" Automatically :write before running commands
 "set autoread		" autoload files that have changed outside of vim
-"set clipboard+=unnamed	" use system clipboard INFO maybe Mac specific, not tested, not needed
 
 " better splits
 set splitbelow
 set splitright
 
-set timeoutlen=1000 ttimeoutlen=0		" delay for the esc key, 10ms
+set timeoutlen=1000 ttimeoutlen=0		" delay for the esc key, 10ms XXX
 "set exrc		" source .vimrc file if it present in working directory
-set secure		" This option will restrict usage of some commands in non-default .vimrc files; commands that wrote to file or execute shell commands are not allowed and map commands are displayed.
+set secure		" This option will restrict usage of some commands in non-default .vimrc files;
+				" commands that wrote to file or execute shell commands are not allowed and map commands are displayed.
 
 set nomodeline
 set modelines=0
@@ -52,7 +52,6 @@ endif
 
 set gdefault "applies substitutions globally on lines. For example, instead of :%s/foo/bar/g you just type :%s/foo/bar/
 
-"set completeopt=menu,menuone,preview
 "set completeopt=menuone,preview	" default
 set completeopt=menuone				" f(); can be view in command line with plugin
 set completeopt+=noselect			" fix deoplete auto insert
@@ -64,23 +63,25 @@ set showmatch
 
 "		<tab> and wrapping			{{{
 """""""""""""""""""""""""""""""""""""""
+set tabstop=4		" tab size
+set shiftwidth=4 	" when indenting with '>'
+" set expandtab		" convert tab to spaces
+
 " soft wrap
 set wrap			" soft break when line is wider than Vim window (not tw)
-set linebreak		" break line without breaking the word
-					" wont't work when "list" is enabled
+set linebreak		" don't break in the middle of the word
+					" wont't work when "list" is enabled - will in nvim
+set showbreak=…		" char to be displayed on the beggining of broken line
 
 " hard break
-" set textwidth=78			" autowrap after N chars
+" set textwidth=78	" autowrap after N chars
 set colorcolumn=+1	" show coloumn where autowrap will start"
 set formatoptions=""
 		" default: tcq
 		" t: autowrap using tw
 		" c: add comment in new line a: format line every time when it is
 		" changed (no more longer or shorter lines) 		pretty annoying
-
-set tabstop=4		" tab size
-set shiftwidth=4 	" when indenting with '>'
-"set expandtab		" convert tab to spaces
+" TODO (if possible): soft wrap lines on tw
 """"""""""""""""""""""""""""""""""""}}}
 "	commandline completion			{{{
 """""""""""""""""""""""""""""""""""""""
@@ -106,7 +107,7 @@ set wildignore+=*~,*.swp,*.tmp
 set listchars=tab:\│·,extends:>,precedes:<
 " show ALL spaces:
 " set listchars+=space:║
-"set listchars+=trail:◊
+" set listchars+=trail:◊
 set list	" show invisible chars (tabs and others defined in listchars)
 
 " directory for swap files
@@ -118,37 +119,37 @@ set backupdir=$HOME/.vim/swap/,/tmp
 set ignorecase		" case insensitive search, needed for the line below
 set smartcase		" If searched word starts with an uppercase then be case sensitive
 set incsearch		" search as you type INFO for caseinsensitive search: /something\c
-"set hlsearch        " highlight search - disabled because it will activate themself after reloading vimrc
+" set hlsearch        " highlight search - disabled because it will activate themself after reloading vimrc
 """"""""""""""""""""""""""""""""""""}}}
 "		spell						{{{
 """""""""""""""""""""""""""""""""""""""
 set spellfile=~/.vim/spelluser.utf-8.add	" don't use '_' in filename
-"set spelllang=~/.vim/spell/hr.utf-8.spl,en	"
-setlocal spelllang=en_us	" TODO hr
-" set complete+=kspell
-""""""""""""""""""""""""""""""""""""}}}
-
-set conceallevel=2	" hide concealed chars until cursor is on that line
-"set foldcolumn=2	" will show clickable '+' in column at the left (which is wide $foldcolumn chars)
+" set spellfile+=~/.vim/hr.utf-8.spl
+setlocal spelllang=en_us
+" setlocal spelllang=en_us,hr_hr
 
 " complete from dictionary - Ctrl-x Ctrl-k
 set dictionary+=/usr/share/dict/words
-set complete+=k
+set complete+=kspell
+""""""""""""""""""""""""""""""""""""}}}
+
+set conceallevel=2	" hide concealed chars until cursor is on that line
+"set foldcolumn=2	" show clickable '+' in column at the left (which is $foldcolumn chars wide)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		OS specific															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if has('unix')
 	let s:uname = substitute(system("uname"), '\n', '', '')
-endif
 
-if s:uname == "FreeBSD"
-	let g:tagbar_ctags_bin=substitute(system("which exctags"), '\n', '','')
+	if s:uname == "FreeBSD"
+		let g:tagbar_ctags_bin=substitute(system("which exctags"), '\n', '','')
 
-	let s:libclang_path = "/usr/local/llvm38/lib/libclang.so"
-	let s:clang_header = "/usr/local/llvm38/include/clang"
-elseif s:uname == "Linux"
-	let s:libclang_path = "/usr/lib/llvm-3.6/lib/libclang.so"
-	let s:clang_header = "/usr/include/clang/"
+		let s:libclang_path = "/usr/local/llvm38/lib/libclang.so"
+		let s:clang_header = "/usr/local/llvm38/include/clang"
+	elseif s:uname == "Linux"
+		let s:libclang_path = "/usr/lib/llvm-3.6/lib/libclang.so"
+		let s:clang_header = "/usr/include/clang/"
+	endif
 endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		build/programming			{{{
@@ -310,8 +311,9 @@ cabbrev WQ wq
 cabbrev Wq wq
 cabbrev Wa wq
 cabbrev wQ wq
-" generic aliases
-" TODO :we
+
+command! WE write | edit
+cabbrev we WE
 
 " TODO remap all to this
 "cnoreabbrev <expr> W ((getcmdtype() is# ':' && getcmdline() is# 'W')?('w'):('W'))
@@ -328,9 +330,6 @@ cabbrev fp echo @%
 cabbrev FP echo expand('%:p')
 " reload syntax
 cabbrev rsyn syntax sync fromstart
-"cabbrev fix_dos ed ++ff=dos
-"cabbrev fixdos ed ++ff=dos
-" TODO put this inf function (:e ++ff=dos) ili tako nekako
 cabbrev CC set cursorcolumn!
 
 " folds help: zo zc za, zO, zC, zA (open, close, toggle)
@@ -348,9 +347,6 @@ cabbrev zoa %foldopen!
 
 " Don't show ^M in DOS files
 command! FixDos edit ++ff=dos
-
-" :we to write and reload file TODO
-"cabbrev we write | edit
 
 " XXX CtrlSpace won't restore tabs with only one tab (only at PC on the work, on my everything works™)
 cabbrev css CtrlSpaceSaveWorkspace
@@ -375,6 +371,8 @@ nnoremap j gj
 nnoremap k gk
 nnoremap gj j
 nnoremap gk k
+nnoremap $ g$
+nnoremap 0 g0
 
 nnoremap e el
 
@@ -642,9 +640,15 @@ command! FixWhiteSpace StripWhitespace
 "nnoremap <leader>+ <Plug>AirlineSelectNextTab
 "nnoremap <leader>= <Plug>AirlineSelectNextTab
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+map g<C-]> :cs find 3 <C-R>=expand("<cword>")<CR><CR>
 
-"		copy paste mappings													{{{
+"		copy & paste mappings												{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" C/P registers:
+" ": unnamed register (dd/yy)
+" *: X11 primary	  (select/middle click)
+" +: X11 secondanry   (Ctrl-C/V)
+
 " paste and adjuste indent
 " nnoremap p ]p
 " nnoremap P ]P
@@ -660,88 +664,110 @@ nnoremap diw "_diw
 nnoremap dy yydd
 nnoremap yd yydd
 
-inoremap <C-r>1 <C-o>"q]p<C-o>:echo "paste from the register 1"<cr>
-" TODO move to clipboard part, maybe
-inoremap <C-r>! <C-o>"*]p<C-o>:echo "paste from the X11 1st"<cr>
-inoremap <C-r>@ <C-o>"+]p<C-o>:echo "paste from the X11 2st"<cr>
-inoremap <C-r>f <C-r>%<C-o>:echo "pasted relative filename"<cr><C-o>l
-inoremap <C-r>F <C-r>%:p<C-o>:echo "pasted full filename"<cr>
-" TODO: remove '\<' and '\>' from paste:
-inoremap <C-r>/ <C-r>/<C-o>:echo "pasted highlighted text"<cr>
-
-" TODO <C-r>f/F in command mode
-" cnoremap <C-r>F <C-r>%:p<C-o>:echo "pasted full filename"<cr>
-
 " easier copying when cursor is not at the beggining of the word:
 nnoremap yw yiw
 " in case that old behaviour is needed:
 nnoremap yW yw
 
-
-map g<C-]> :cs find 3 <C-R>=expand("<cword>")<CR><CR>
-
-
-
-" copy filepath to X11 clipboard
-nnoremap <leader>FP  :let @* = expand("%")<cr>:echo		"relative path of the file copied to the X11 1st clipboard"<CR>
-nnoremap <leader>fp  :let @+ = expand("%")<cr>:echo		"relative path of the file copied to the X11 2nd clipboard"<CR>
-nnoremap <leader>FFP :let @* = expand("%:p")<cr>:echo		"full path of the file copied to the X11 1st clipboard"<CR>
-nnoremap <leader>ffp :let @+ = expand("%:p")<cr>:echo		"full path of the file copied to the X11 2nd clipboard"<CR>
-
-
+" INFO shortcuts for insert/command mode: <C-r>X
+" c command
+" / highlighted (*) or searched (/) text - already default
+" p vim paste buffer
+" f filename with extension
+" F filename with full path
+	" INFO stuff that won't work:
+	" aligning text after <C-o>
+	" echoing text after paste (cursor will be moved one place to the left)
 inoremap <C-r>c <C-o>":]p<C-o>:echo "pasted last used command"<cr>
-" INFO expression register: in insert mode <C-r>=2+2 // in text "4" will be inserted
-" INFO <C-r>/ is already default
 " TODO: change \<something\> to something		in C-r /
-inoremap <C-r>p <C-o>]p<C-o>:echo "pasted from vim paste buffer"<cr>
+inoremap <C-r>/ <C-r>/<C-o>:echo "pasted highlighted/searched text"<cr>
+inoremap <C-r>p <C-o>]p<C-o>:echo "pasted from Vim paste buffer"<cr>
+inoremap <C-r>f <C-r>=expand("%:t")<CR>
+cnoremap <C-r>f <C-r>=expand("%:t")<CR>
+inoremap <C-r>F <C-r>%
+cnoremap <C-r>F <C-r>%
+" INFO expression register: in insert mode <C-r>=2+2 // in text "4" will be inserted
 
 "	named registers															{{{
-vnoremap <leader>y1 "qy  :echo "copied to the register 1"<cr>
-vnoremap <leader>y2 "wy  :echo "copied to the register 2"<cr>
-vnoremap <leader>y3 "ey  :echo "copied to the register 3"<cr>
-vnoremap <leader>y4 "ry  :echo "copied to the register 4"<cr>
-vnoremap <leader>y5 "ty  :echo "copied to the register 5"<cr>
-vnoremap <leader>y6 "yy  :echo "copied to the register 6"<cr>
-vnoremap <leader>y7 "uy  :echo "copied to the register 7"<cr>
-vnoremap <leader>y8 "iy  :echo "copied to the register 8"<cr>
-vnoremap <leader>y9 "oy  :echo "copied to the register 9"<cr>
-vnoremap <leader>y0 "py  :echo "copied to the register 0"<cr>
+vnoremap <leader>y1 "qy :echo "copied to the register 1(q)"<cr>
+vnoremap <leader>y2 "wy :echo "copied to the register 2(w)"<cr>
+vnoremap <leader>y3 "ey :echo "copied to the register 3(e)"<cr>
+vnoremap <leader>y4 "ry :echo "copied to the register 4(r)"<cr>
+vnoremap <leader>y5 "ty :echo "copied to the register 5(t)"<cr>
+vnoremap <leader>y6 "yy :echo "copied to the register 6(y)"<cr>
+vnoremap <leader>y7 "uy :echo "copied to the register 7(u)"<cr>
+vnoremap <leader>y8 "iy :echo "copied to the register 8(i)"<cr>
+vnoremap <leader>y9 "oy :echo "copied to the register 9(u)"<cr>
+vnoremap <leader>y0 "py :echo "copied to the register 0(p)"<cr>
+" in normal mode - still work on whole line
+nnoremap <leader>y1 "qyy :echo "copied to the register 1(q)"<cr>
+nnoremap <leader>y2 "wyy :echo "copied to the register 2(w)"<cr>
+nnoremap <leader>y3 "eyy :echo "copied to the register 3(e)"<cr>
+nnoremap <leader>y4 "ryy :echo "copied to the register 4(r)"<cr>
+nnoremap <leader>y5 "tyy :echo "copied to the register 5(t)"<cr>
+nnoremap <leader>y6 "yyy :echo "copied to the register 6(y)"<cr>
+nnoremap <leader>y7 "uyy :echo "copied to the register 7(u)"<cr>
+nnoremap <leader>y8 "iyy :echo "copied to the register 8(i)"<cr>
+nnoremap <leader>y9 "oyy :echo "copied to the register 9(o)"<cr>
+nnoremap <leader>y0 "pyy :echo "copied to the register 0(p)"<cr>
 " append
-vnoremap <leader>Y1 "Qy  :echo "added to the register 1"<cr>
-vnoremap <leader>Y2 "Wy  :echo "added to the register 2"<cr>
-vnoremap <leader>Y3 "Ey  :echo "added to the register 3"<cr>
-vnoremap <leader>Y4 "Ry  :echo "added to the register 4"<cr>
-vnoremap <leader>Y5 "Ty  :echo "added to the register 5"<cr>
-vnoremap <leader>Y6 "Yy  :echo "added to the register 6"<cr>
-vnoremap <leader>Y7 "Uy  :echo "added to the register 7"<cr>
-vnoremap <leader>Y8 "Iy  :echo "added to the register 8"<cr>
-vnoremap <leader>Y9 "Oy  :echo "added to the register 9"<cr>
-vnoremap <leader>Y0 "Py  :echo "added to the register 0"<cr>
-
-nnoremap <leader>p1 "q]p  :echo "paste from the register 1"<cr>
-nnoremap <leader>p2 "w]p  :echo "paste from the register 2"<cr>
-nnoremap <leader>p3 "e]p  :echo "paste from the register 3"<cr>
-nnoremap <leader>p4 "r]p  :echo "paste from the register 4"<cr>
-nnoremap <leader>p5 "t]p  :echo "paste from the register 5"<cr>
-nnoremap <leader>p6 "y]p  :echo "paste from the register 6"<cr>
-nnoremap <leader>p7 "u]p  :echo "paste from the register 7"<cr>
-nnoremap <leader>p8 "i]p  :echo "paste from the register 8"<cr>
-nnoremap <leader>p9 "o]p  :echo "paste from the register 9"<cr>
-nnoremap <leader>p0 "p]p  :echo "paste from the register 0"<cr>
+vnoremap <leader>Y1 "Qy :echo "added to the register 1(q)"<cr>
+vnoremap <leader>Y2 "Wy :echo "added to the register 2(w)"<cr>
+vnoremap <leader>Y3 "Ey :echo "added to the register 3(e)"<cr>
+vnoremap <leader>Y4 "Ry :echo "added to the register 4(r)"<cr>
+vnoremap <leader>Y5 "Ty :echo "added to the register 5(t)"<cr>
+vnoremap <leader>Y6 "Yy :echo "added to the register 6(y)"<cr>
+vnoremap <leader>Y7 "Uy :echo "added to the register 7(u)"<cr>
+vnoremap <leader>Y8 "Iy :echo "added to the register 8(i)"<cr>
+vnoremap <leader>Y9 "Oy :echo "added to the register 9(o)"<cr>
+vnoremap <leader>Y0 "Py :echo "added to the register 0(p)"<cr>
+" paste
+nnoremap <leader>p1 "q]p :echo "paste from the register 1(q)"<cr>
+nnoremap <leader>p2 "w]p :echo "paste from the register 2(w)"<cr>
+nnoremap <leader>p3 "e]p :echo "paste from the register 3(e)"<cr>
+nnoremap <leader>p4 "r]p :echo "paste from the register 4(r)"<cr>
+nnoremap <leader>p5 "t]p :echo "paste from the register 5(t)"<cr>
+nnoremap <leader>p6 "y]p :echo "paste from the register 6()"<cr>
+nnoremap <leader>p7 "u]p :echo "paste from the register 7()"<cr>
+nnoremap <leader>p8 "i]p :echo "paste from the register 8()"<cr>
+nnoremap <leader>p9 "o]p :echo "paste from the register 9()"<cr>
+nnoremap <leader>p0 "p]p :echo "paste from the register 0()"<cr>
+" paste in insert mode
+inoremap <C-r>1 <C-o>"q]p<C-o>:echo "paste from the register 1(q)"<cr>
+inoremap <C-r>2 <C-o>"w]p<C-o>:echo "paste from the register 2(w)"<cr>
+inoremap <C-r>3 <C-o>"e]p<C-o>:echo "paste from the register 3(e)"<cr>
+inoremap <C-r>4 <C-o>"r]p<C-o>:echo "paste from the register 4(r)"<cr>
+inoremap <C-r>5 <C-o>"t]p<C-o>:echo "paste from the register 5(t)"<cr>
+inoremap <C-r>6 <C-o>"y]p<C-o>:echo "paste from the register 6(y)"<cr>
+inoremap <C-r>7 <C-o>"u]p<C-o>:echo "paste from the register 7(u)"<cr>
+inoremap <C-r>8 <C-o>"i]p<C-o>:echo "paste from the register 8(i)"<cr>
+inoremap <C-r>9 <C-o>"o]p<C-o>:echo "paste from the register 9(o)"<cr>
+inoremap <C-r>0 <C-o>"p]p<C-o>:echo "paste from the register 0(p)"<cr>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "	clipboard																{{{
 if has('clipboard')	" not really needed for all options under this
-	" ": unnamed register (dd/yy)
-	" *: X11 primary	  (select/middle click)
-	" +: X11 secondanry   (Ctrl-C/V)
+	" copy filepath to X11 clipboard
+	nnoremap <leader>FP  :let @* = expand("%")<cr>:echo		"relative path of the file copied to the X11 1st clipboard"<CR>
+	nnoremap <leader>fp  :let @+ = expand("%")<cr>:echo		"relative path of the file copied to the X11 2nd clipboard"<CR>
+	nnoremap <leader>FFP :let @* = expand("%:p")<cr>:echo		"full path of the file copied to the X11 1st clipboard"<CR>
+	nnoremap <leader>ffp :let @+ = expand("%:p")<cr>:echo		"full path of the file copied to the X11 2nd clipboard"<CR>
 
-	" INFO can't have spaces in alias, spaces is aliased to fold toggle TODO
+	" insert mode paste from X11 clipboard
+	inoremap <C-r>! <C-o>"*]p<C-o>:echo "paste from the X11 1st clipboard"<cr>
+	inoremap <C-r>@ <C-o>"+]p<C-o>:echo "paste from the X11 2st clipboard"<cr>
+
+	" INFO can't have spaces in alias, space is aliased to fold toggle TODO
 	" "*	X11 primary buffer
 	vnoremap <leader>ry "*y
 	vnoremap <leader>rd "*d
 	nnoremap <leader>rp "*p
 	vnoremap <leader>rp "*p
 	" TODO r{1,2}{y,d,p}
+
+
+	" Ctrl-
+
+
 
 
 	" TODO TODO IDEA
@@ -770,25 +796,14 @@ if has('clipboard')	" not really needed for all options under this
 	nnoremap <leader>p "+p :echo "pasted from the X11 2nd clipboard"<cr>
 	vnoremap <leader>p "+p :echo "pasted from the X11 2nd clipboard"<cr>
 
-	" copy filepath to X11 clipboard
-	nnoremap <leader>FP  :let @* = expand("%")<cr>:echo		"relative path of the file copied to the X11 1st clipboard"<CR>
-	nnoremap <leader>fp  :let @+ = expand("%")<cr>:echo		"relative path of the file copied to the X11 2nd clipboard"<CR>
-	nnoremap <leader>FFP :let @* = expand("%:p")<cr>:echo		"full path of the file copied to the X11 1st clipboard"<CR>
-	nnoremap <leader>ffp :let @+ = expand("%:p")<cr>:echo		"full path of the file copied to the X11 2nd clipboard"<CR>
 endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-
 	" Easier copy/paste to the named registers
 	" INFO this will slowdown copy to the X11 clipboard (<leader>y)
-	" TODO better naming (it's not a register 1 but q)
 	" TODO :set paste [y/d/p] :set nopaste
-	" TODO registers: asdfghjkl
-
-	" % 	relative path
-	" %:p	full path
-	" %:t	just filename
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+
 "		mouse mappings														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " double click select all occurrences
@@ -799,7 +814,7 @@ endif
 " TODO Shift and/or Alt + 2 mouse click: goto tag
 
 " triple click to toggle fold
-nnoremap <3-LeftMouse> za
+" nnoremap <3-LeftMouse> za
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 " Map to buttons
@@ -1211,7 +1226,7 @@ nnoremap <A-r> :w<cr>:RustRun<cr>
 " Rust autocompleter (cargo install racer)
 " plugin 'vim-racer' is not really needed for deoplete-rust, but racer_cmd is.
 let g:racer_cmd = $HOME."/.cargo/bin/racer"
-" let $RUST_SRC_PATH = "/usr/src/rust/src/"
+" let $RUST_SRC_PATH = "$HOME/.multirust/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src"
 " if you want completions to show the complete function definition (e.g. its arguments and return type), enable the experimental completer:
 let g:racer_experimental_completer = 1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
@@ -1397,8 +1412,7 @@ if executable('ag')
 		" FreeBSD ag version 1.0.1
 	elseif s:uname == "Linux"
 		" Linux ag --version: 0.19.2
-		let g:ackprg = 'ag -a'
-		" TODO ack-grep?
+		let g:ackprg = 'ag --all-text'
 	endif
 endif
 
@@ -1611,30 +1625,6 @@ let g:NERDTreeMinimalUI = 1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
-" <leader>s search all buffers
-
-"				GUI settings												{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if has("gui_running")
-	"set lines=150 columns=230
-	set guioptions -=T		" toolbar
-	set guioptions -=r		" right scrollbar
-	set guioptions -=L		" left scrollbar
-
-	" gvim ispravno generira u fajlu ▸ ali ne i kad se stisne tab
-
-	"Invisible character colors
-	highlight NonText guifg=#2a4a59
-	highlight SpecialKey guifg=#2a4a59
-
-	set winaltkeys=no		" Turn off <Alt>/<Meta> pulling down GUI menu
-
-	set showbreak=…		" char to be displayed on the beggining of broken line
-	"set listchars=tab:\|·,eol:¬,trail:·
-	" trail is not needed, plugin take care of that
-	" TODO same font as xterm
-endif
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 " 					colors and TERM setup									{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " colors as sublime
@@ -1687,6 +1677,26 @@ highlight Comment		ctermfg=101
 
 highlight ExtraWhitespace	ctermbg=162
 "highlight ExtraWhitespace ctermbg=202
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"				GUI settings												{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has("gui_running")
+	"set lines=150 columns=230
+	set guioptions -=T		" toolbar
+	set guioptions -=r		" right scrollbar
+	set guioptions -=L		" left scrollbar
+
+	" gvim ispravno generira u fajlu ▸ ali ne i kad se stisne tab
+
+	"Invisible character colors
+	highlight NonText guifg=#2a4a59
+	highlight SpecialKey guifg=#2a4a59
+
+	set winaltkeys=no		" Turn off <Alt>/<Meta> pulling down GUI menu
+
+	set showbreak=…		" char to be displayed on the beggining of broken line
+	"set listchars=tab:\|·,eol:¬,trail:·
+endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "				custom functions											{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1897,8 +1907,10 @@ map g<C-\> :cs find 0 <C-R>=expand("<cword>")<CR><CR>
 
 " " work specific stuff														{{{
 " """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:work_pc=system('is_work_pc')
-let g:work_dir=system('is_work_dir')
+if !has('windows')
+	let g:work_pc=system('is_work_pc')
+	let g:work_dir=system('is_work_dir')
+endif
 
 if work_pc == 1
 	set list
@@ -1916,7 +1928,7 @@ endif
 " 		maybe <expr> if window nubmer greater than X/there is next window
 " 		then...
 " TODO skip syntastic window
-nnoremap <tab> :wincmd p<cr>
+nnoremap <tab> :wincmd w<cr>
 " TODO S-Tab jump to "special" windows - syntastic, quick fix, ...
 
 
@@ -2120,12 +2132,6 @@ set isfname+=32	" <space> is part of filename
 " current buffer number: bufnr('%')
 " get line under the cursors: getline('.')
 "									}}}
-" font {{{
-" another patched font
-" mkdir -p ~/.local/share/fonts
-" cd ~/.local/share/fonts && curl -fLo "Droid Sans Mono for Powerline Nerd Font Complete.otf" https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/patched-fonts/DroidSansMono/complete/Droid%20Sans%20Mono%20for%20Powerline%20Nerd%20Font%20Complete.otf
-
-" }}}
 
 
 " variables:
@@ -2151,7 +2157,6 @@ set isfname+=32	" <space> is part of filename
 " INFO CtrlSpaceSaveWorspace would work OK for ctrl-space tabs and buffers
 " TODO even full and default CtrlSpace wont recognize multiple buffers when vim file1.txt file2.txt (and CtrlSpaceGoUp/Down won't work)
 
-" kopirat listchars u novi vimrc
 " show leading whitespaces
 " setlocal conceallevel=2 concealcursor=nv
 " syn match LeadingWS /\(^\s*\)\@<=\s/ conceal cchar=·
