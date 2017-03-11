@@ -55,6 +55,7 @@ set gdefault "applies substitutions globally on lines. For example, instead of :
 "set completeopt=menu,menuone,preview
 "set completeopt=menuone,preview	" default
 set completeopt=menuone				" f(); can be view in command line with plugin
+set completeopt+=noselect			" fix deoplete auto insert
 set noshowmode						"Don't show the mode(airline is handling this)
 set shortmess+=I	" don't show intro message at startup
 set cursorline		" color the line when the cursor is
@@ -252,6 +253,8 @@ augroup my_group_with_a_very_uniq_name
 
 	" Don't show numbers in preview window
 	autocmd BufWinEnter * if &previewwindow | setlocal nonumber norelativenumber | endif
+	" XXX:
+	autocmd BufWinEnter * if &previewwindow | nnoremap <buffer> q :q<cr>| endif
 
 
 	autocmd BufWinEnter * if bufname("%") == "[Command Line]" | nnoremap <buffer> q :q<cr> | endif
@@ -372,6 +375,8 @@ nnoremap j gj
 nnoremap k gk
 nnoremap gj j
 nnoremap gk k
+
+nnoremap e el
 
 " toggle between ^ (goto first non-blank char) and 0 (goto start of the line)
 nnoremap <silent>0 :call ZeroMove()<cr>
@@ -810,7 +815,7 @@ call plug#begin('~/.vim/plugged')
 if has("nvim")
 	" Autocomplete for nvim (needs python3)
 	Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-	Plug 'zchee/deoplete-clang'	" show functions arguments, slows down j/k
+	" Plug 'zchee/deoplete-clang'	" show functions arguments, slows down j/k
 	Plug 'sebastianmarkow/deoplete-rust'
 	" Plug 'Rip-Rip/clang_complete'
 	"Plug 'wellle/tmux-complete.vim'	" autocomplete text from tmux buffer (eg git commit hash)
@@ -829,7 +834,9 @@ Plug 'rust-lang/rust.vim'
 Plug 'racer-rust/vim-racer'	" Rust autocomplete, needs cargo install racer, not really needed for deoplete-rust
 Plug 'timonv/vim-cargo'		" simple plugin, cmds: Cargo{Build, Run, Test, Bench}
 
+" Plug 'vim-scripts/Conque-GDB'
 
+Plug 'Raimondi/delimitMate'		" automatic closing quotes, brackets, ...  remaps <BS>
 "Plug 'Shougo/neosnippet-snippets'	" needed for neosnippet
 "Plug 'Shougo/neosnippet.vim' 		" dodatak za neocomplete
 "Plug 'garbas/vim-snipmate' 		" autocomplete for loops and etc
@@ -876,7 +883,6 @@ Plug 'mhinz/vim-signify'		" Show marks for modified/added/removed: svn, git, ...
 
 Plug 'xolox/vim-misc'				" Needed for easytags and vim-session
 Plug 'xolox/vim-easytags'			" XXX XXX XXX XXX XXX fucking slow on work PC
-"Plug 'Raimondi/delimitMate'		" automatic closing quotes, brackets, ...  remaps <BS>
 Plug 'scrooloose/nerdcommenter'		" comments
 Plug 'scrooloose/nerdtree',		{ 'on': 'NERDTreeToggle' }	" project tree (file explorer)
 "Plug 'jistr/vin-nerdtree-tabs' 	" Nerdtree for all tabs
@@ -1493,48 +1499,50 @@ set statusline+=%*
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		NeoMake															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:neomake_open_list = 2	" auto open list, but don't jump to it
-" :ll
-"
-" autocmd! BufWritePost * Neomake
+if has("nvim")
+	let g:neomake_open_list = 2	" auto open list, but don't jump to it
+	" :ll
+	"
+	" autocmd! BufWritePost * Neomake
 
-let g:neomake_error_sign = {'text': 'E'}
-let g:neomake_warning_sign= {'text': 'W'}
-call neomake#signs#RedefineErrorSign()
-call neomake#signs#RedefineWarningSign()
+	let g:neomake_error_sign = {'text': 'E'}
+	let g:neomake_warning_sign= {'text': 'W'}
+	call neomake#signs#RedefineErrorSign()
+	call neomake#signs#RedefineWarningSign()
 
-let g:neomake_make_maker = {
-			\ 'exe': 'make',
-			\ 'args': ['--build'],
-			\ 'errorformat': '%f:%l:%c: %m',
-			\ }
-" must be called with Neomake rust
-			 " 'args': ['-A non_camel_case'],
-let g:neomake_rust_rust_maker = {
-			\ 'exe': 'rustc',
-			\ 'errorformat': '%f:%l: %m',
-			\ }
-let g:neomake_rust_enabled_makers = ['rust']
+	let g:neomake_make_maker = {
+				\ 'exe': 'make',
+				\ 'args': ['--build'],
+				\ 'errorformat': '%f:%l:%c: %m',
+				\ }
+	" must be called with Neomake rust
+				 " 'args': ['-A non_camel_case'],
+	let g:neomake_rust_rust_maker = {
+				\ 'exe': 'rustc',
+				\ 'errorformat': '%f:%l: %m',
+				\ }
+	let g:neomake_rust_enabled_makers = ['rust']
 
 
-" let g:neomake_highlight_columns=0	" don't highlight the first char
+	" let g:neomake_highlight_columns=0	" don't highlight the first char
 
-" let &errorformat="%f:%l:%c: %m"
+	" let &errorformat="%f:%l:%c: %m"
 
-" Start of the multi-line error message (%A),
-" %p^ means a string of spaces and then a ^ to
-" get the column number
-let &efm  = '%A%p^' . ','
-" Next is the main bit: continuation of the error line (%C)
-" followed by the filename in quotes, a comma (\,)
-" then the rest of the details
-let &efm .= '%C"%f"\, line %l: error(%n): %m' . ','
-" Next is the last line of the error message, any number
-" of spaces (' %#': equivalent to ' *') followed by a bit
-" more error message
-let &efm .= '%Z %#%m' . ','
-" This just ignores any other lines (must be last!)
-let &efm .= '%-G%.%#'
+	" Start of the multi-line error message (%A),
+	" %p^ means a string of spaces and then a ^ to
+	" get the column number
+	let &efm  = '%A%p^' . ','
+	" Next is the main bit: continuation of the error line (%C)
+	" followed by the filename in quotes, a comma (\,)
+	" then the rest of the details
+	let &efm .= '%C"%f"\, line %l: error(%n): %m' . ','
+	" Next is the last line of the error message, any number
+	" of spaces (' %#': equivalent to ' *') followed by a bit
+	" more error message
+	let &efm .= '%Z %#%m' . ','
+	" This just ignores any other lines (must be last!)
+	let &efm .= '%-G%.%#'
+endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		multicursor															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1570,7 +1578,10 @@ let g:easytags_async = 1
 "let g:easytags_file = "~/.vim/tags"
 
 "set regexpengine=1 " old engine, faster (maybe), no changes
-let g:easytags_auto_highlight=0		" fix slowiness
+" let g:easytags_auto_highlight=0		" fix slowiness
+
+
+let g:easytags_suppress_ctags_warning = 1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		delimitMate															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1579,6 +1590,8 @@ augroup mydelimitMate
 	au!
 	au FileType markdown let b:delimitMate_nesting_quotes = ["`"]
 	au FileType python let b:delimitMate_nesting_quotes = ['"', "'"]
+	" removed <:> :
+	au FileType rust let delimitMate_matchpairs = "(:),[:],{:}"
 augroup END
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		NERDTree															{{{
@@ -1653,7 +1666,8 @@ highlight SpecialKey	ctermfg=236
 highlight Conceal		ctermfg=7 ctermbg=233
 
 " longer vertical bar for vertical splits, space for folds (default was -)
-set fillchars=vert:\│,fold:\
+" INFO trailing white space is NEEDED here
+set fillchars=vert:\│,fold:\ 
 
 " change the colors in diff mode
 highlight DiffAdded		ctermfg=81
@@ -1662,7 +1676,8 @@ highlight DiffRemoved	ctermfg=208
 " auto completion menu
 " highlight pmenu			ctermfg=white ctermbg=52
 " highlight pmenu			ctermfg=120 ctermbg=8
-highlight pmenu 			ctermbg=232 ctermfg=120
+" highlight pmenu 			ctermbg=232 ctermfg=120
+highlight pmenu 			ctermbg=243 ctermfg=120
 
 " hide ANSCI escape chars
 syntax match Ignore /\%o33\[[0-9]\{0,5}m/ conceal
@@ -1670,6 +1685,7 @@ syntax match Ignore /\%o33\[[0-9]\{0,5}m/ conceal
 " ugly but easier to read
 highlight Comment		ctermfg=101
 
+highlight ExtraWhitespace	ctermbg=162
 "highlight ExtraWhitespace ctermbg=202
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "				custom functions											{{{
@@ -1838,7 +1854,7 @@ endfunction
 "" Add set path=.,<relative include dir> for searching for header in particular directories. For more information do ":help file-searching".
 
 " open tag in a new tab TEST modified line
-"map <C-\> :tab split<cr>:exec("tag ".expand("<cword>"))<CR>
+nnoremap <C-\> :tab split<cr>:exec("tag ".expand("<cword>"))<CR>
 " this is remapped to C-]
 " open tag in a new split
 " XXX will open split when tag is not found
@@ -1849,7 +1865,7 @@ endfunction
 if has('cscope')
 	" include cscope when searching for tag (Ctrl-])
 	" show verbose info when loading cscope DB
-	set cscopetag cscopeverbose
+	" set cscopetag cscopeverbose	" XXX iritating - ALWAYS will show  multiple choices (as g] would do)
 
 	if has('quickfix')
 		set cscopequickfix=s-,c-,d-,i-,t-,e-

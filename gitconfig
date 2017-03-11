@@ -21,6 +21,9 @@
 	c = commit --allow-empty-message -am
 	cl = clone
 	ls = ls-files
+	sh = stash
+	shp = stash pop
+	sp = stash pop
 	# some aliases for lazy shits like me
 	d = diff
 	s = status
