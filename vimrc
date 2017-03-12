@@ -146,9 +146,19 @@ if has('unix')
 
 		let s:libclang_path = "/usr/local/llvm38/lib/libclang.so"
 		let s:clang_header = "/usr/local/llvm38/include/clang"
+
+		if executable('ag')
+			" FreeBSD ag version 1.0.1
+			let g:ackprg = 'ag --vimgrep --path-to-ignore ~/.agignore -H --column -a'
+		endif
 	elseif s:uname == "Linux"
 		let s:libclang_path = "/usr/lib/llvm-3.6/lib/libclang.so"
 		let s:clang_header = "/usr/include/clang/"
+
+		if executable('ag')
+			" Linux ag --version: 0.19.2
+			let g:ackprg = 'ag --all-text'
+		endif
 	endif
 endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
@@ -316,6 +326,7 @@ command! WE write | edit
 cabbrev we WE
 
 " TODO remap all to this
+" 170312: why?
 "cnoreabbrev <expr> W ((getcmdtype() is# ':' && getcmdline() is# 'W')?('w'):('W'))
 
 command! PU PlugUpdate | PlugUpgrade
@@ -340,7 +351,7 @@ cabbrev foldcloseall %foldclose!
 cabbrev foldca %foldclose!
 cabbrev fca %foldclose!
 cabbrev foa %foldopen!
-"because standard Vim fold shortcuts are starting with z
+" because standard Vim fold shortcuts are starting with z
 cabbrev zca %foldclose!
 cabbrev zoa %foldopen!
 " close all other folds
@@ -397,7 +408,7 @@ vnoremap > >gv
 " deindent from insert mode
 inoremap <S-Tab> <C-o><<
 " INFO maybe more useful shortcut for window management
-" XXX doesn't work
+" INFO <S-Tab> is used for autocomplete
 nnoremap <S-Tab> <<
 
 " auto-complete 'fix'
@@ -418,6 +429,7 @@ inoremap <expr><C-_>	deoplete#undo_completion()
 " endfunction
 " INFO 161203 It's seems that default behaviour of enter and deoplete is good enough for me
 
+" show ASCII code of the char under the cursor
 nnoremap <M-x> ga
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		buffers/windows/tabs keymaps										{{{
@@ -476,8 +488,9 @@ nnoremap to :tabnew<cr>:CtrlP<CR>
 nnoremap ti :tabedit<space>
 nnoremap te :tabedit<space>
 
-nnoremap <leader>q :tabprev<cr>
-nnoremap <leader>w :tabnext<cr>
+" 170312 disabled, never used
+" nnoremap <leader>q :tabprev<cr>
+" nnoremap <leader>w :tabnext<cr>
 
 " jumping, Ctrl-I (tab) is used for switching splits
 nnoremap <C-p> :pop<cr>:echo "Tag jump -1"<cr>
@@ -487,6 +500,7 @@ nnoremap <C-n> :tag<cr>:echo "Tag jump +1"<cr>
 " <leader>n 	for switching buffers
 " Alt-shift-N 	for switching tabs
 if has('nvim')
+	" INFO Alt-N is used for tmux
 	" INFO shift in shortcuts doesn't work, but this is:
 	nnoremap <A-!> :tabfirst<cr>
 	nnoremap <A-@> :tabn 2<cr>
@@ -504,10 +518,11 @@ nnoremap <C-w>d :tab split<cr>:echom "tab duplicated"<cr>
 " close all windows in current tab
 nnoremap <C-w>C :tabclose<cr>
 
-" inoremap <C-w>j <esc><C-w>j
-" inoremap <C-w>k <esc><C-w>k
-" inoremap <C-w>h <esc><C-w>h
-" inoremap <C-w>l <esc><C-w>l
+" resize Vim windows (almost) as tmux splits
+nnoremap <C-w>H :call TmuxResize('h', 1)<CR>
+nnoremap <C-w>J :call TmuxResize('j', 1)<CR>
+nnoremap <C-w>K :call TmuxResize('k', 1)<CR>
+nnoremap <C-w>L :call TmuxResize('l', 1)<CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		Emacs shortcuts														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -584,25 +599,12 @@ nnoremap <leader>h :noh<cr>
 nnoremap <leader>s :setlocal spell!<cr>
 " toggle showing invisible chars
 nnoremap <leader>l :set list!<cr>:set list?<CR>
-" nnoremap <leader>n :set relativenumber!<cr>
-" nnoremap <leader>N :set number!<cr>
-" nnoremap <leader>n :set relativenumber!<cr>:set number!<CR>
-" nnoremap <leader>N :set relativenumber!<cr>
 nnoremap <leader>n :set relativenumber!<cr>
 nnoremap <leader>N :set number!<cr>
-"reload config file
 nnoremap <leader>r :so $MYVIMRC<cr>:echo "vimrc reloaded"<CR>
 nnoremap <leader>e :e $MYVIMRC<cr>
 
-" INFO capsed to not slowdown <leader>m which is more used (for CtrlP MRU)
 nnoremap <silent> <leader>ML :call AppendModeline()<cr>
-" buffers and windows
-" INFO not really useful, better shortcuts can use that shortcuts
-"nnoremap <leader>w :w<cr>
-"nnoremap <leader>x :x<cr>
-"nnoremap <leader>q :q<cr>
-
-
 " INFO there are some leader mappings <leader>0..9 in tabs section
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		plugin mappings														{{{
@@ -625,20 +627,6 @@ nnoremap <leader>a :tab split<cr>:Ack! <C-r><C-w><CR>
 " nnoremap <leader>a :tab split<cr>:Ack! -a<C-r><C-w><CR>
 nnoremap <leader>A :tab split<cr>:Ack! ""<left>
 command! FixWhiteSpace StripWhitespace
-
-" not too useful
-"nnoremap <leader>1 <Plug>AirlineSelectTab1
-"nnoremap <leader>2 <Plug>AirlineSelectTab2
-"nnoremap <leader>3 <Plug>AirlineSelectTab3
-"nnoremap <leader>4 <Plug>AirlineSelectTab4
-"nnoremap <leader>5 <Plug>AirlineSelectTab5
-"nnoremap <leader>6 <Plug>AirlineSelectTab6
-"nnoremap <leader>7 <Plug>AirlineSelectTab7
-"nnoremap <leader>8 <Plug>AirlineSelectTab8
-"nnoremap <leader>9 <Plug>AirlineSelectTab9
-"nnoremap <leader>- <Plug>AirlineSelectPrevTab
-"nnoremap <leader>+ <Plug>AirlineSelectNextTab
-"nnoremap <leader>= <Plug>AirlineSelectNextTab
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 map g<C-]> :cs find 3 <C-R>=expand("<cword>")<CR><CR>
 
@@ -756,7 +744,6 @@ if has('clipboard')	" not really needed for all options under this
 	inoremap <C-r>! <C-o>"*]p<C-o>:echo "paste from the X11 1st clipboard"<cr>
 	inoremap <C-r>@ <C-o>"+]p<C-o>:echo "paste from the X11 2st clipboard"<cr>
 
-	" INFO can't have spaces in alias, space is aliased to fold toggle TODO
 	" "*	X11 primary buffer
 	vnoremap <leader>ry "*y
 	vnoremap <leader>rd "*d
@@ -764,11 +751,12 @@ if has('clipboard')	" not really needed for all options under this
 	vnoremap <leader>rp "*p
 	" TODO r{1,2}{y,d,p}
 
-
-	" Ctrl-
-
-
-
+	" tmux:
+	" p - tmux buffer paste
+	" P - X11 2nd
+	" [ - X11 1st
+	" { - Vim paste
+	" INFO vim: only used X11 1st and 2nd
 
 	" TODO TODO IDEA
 	" y - vim yank
@@ -789,12 +777,13 @@ if has('clipboard')	" not really needed for all options under this
 	" X11 secondary buffer		"+
 	"vnoremap <leader>y "+y :echo "copied to the X11 2nd clipboard"<cr>
 	" TODO TODO set paste mode before pasting
-	vnoremap <leader>y "+y :echo "copied to the X11 2nd clipboard"<cr>
-	vnoremap <leader>yy "+y :echo "copied to the X11 2nd clipboard"<cr>
-	vnoremap <leader>d "+d :echo "cutted to the X11 2nd clipboard"<cr>
-	vnoremap <leader>x "+d :echo "cutted to the X11 2nd clipboard"<cr>
-	nnoremap <leader>p "+p :echo "pasted from the X11 2nd clipboard"<cr>
-	vnoremap <leader>p "+p :echo "pasted from the X11 2nd clipboard"<cr>
+	vnoremap <leader>y "+y :echo  "copied to the X11 2nd clipboard"<cr>
+	nnoremap <leader>yy "+y :echo "copied to the X11 2nd clipboard"<cr>
+	vnoremap <leader>d "+d :echo  "cutted to the X11 2nd clipboard"<cr>
+	nnoremap <leader>d "+dd :echo "cutted to the X11 2nd clipboard"<cr>
+	vnoremap <leader>x "+d :echo  "cutted to the X11 2nd clipboard"<cr>
+	nnoremap <leader>p "+p :echo  "pasted from the X11 2nd clipboard"<cr>
+	vnoremap <leader>p "+p :echo  "pasted from the X11 2nd clipboard"<cr>
 
 endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
@@ -816,12 +805,6 @@ endif
 " triple click to toggle fold
 " nnoremap <3-LeftMouse> za
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-
-" Map to buttons
-nnoremap <C-w>H :call TmuxResize('h', 1)<CR>
-nnoremap <C-w>J :call TmuxResize('j', 1)<CR>
-nnoremap <C-w>K :call TmuxResize('k', 1)<CR>
-nnoremap <C-w>L :call TmuxResize('l', 1)<CR>
 "				Plugins
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "				Plugins														{{{
@@ -1331,6 +1314,7 @@ augroup END
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		bufkill																{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" INFO used for :BD
 " don't create various <leader>b* mapping (which will slowdown <leader>b for CtrlPBuffer)
 let g:BufKillCreateMappings = 0
 " To move backwards/forwards through recently accessed buffers, use: :BB/:BF
@@ -1405,16 +1389,6 @@ nmap [C <plug>(signify-prev-hunk)
 " INFO ack Vim plugin but systems 'ag' binary will be used
 " :AckAdd:		add results to the current search list in quickfix
 " :AckWindow:	search current tab
-if executable('ag')
-	if s:uname == "FreeBSD"
-		"let g:ackprg = 'ag --vimgrep --path-to-ignore ~/.agignore'
-		let g:ackprg = 'ag --vimgrep --path-to-ignore ~/.agignore -H --column -a'
-		" FreeBSD ag version 1.0.1
-	elseif s:uname == "Linux"
-		" Linux ag --version: 0.19.2
-		let g:ackprg = 'ag --all-text'
-	endif
-endif
 
 let g:ack_apply_qmappings = 0	" disable QuickFix mappings
 let g:ack_apply_lmappings = 0
@@ -1627,10 +1601,7 @@ let g:NERDTreeMinimalUI = 1
 
 " 					colors and TERM setup									{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" colors as sublime
 colorscheme molokai
-"colorscheme badwolf
-"colorscheme dracula
 " highlight Normal		ctermbg=233	" XXX change in theme file
 
 highlight Todo			ctermfg=196 ctermbg=232
@@ -1656,8 +1627,7 @@ highlight SpecialKey	ctermfg=236
 highlight Conceal		ctermfg=7 ctermbg=233
 
 " longer vertical bar for vertical splits, space for folds (default was -)
-" INFO trailing white space is NEEDED here
-set fillchars=vert:\│,fold:\ 
+set fillchars=fold:\ ,vert:\│
 
 " change the colors in diff mode
 highlight DiffAdded		ctermfg=81
@@ -1910,15 +1880,15 @@ map g<C-\> :cs find 0 <C-R>=expand("<cword>")<CR><CR>
 if !has('windows')
 	let g:work_pc=system('is_work_pc')
 	let g:work_dir=system('is_work_dir')
-endif
 
-if work_pc == 1
-	set list
+	if work_pc == 1
+		set list
 
-	if work_dir == 1
-		" expand only if we are working on work stuff
-		set expandtab
-		highlight clear ColorColumn	" don't color background after textwidth
+		if work_dir == 1
+			" expand only if we are working on work stuff
+			set expandtab
+			highlight clear ColorColumn	" don't color background after textwidth
+		endif
 	endif
 endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
@@ -2033,7 +2003,6 @@ set isfname+=32	" <space> is part of filename
 "/some_text.*							-> '.' and wild wildcard starts working
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 " TODO replace <C-r><C-w> shortcuts with expand('<cword>')
-" move split to tab: Ctrl-W T
 " moving		 															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " '[ '] jump to the beggining or end of last change
@@ -2142,7 +2111,6 @@ set isfname+=32	" <space> is part of filename
 " Vim debug:
 " vim -V9myVimLog
 " TODO ag sredit da nema praznu liniju ispod svake korisne u quickfix
-" TODO C-w c da zatvori cijeli tab (ukljucujus sve splitove i quickfix window) -> :tabclose
 " TODO napravit da oboja jednako i TODO2
 " TODO remember highlight state after reloading vimrc
 " TODO n (next match) skip if the next match is line after cursor
@@ -2162,7 +2130,7 @@ set isfname+=32	" <space> is part of filename
 " syn match LeadingWS /\(^\s*\)\@<=\s/ conceal cchar=·
 " XXX and this will also change how tabs are showed
 " INFO highlight ALL whitespace (and tabs): /\s
-" INFO highlight all whitespace at hte beggining: /^<space>
+" INFO highlight all whitespace at the beggining: /^<space>
 " sctrach buffer: enew (buffer withou file)
 " TODO yank da bude zapravo set paste mode, set ono da poravna (]p) i onda nopaste
 " TODO jump to header under cursor
