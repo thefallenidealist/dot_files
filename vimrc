@@ -778,7 +778,7 @@ if has('clipboard')	" not really needed for all options under this
 	"vnoremap <leader>y "+y :echo "copied to the X11 2nd clipboard"<cr>
 	" TODO TODO set paste mode before pasting
 	vnoremap <leader>y "+y :echo  "copied to the X11 2nd clipboard"<cr>
-	nnoremap <leader>yy "+y :echo "copied to the X11 2nd clipboard"<cr>
+	nnoremap <leader>y "+yy :echo "copied to the X11 2nd clipboard"<cr>
 	vnoremap <leader>d "+d :echo  "cutted to the X11 2nd clipboard"<cr>
 	nnoremap <leader>d "+dd :echo "cutted to the X11 2nd clipboard"<cr>
 	vnoremap <leader>x "+d :echo  "cutted to the X11 2nd clipboard"<cr>
@@ -874,7 +874,7 @@ Plug 'rhysd/vim-clang-format'
 " čć
 
 
-Plug 'tpope/vim-fugitive'		" plugin on GitHub repo
+Plug 'tpope/vim-fugitive'		" Git commands for Vim
 "Plug 'airblade/vim-gitgutter'	" Show +-~ left of number column
 Plug 'mhinz/vim-signify'		" Show marks for modified/added/removed: svn, git, ...
 
@@ -980,7 +980,7 @@ if has ('nvim')
 	let g:deoplete#enable_ignore_case = 1	" ignore case
 	let g:deoplete#enable_smart_case = 1	" but use smart case
 	"let g:deoplete#enable_camel_case = 1 " INFO only with deoplete-matcher*fuzzy
-	let g:neocomplete#enable_fuzzy_completion = 1
+	" let g:neocomplete#enable_fuzzy_completion = 1
 	" let g:deoplete#auto_complete_start_length = 1	" default: 2
 	" let g:deoplete#auto_complete_start_length = 1	" deprecated
 	" let g:deoplete#source#attribute#min_pattern_length = 1
@@ -988,7 +988,8 @@ if has ('nvim')
 	"-> is added
 	let g:deoplete#delimiters = ['/', '.', '::', ':', '#', '->']
 	" let g:deoplete#max_list = 20					" max number of items in list
-	let g:deoplete#auto_complete_delay = 1		" ms, default 150, still slow
+	" need to bi bigger than 1 because it will try to autocomplete everything
+	let g:deoplete#auto_complete_delay = 10
 
 	let g:deoplete#sources		= {} " init of the variable
 	let g:deoplete#sources._	= ['buffer', 'file', 'dictionary'] " default files
