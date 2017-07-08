@@ -111,9 +111,9 @@ set listchars=tab:\│·,extends:>,precedes:<
 set list	" show invisible chars (tabs and others defined in listchars)
 
 " directory for swap files
-set directory=$HOME/.vim/swap/,/tmp
+" set directory=$HOME/.vim/swap/,/tmp
 " place for: filename.txt~
-set backupdir=$HOME/.vim/swap/,/tmp
+" set backupdir=$HOME/.vim/swap/,/tmp
 "		search						{{{
 """""""""""""""""""""""""""""""""""""""
 set ignorecase		" case insensitive search, needed for the line below
@@ -486,6 +486,7 @@ nnoremap tm :tabnew<cr>:CtrlPMRUFiles<CR>
 nnoremap to :tabnew<cr>:CtrlP<CR>
 " because it's close to O, and sometimes there is a need to just open a file
 nnoremap ti :tabedit<space>
+" XXX 170609 will fuckup CtrlP completition
 nnoremap te :tabedit<space>
 
 " 170312 disabled, never used
@@ -501,7 +502,7 @@ nnoremap <C-n> :tag<cr>:echo "Tag jump +1"<cr>
 " Alt-shift-N 	for switching tabs
 if has('nvim')
 	" INFO Alt-N is used for tmux
-	" INFO shift in shortcuts doesn't work, but this is:
+	" INFO shift in shortcuts won't work, but this will:
 	nnoremap <A-!> :tabfirst<cr>
 	nnoremap <A-@> :tabn 2<cr>
 	nnoremap <A-#> :tabn 3<cr>
@@ -811,26 +812,27 @@ endif
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 call plug#begin('~/.vim/plugged')
 if has("nvim")
-	" Autocomplete for nvim (needs python3)
-	Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-	" Plug 'zchee/deoplete-clang'	" show functions arguments, slows down j/k
-	Plug 'sebastianmarkow/deoplete-rust'
-	" Plug 'Rip-Rip/clang_complete'
-	"Plug 'wellle/tmux-complete.vim'	" autocomplete text from tmux buffer (eg git commit hash)
-	Plug 'neomake/neomake'	" replacement for syntastic
+	Plug 'roxma/nvim-completion-manager'
 else
 	Plug 'Shougo/neocomplete.vim' " Needs Lua
 	" Plug 'vim-syntastic/syntastic'
 	" Plug 'scrooloose/syntastic'		" synthax checker in the window at the bottom
+
+	" nvim completion manager for Vim8:
+    Plug 'roxma/vim-hug-neovim-rpc'
 endif
 "Plug 'Shougo/neoinclude.vim', {'for': 'c,cpp'}	" headers autocomplete
 Plug 'Shougo/echodoc.vim'	" show functions in commad line window (:) insted of in preview
 " Plug 'Shougo/neopairs.vim'	" Auto insert pairs when complete done
 "Plug 'ervandew/supertab'
+" Plug 'Shougo/denite.nvim'
 
+Plug 'timonv/vim-cargo'		" simple plugin, cmds: Cargo{Build, Run, Test, Bench}
+
+" nvim-completion-manager addon for Rust:
 Plug 'rust-lang/rust.vim'
 Plug 'racer-rust/vim-racer'	" Rust autocomplete, needs cargo install racer, not really needed for deoplete-rust
-Plug 'timonv/vim-cargo'		" simple plugin, cmds: Cargo{Build, Run, Test, Bench}
+Plug 'roxma/nvim-cm-racer'
 
 " Plug 'vim-scripts/Conque-GDB'
 
@@ -868,7 +870,7 @@ Plug 'mileszs/ack.vim'			" ack plugin, but for 'ag'
 "Plug 'gcmt/taboo.vim'			" rename tabs XXX don't work with CtrlSpace and AirLine
 "Plug 'ronakg/quickr-cscope.vim'" cscope XXX
 Plug 'brookhong/cscope.vim'		" cscope
-Plug 'rhysd/vim-clang-format'
+" Plug 'rhysd/vim-clang-format'
 
 "Plug 'tpope/vim-characterize'	" show dec/hex/oct for char under the cursos, (ga), unicode style
 " čć
@@ -880,7 +882,7 @@ Plug 'mhinz/vim-signify'		" Show marks for modified/added/removed: svn, git, ...
 
 
 Plug 'xolox/vim-misc'				" Needed for easytags and vim-session
-Plug 'xolox/vim-easytags'			" XXX XXX XXX XXX XXX fucking slow on work PC
+" Plug 'xolox/vim-easytags'			" XXX XXX XXX XXX XXX fucking slow on work PC
 Plug 'scrooloose/nerdcommenter'		" comments
 Plug 'scrooloose/nerdtree',		{ 'on': 'NERDTreeToggle' }	" project tree (file explorer)
 "Plug 'jistr/vin-nerdtree-tabs' 	" Nerdtree for all tabs
@@ -972,48 +974,53 @@ call plug#end()
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "				Plugins setup												{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"		deoplete 															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""{{{
+"				auto-complete
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if has ('nvim')
-	" NeoVim autocomplete
-	let g:deoplete#enable_at_startup = 1
-	let g:deoplete#enable_ignore_case = 1	" ignore case
-	let g:deoplete#enable_smart_case = 1	" but use smart case
-	"let g:deoplete#enable_camel_case = 1 " INFO only with deoplete-matcher*fuzzy
-	" let g:neocomplete#enable_fuzzy_completion = 1
-	" let g:deoplete#auto_complete_start_length = 1	" default: 2
-	" let g:deoplete#auto_complete_start_length = 1	" deprecated
-	" let g:deoplete#source#attribute#min_pattern_length = 1
-	"let g:deoplete#max_abbr_width = 0 " disable, default: 80
-	"-> is added
-	let g:deoplete#delimiters = ['/', '.', '::', ':', '#', '->']
-	" let g:deoplete#max_list = 20					" max number of items in list
-	" need to bi bigger than 1 because it will try to autocomplete everything
-	let g:deoplete#auto_complete_delay = 10
+"		nvim-completion-manager  											{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" builtin: current buffer, tmux, ctags, filepath
+"" use a single command :PythonSupportInit to initialize python support for neovim.
 
-	let g:deoplete#sources		= {} " init of the variable
-	let g:deoplete#sources._	= ['buffer', 'file', 'dictionary'] " default files
-	" let g:deoplete#sources.cpp = ['buffer', 'clang', 'tag']
-	let g:deoplete#sources.h	= ['buffer', 'clang', 'tag']
-	" XXX 161215: will fuckup itself if 'file' is present
-	let g:deoplete#sources.cpp	= ['buffer', 'clang', 'tag', 'dictionary']
-	let g:deoplete#sources.c	= ['buffer', 'clang', 'tag']
+" OS as user: pip3 install --upgrade --user neovim
 
-	let g:deoplete#sources#clang#libclang_path = s:libclang_path
-	let g:deoplete#sources#clang#clang_header  = s:clang_header
+" let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'jedi')
+" language specific completions on markdown file
+" let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'mistune')
 
-	" "let g:deoplete#sources#clang#flags = '-Wall'
-	let g:deoplete#sources#clang#std#c = 'c11'
-	let g:deoplete#sources#clang#std#cpp = 'c++11'
-	" let g:deoplete#sources#clang#sort_algo = 'priority'
+" utils, optional
+" let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'psutil')
+" let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'setproctitle')
 
-	" let g:deoplete#tag#cache_limit_size = 50000000 " 50 MB
-	call deoplete#custom#set('_', 'matchers', ['matcher_length', 'matcher_full_fuzzy'])	" don't auto complete basing on the first char
 
-	" let g:deoplete#sources#clang#sort_algo = 'priority'	" or alphabetical " XXX pojebe i krene samo nadopunjavat
-	let g:echodoc_enable_at_startup = 1			" show info in cmd line instead in preview window
-endif
+" don't give |ins-completion-menu| messages:
+set shortmess+=c
+
+" 170708 don't use this with nvim-completition-manager (it will go to new line)
+" inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
+inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+
+" enable for buffers, explicitly
+let g:cm_smart_enable = 1
+" enable all registered sources
+let g:cm_sources_enable	= 1
+" let g:cm_matcher = {'module': 'cm_matchers.prefix_matcher', 'case': 'smartcase'}
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		racer																{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Rust autocompleter (cargo install racer)
+" plugin 'vim-racer' is not really needed for deoplete-rust, but racer_cmd is.
+let g:racer_cmd = $HOME."/.cargo/bin/racer"
+let $RUST_SRC_PATH = $HOME."/src/rust-src/src"
+
+" show the complete function definition (e.g. its arguments and return type):
+let g:racer_experimental_completer = 1
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+
+
 "		airline																{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " TODO reenable this when CtrlSpace can be disabled
@@ -1205,28 +1212,24 @@ let g:rust_recommended_style = 0	" don't expandtab and other stuff
 inoremap <A-r> <C-o>:w<cr><C-o>:RustRun<cr>
 nnoremap <A-r> :w<cr>:RustRun<cr>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		racer															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Rust autocompleter (cargo install racer)
-" plugin 'vim-racer' is not really needed for deoplete-rust, but racer_cmd is.
-let g:racer_cmd = $HOME."/.cargo/bin/racer"
-" let $RUST_SRC_PATH = "$HOME/.multirust/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src"
-" if you want completions to show the complete function definition (e.g. its arguments and return type), enable the experimental completer:
-let g:racer_experimental_completer = 1
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		deoplete-rust														{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" rust autocomplete in vim
-" shortcuts: gd and K (view documentation)
-if has ('nvim')
-	let g:deoplete#sources#rust#racer_binary = $HOME."/.cargo/bin/racer"
-	let g:deoplete#sources#rust#rust_source_path = $HOME."/src/rust/rust/src"
-	" let g:deoplete#sources#rust#disable_keymap = 1	" disable gd and K	([i is better)
-	let g:deoplete#sources#rust#documentation_max_height = 20 " default 20
 
-	let g:deoplete#omni_patterns = {}
-	let g:deoplete#omni_patterns.rust = '[(\.)(::)]' " autocomplete without C-x C-o
-endif
+
+
+
+
+"		empty  															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+
+
+
+
+
+
+
+
+
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 "		lastplace															{{{
@@ -1457,82 +1460,6 @@ let g:zoomwin_localoptlist   = [
 			\ "tw"  , "udf" , "wm"]
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
-"		Syntastic															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" This is Vim only?
-let g:syntastic_always_populate_loc_list = 1	" auto populating window at the bottom
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-"let g:syntastic_check_on_wq = 0
-let g:syntastic_loc_list_height=4	" size of the bottom window
-let g:syntastic_error_symbol = "✗"
-let g:syntastic_error_symbol = '✘'
-let g:syntastic_warning_symbol = "▲"
-
-" Don't use GCC
-let g:syntastic_c_compiler = 'clang'
-let g:syntastic_c_compiler_options = ' -Wall -std=c99'
-
-let g:syntastic_cpp_compiler = 'clang++'
-let g:syntastic_cpp_compiler_options = ' -Wall -std=c++11 -stdlib=libc++'
-let g:syntastic_cpp_check_header = 1
-let g:syntastic_cpp_include_dirs = ["includes", "headers"]
-
-" Rust:
-let g:syntastic_rust_checkers = ["rustc"]
-" let g:syntastic_rust_checkers = ["rustc -A non_camel_case"]
-
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		NeoMake															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if has("nvim")
-	let g:neomake_open_list = 2	" auto open list, but don't jump to it
-	" :ll
-	"
-	" autocmd! BufWritePost * Neomake
-
-	let g:neomake_error_sign = {'text': 'E'}
-	let g:neomake_warning_sign= {'text': 'W'}
-	call neomake#signs#RedefineErrorSign()
-	call neomake#signs#RedefineWarningSign()
-
-	let g:neomake_make_maker = {
-				\ 'exe': 'make',
-				\ 'args': ['--build'],
-				\ 'errorformat': '%f:%l:%c: %m',
-				\ }
-	" must be called with Neomake rust
-				 " 'args': ['-A non_camel_case'],
-	let g:neomake_rust_rust_maker = {
-				\ 'exe': 'rustc',
-				\ 'errorformat': '%f:%l: %m',
-				\ }
-	let g:neomake_rust_enabled_makers = ['rust']
-
-
-	" let g:neomake_highlight_columns=0	" don't highlight the first char
-
-	" let &errorformat="%f:%l:%c: %m"
-
-	" Start of the multi-line error message (%A),
-	" %p^ means a string of spaces and then a ^ to
-	" get the column number
-	let &efm  = '%A%p^' . ','
-	" Next is the main bit: continuation of the error line (%C)
-	" followed by the filename in quotes, a comma (\,)
-	" then the rest of the details
-	let &efm .= '%C"%f"\, line %l: error(%n): %m' . ','
-	" Next is the last line of the error message, any number
-	" of spaces (' %#': equivalent to ' *') followed by a bit
-	" more error message
-	let &efm .= '%Z %#%m' . ','
-	" This just ignores any other lines (must be last!)
-	let &efm .= '%-G%.%#'
-endif
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		multicursor															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:multi_cursor_use_default_mapping=0
@@ -1551,10 +1478,10 @@ if exists(":Tabularize")
 	" Tabularize /:\zs      // ispadne varA:    10  	// : ostane uz var, tabulira s charom iza delimitera
 
 	" not really useful shortcuts
-	"nnoremap <leader>a= :Tabularize /=<cr>
-	"vnoremap <leader>a= :Tabularize /=<cr>
-	"nnoremap <leader>a: :Tabularize /:\zs<cr>
-	"vnoremap <leader>a: :Tabularize /:\zs<cr>
+	nnoremap <leader>a= :Tabularize /=<cr>
+	vnoremap <leader>a= :Tabularize /=<cr>
+	nnoremap <leader>a: :Tabularize /:\zs<cr>
+	vnoremap <leader>a: :Tabularize /:\zs<cr>
 endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		EasyTags															{{{

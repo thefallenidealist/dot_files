@@ -29,6 +29,7 @@
 	s = status
 	b = branch
 	a = add
+	su = submodule update --recursive --init
 [log]
 	decorate = full
 [color]
