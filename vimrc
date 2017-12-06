@@ -1,11 +1,14 @@
-" created 160729, again
-" vim as IDE at work: created 160512
-" export MYVIMRC="~/vim_ide"		" change .vim position
-" vim -U ~/vim_ide/vimrc
+" 170812
+" 1.0 - created 160729, again
+" 0.1 - 160512 - vim as IDE at work
+" 0.0 - 2006. probably
+" vim: set ft=vim ts=4 sw=4 tw=78 fdm=marker noet :
 
-" Unicode characters can be inserted by typing ctrl-vu followed by the 4 digit hexadecimal code.
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"				settings
+" Guifont DejaVu Sans Mono:h13
+set sessionoptions+=tabpages,globals
+" TODO 2017-09-02 Windows libclang
+" 					GUI colors
+
 "				Generic Vim settings 										{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if !has('nvim')
@@ -30,7 +33,8 @@ set showcmd			" show size of visual block in cmdline at right
 set notitle
 
 set autowrite		" Automatically :write before running commands
-"set autoread		" autoload files that have changed outside of vim
+" set autoread		" autoload files that have changed outside of vim
+set noautoread
 
 " better splits
 set splitbelow
@@ -39,7 +43,7 @@ set splitright
 set timeoutlen=1000 ttimeoutlen=0		" delay for the esc key, 10ms XXX
 "set exrc		" source .vimrc file if it present in working directory
 set secure		" This option will restrict usage of some commands in non-default .vimrc files;
-				" commands that wrote to file or execute shell commands are not allowed and map commands are displayed.
+" commands that wrote to file or execute shell commands are not allowed and map commands are displayed.
 
 set nomodeline
 set modelines=0
@@ -61,6 +65,7 @@ set cursorline		" color the line when the cursor is
 set matchpairs+=<:>	" Include angle brackets in matching.
 set showmatch
 
+set encoding=utf-8	" otherwise gVim will complain about listchars and showbreak
 "		<tab> and wrapping			{{{
 """""""""""""""""""""""""""""""""""""""
 set tabstop=4		" tab size
@@ -70,17 +75,17 @@ set shiftwidth=4 	" when indenting with '>'
 " soft wrap
 set wrap			" soft break when line is wider than Vim window (not tw)
 set linebreak		" don't break in the middle of the word
-					" wont't work when "list" is enabled - will in nvim
+" wont't work when "list" is enabled - will in nvim
 set showbreak=…		" char to be displayed on the beggining of broken line
 
 " hard break
 " set textwidth=78	" autowrap after N chars
 set colorcolumn=+1	" show coloumn where autowrap will start"
 set formatoptions=""
-		" default: tcq
-		" t: autowrap using tw
-		" c: add comment in new line a: format line every time when it is
-		" changed (no more longer or shorter lines) 		pretty annoying
+" default: tcq
+" t: autowrap using tw
+" c: add comment in new line a: format line every time when it is
+" changed (no more longer or shorter lines) 		pretty annoying
 " TODO (if possible): soft wrap lines on tw
 """"""""""""""""""""""""""""""""""""}}}
 "	commandline completion			{{{
@@ -114,6 +119,9 @@ set list	" show invisible chars (tabs and others defined in listchars)
 " set directory=$HOME/.vim/swap/,/tmp
 " place for: filename.txt~
 " set backupdir=$HOME/.vim/swap/,/tmp
+set backupdir=~/.vim/backup//
+set directory=~/.vim/swap//
+set undodir=~/.vim/undo//
 "		search						{{{
 """""""""""""""""""""""""""""""""""""""
 set ignorecase		" case insensitive search, needed for the line below
@@ -142,117 +150,99 @@ if has('unix')
 	let s:uname = substitute(system("uname"), '\n', '', '')
 
 	if s:uname == "FreeBSD"
-		let g:tagbar_ctags_bin=substitute(system("which exctags"), '\n', '','')
+		let g:clang_library_path='/usr/local/llvm40/lib'
 
-		let s:libclang_path = "/usr/local/llvm38/lib/libclang.so"
-		let s:clang_header = "/usr/local/llvm38/include/clang"
+		" Exuberant Ctags
+		" let g:ctags_exe='/usr/local/bin/exctags'
+		" Universal Ctags - Exuberant Ctags fork
+		let g:ctags_exe='/usr/local/bin/uctags'
 
-		if executable('ag')
-			" FreeBSD ag version 1.0.1
-			let g:ackprg = 'ag --vimgrep --path-to-ignore ~/.agignore -H --column -a'
-		endif
+		" let g:tagbar_ctags_bin=substitute(system("which exctags"), '\n', '','')
+		let g:tagbar_ctags_bin=g:ctags_exe
+
 	elseif s:uname == "Linux"
-		let s:libclang_path = "/usr/lib/llvm-3.6/lib/libclang.so"
-		let s:clang_header = "/usr/include/clang/"
-
-		if executable('ag')
-			" Linux ag --version: 0.19.2
-			let g:ackprg = 'ag --all-text'
-		endif
-	endif
+	endif " uname
+elseif has('windows')
+	let g:ctags_exe='c:\bin\ctags.exe'
+	" let g:python3_host_prog='c:\Python3\python.exe'
+	let g:python_host_prog='c:\python27\python.exe'
 endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		build/programming			{{{
 """""""""""""""""""""""""""""""""""""""
 " TODO incoporate this as prefix for part below
 " makeprg can't have spaces
-if s:uname == "FreeBSD"
-	set makeprg="gmake -j4"
-elseif s:uname == "Linux"
-	set makeprg="make -j4"
+if has('unix')
+	if s:uname == "FreeBSD"
+		set makeprg="gmake -j4"
+	elseif s:uname == "Linux"
+		set makeprg="make -j4"
+	endif
 endif
 
-" function! Compile()
-	" " TODO wait for user input after compiling and before running
-		" " if enter run program, if q/esc don't
-	" if file_readable('Makefile')
+function! Compile()
+	" TODO wait for user input after compiling and before running
+	" if enter run program, if q/esc don't
+	if file_readable('Makefile')
+		echo "building Makefile"
 		" make
-	" elseif file_readable('makefile')
-		" make
-	" elseif file_readable('compile.sh')
-		" setlocal makeprg=./compile.sh
-		" make
-	" elseif file_readable('compile')
-		" setlocal makeprg=./compile
-	" elseif expand('%:e') == "cpp"
-		" setlocal makeprg=c++\ -Wall\ %\ -o\ %:r.elf\ -std=c++11
-		" make
-	" elseif expand('%:e') == "c"
-		" setlocal makeprg=cc\ -Wall\ %\ -o\ %:r.elf\ -std=c99
-		" make
-	" elseif expand('%:e') == "rs"
+		" TODO 170909
+		!gmake
+	elseif file_readable('makefile')
+		echo "building makefile"
+		make
+	elseif expand('%:e') == "cpp"
+		setlocal makeprg=c++\ -Wall\ %\ -o\ %:r.elf\ -std=c++11
+		make
+	elseif expand('%:e') == "c"
+		setlocal makeprg=cc\ -Wall\ %\ -o\ %:r.elf\ -std=c99
+		make
+	elseif expand('%:e') == "rs"
+		echo "building Rust"
 		" setlocal makeprg=rustc\ %
-		" make
+		make
 		" !./%:r
-	" else
-		" echoerr "Don't know how to build :["
-	" endif
-" endfunction
-" nnoremap <F5> :call Compile()<cr>
-" nnoremap <leader>rr :call Compile()<cr>
+	else
+		echoerr "Don't know how to build :["
+	endif
+endfunction
+
+nnoremap <F5> :call Compile()<cr>
+nnoremap <leader>rr :call Compile()<cr>
 
 " za gF komandu koja otvori fajl pod kursorom
 let &path.="src/include,/usr/include/AL,"
-
-" XXX XXX XXX only work in first buffer
-" Highlight TODO, FIXME, NOTE, etc. FIXME:
-if has("autocmd")
-	if v:version > 701
-		autocmd Syntax * call matchadd('Todo',  '\W\zs\(TODO\|FIXME\|CHANGED\|XXX\|BUG\|HACK\|ZAJEB\)')
-		autocmd Syntax * call matchadd('Debug', '\W\zs\(NOTE\|INFO\|IDEA\)')
-		autocmd Syntax * call matchadd('Debug', '\W\zs\(INFO_START\|INFO_END\|ERROR\|DEBUG_START\|DEBUG_END\|DEBUG_INFO\)')
-	endif
-endif
 
 " tags file in CWD
 " search for $CWD/tags, $CWD/.tags and go level up until $HOME
 set tags=tags,.tags;$HOME
 """"""""""""""""""""""""""""""""""""}}}
-
 "		autocmd																{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 augroup my_group_with_a_very_uniq_name
 	" this is executed every time when vimrc is sourced, so clear it at the beggining:
 	autocmd!
 
-	autocmd Filetype man NumbersDisable
-	" Filetype only works on first time opening the help window
-	autocmd Filetype help NumbersDisable
-	autocmd BufEnter help norelativenumber
-	autocmd BufEnter help IndentLinesDisable
-	" INFO FixWhiteSpace is controled from its option
-
-	" map q as kill only in help window
+	" easier quit from this windows
 	autocmd Filetype help nnoremap <buffer> q :wincmd c<cr>
-	" unmap enter in help and man window
-	"autocmd Filetype help nnoremap <buffer> <cr> <cr>
-	" Enter is "goto tag" TODO: if not tag map to *
+	autocmd FileType qf,quickfix,netrw nnoremap <buffer> q :q<cr>
+	autocmd WinEnter * if PreviewWindowOpened() == '1' | nnoremap <buffer> q :q<cr> | endif
+	" INFO 170813: will remap q for 
+	" autocmd WinEnter * unmap <buffer> q
+
+	" remap enter in help and man window
 	autocmd Filetype help nnoremap <buffer> <cr> <C-]>
-	autocmd Filetype man nnoremap <buffer> <cr> <cr>
+	autocmd Filetype man nnoremap <buffer> <cr> <C-]>
 
 	" unmap enter in QuickFix window (window at the bottom which isn't preview)
 	autocmd BufReadPost quickfix nnoremap <buffer> <cr> <cr>
-	"autocmd BufReadPost quickfix nnoremap <buffer> q :q<cr>
-	" autocmd FileType quickfix nnoremap <buffer> q :q<cr>
-	" INFO qf and quickfix aren't the same
-	autocmd FileType qf,netrw nnoremap <buffer> q :q<cr>
 	autocmd Filetype qf set nolist
 
 	" force Vim to threat .md files as markdown and not Modula
 	" or use tpope/vim-markdown plugin
 	autocmd BufNewFile,BufReadPost *.md set filetype=markdown
 
-	" don't match < in C++ (cout << "Something";)
+	" don't match '<' in C++ (cout << "Something";)
 	autocmd Filetype cpp,make,vim set matchpairs-=<:>
 	autocmd Filetype shell set matchpairs-=`:`	" works, but only in reverse
 
@@ -262,12 +252,6 @@ augroup my_group_with_a_very_uniq_name
 	autocmd FileType qf nnoremap <buffer> p <plug>(quickr_preview)
 	"autocmd FileType qf nnoremap <buffer> q <plug>(quickr_preview_qf_close)
 
-	" Don't show numbers in preview window
-	autocmd BufWinEnter * if &previewwindow | setlocal nonumber norelativenumber | endif
-	" XXX:
-	autocmd BufWinEnter * if &previewwindow | nnoremap <buffer> q :q<cr>| endif
-
-
 	autocmd BufWinEnter * if bufname("%") == "[Command Line]" | nnoremap <buffer> q :q<cr> | endif
 	autocmd BufEnter * if bufname("%") == "[Command Line]" | nnoremap <buffer> q :q<cr> | endif
 	autocmd BufEnter * if @% == "[Command Line]" | echo "QQQQQQ" | endif
@@ -276,24 +260,24 @@ augroup END
 
 " setup when in diff mode:
 if &diff
+	" TODO 170831: check if is working in nvim-qt on Windows
+	" INFO 170901: This is not working on Windows, check on Unix
 	cabbrev q qa!
 	nnoremap q :qa!<cr>
+	" when fixing merge conflict:
+	map <leader>1 :diffget LOCAL<CR>
+	map <leader>2 :diffget BASE<CR>
+	map <leader>3 :diffget REMOTE<CR>
 endif
 
 " setup for preview window
-" if &previewwindow
+if &previewwindow
+	" INFO 170813: echo will work here, but not nnoremap
+	" echoe "Preview Window here!"
 	" nnoremap q :q!<cr>
-" endif
+endif
 
-" TODO:
-" autocmd WinEnter *
-" if &previewwindow
-	" nnoremap q :q!<cr>
-" endif
-
-"autocmd WinEnter * if &previewwindow | ... | endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"				keymaps
 "		cmd aliases															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " INFO all abbrev commands are non recursive
@@ -301,43 +285,57 @@ endif
 " alias only triggered if it's on the start of the line
 cnoreabbrev <expr> csa ((getcmdtype() == ':' && getcmdpos() <= 4)? 'cs add'  : 'csa')
 
+function! SetupCommandAlias(from, to)									" {{{
+	" cmd alias will be valid only at the beggining of the line
+	" from: https://stackoverflow.com/a/3879737/8078624
+	exec 'cnoreabbrev <expr> '.a:from
+				\ .' ((getcmdtype() is# ":" && getcmdline() is# "'.a:from.'")'
+				\ .'? ("'.a:to.'") : ("'.a:from.'"))'
+endfun
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 " annoying misspell:
-cabbrev W w
-cabbrev Q q
-cabbrev E e
-cabbrev E! e!
-cabbrev e1 e!
-cabbrev E1 e!
-cabbrev q1 q!
-cabbrev X x
-cabbrev x1 x!
-cabbrev QA qa
-cabbrev QA1 qa!
-cabbrev Qa! qa!
-cabbrev qA qa
-cabbrev qa1 qa!
-cabbrev Qa qa
-cabbrev WQ wq
-cabbrev Wq wq
-cabbrev Wa wq
-cabbrev wQ wq
+call SetupCommandAlias("W", "w")
+call SetupCommandAlias("Q", "q")
+call SetupCommandAlias("E", "e")
+call SetupCommandAlias("X", "x")
+
+call SetupCommandAlias("Qa", "qa")
+call SetupCommandAlias("qA", "qa")
+call SetupCommandAlias("QA", "qa")
+call SetupCommandAlias("Qa!", "qa!")
+call SetupCommandAlias("qA!", "qa!")
+call SetupCommandAlias("QA!", "qa!")
+
+call SetupCommandAlias("w1", "w!")
+call SetupCommandAlias("r1", "r!")
+call SetupCommandAlias("e1", "e!")
+call SetupCommandAlias("x1", "x!")
+
+call SetupCommandAlias("W1", "w!")
+call SetupCommandAlias("R1", "r!")
+call SetupCommandAlias("E1", "e!")
+call SetupCommandAlias("X1", "x!")
+" cabbrev QA1 qa!
+" cabbrev Qa! qa!
+" cabbrev qA qa
+" cabbrev qa1 qa!
 
 command! WE write | edit
 cabbrev we WE
-
-" TODO remap all to this
-" 170312: why?
-"cnoreabbrev <expr> W ((getcmdtype() is# ':' && getcmdline() is# 'W')?('w'):('W'))
 
 command! PU PlugUpdate | PlugUpgrade
 command! PI PlugInstall
 
 " open help in vertical split right
-cabbrev h vert bo help
-cabbrev man vert bo Man
+cabbrev h vert leftabove help
+cabbrev man vert leftabove Man
 " get file path:
 cabbrev fpath echo @%
 cabbrev fp echo @%
+" copy the current filename to the Vim buffer
+cabbrev fpy echo @%
+" copy the current filename to the X11 2nd buffer
+cabbrev fpy echo @%
 cabbrev FP echo expand('%:p')
 " reload syntax
 cabbrev rsyn syntax sync fromstart
@@ -360,8 +358,10 @@ cabbrev zoa %foldopen!
 command! FixDos edit ++ff=dos
 
 " XXX CtrlSpace won't restore tabs with only one tab (only at PC on the work, on my everything works™)
-cabbrev css CtrlSpaceSaveWorkspace
-cabbrev csl CtrlSpaceLoadWorkspace
+" cabbrev css CtrlSpaceSaveWorkspace
+" cabbrev csl CtrlSpaceLoadWorkspace
+cabbrev css :mksession!
+cabbrev csl :source Session.vim
 
 cabbrev ccc call ToggleColorColumn()
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
@@ -369,6 +369,10 @@ cabbrev ccc call ToggleColorColumn()
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " disable ed mode:
 nnoremap Q <nop>
+" remap recording
+nnoremap Q q
+" disable old recording shortcut
+nnoremap q <nop>
 " no more ćevap-fingers
 inoremap <F1> <esc>
 nnoremap <F1> <esc>
@@ -406,28 +410,9 @@ vnoremap < <gv
 vnoremap > >gv
 
 " deindent from insert mode
-inoremap <S-Tab> <C-o><<
-" INFO maybe more useful shortcut for window management
-" INFO <S-Tab> is used for autocomplete
-nnoremap <S-Tab> <<
-
-" auto-complete 'fix'
-" Enter for breaking autocomplete (when it's active)
-" XXX this will not for if one char is typed and completion is active 		Ctrl-e is for breaking
-inoremap <expr><cr>		pumvisible() ? "\<C-y>" : "\<C-g>u\<cr>"
-" tmp fix: use Ctrl-e
-"inoremap <expr><esc>	pumvisible() ? "\<C-e>" : "\<esc>"
-inoremap <expr><tab> 	pumvisible() ? "\<C-n>" : "\<tab>"
-inoremap <expr><S-tab>	pumvisible() ? "\<C-p>" : "\<S-tab>"
-inoremap <expr><C-_>	deoplete#undo_completion()
-
-" <CR>: close popup and save indent.
-" enter to break autocomplete and put new line (previous this action needed 2x enter)
-" inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-" function! s:my_cr_function() abort
-	" return deoplete#mappings#close_popup() . "\<CR>"
-" endfunction
-" INFO 161203 It's seems that default behaviour of enter and deoplete is good enough for me
+" XXX 170902: Won't work autocomplete mapping
+" inoremap <S-Tab> <C-o><<
+" nnoremap <S-Tab> <<
 
 " show ASCII code of the char under the cursor
 nnoremap <M-x> ga
@@ -435,18 +420,58 @@ nnoremap <M-x> ga
 "		buffers/windows/tabs keymaps										{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nnoremap tn :tabnew<cr>
+nnoremap td :tab split<cr>:echom "tab duplicated"<cr>
+
 nnoremap th :tabprev<cr>
 nnoremap tl :tabnext<cr>
-nnoremap td :tab split<cr>:echom "tab duplicated"<cr>
-" XXX very short message duration time
-" nnoremap - :tabprev<cr>:echom "going to the previous tab"<cr>
-" nnoremap + :tabnext<cr>:echom "going to the next tab"<cr>
-" nnoremap = :tabnext<cr>:echom "going to the next tab"<cr>
+nnoremap tj :bnext<cr>
+nnoremap tk :bprev<cr>
 
-nnoremap <A-h> :tabprev<cr>
-nnoremap <A-l> :tabnext<cr>
-nnoremap <A-j> :CtrlSpaceGoDown<cr>
-nnoremap <A-k> :CtrlSpaceGoUp<cr>
+nnoremap [b :bnext<cr>
+nnoremap ]b :bprev<cr>
+
+" delete buffer without closing tab or split
+nnoremap :BD :setl bufhidden=delete <bar> bnext
+nnoremap <leader>d :setl bufhidden=delete <bar> bnext<cr>
+nnoremap <leader>D :bd<cr>
+" INFO <bar> instead of '|' pipe char
+
+" nnoremap <tab> :wincmd w<cr>
+nnoremap <tab> :wincmd w<cr>
+
+if has('nvim')
+	" nnoremap <A-h> :tabprev<cr>
+	" nnoremap <A-l> :tabnext<cr>
+	" nnoremap <A-j> :CtrlSpaceGoDown<cr>
+	" nnoremap <A-k> :CtrlSpaceGoUp<cr>
+	" navigate windows
+	tnoremap <A-h> <C-\><C-N><C-w>h
+	tnoremap <A-j> <C-\><C-N><C-w>j
+	tnoremap <A-k> <C-\><C-N><C-w>k
+	tnoremap <A-l> <C-\><C-N><C-w>l
+	inoremap <A-h> <C-\><C-N><C-w>h
+	inoremap <A-j> <C-\><C-N><C-w>j
+	inoremap <A-k> <C-\><C-N><C-w>k
+	inoremap <A-l> <C-\><C-N><C-w>l
+	nnoremap <A-h> <C-w>h
+	nnoremap <A-j> <C-w>j
+	nnoremap <A-k> <C-w>k
+	nnoremap <A-l> <C-w>l
+
+	" because they are close to hjkl
+	nnoremap <A-u> :tabprev<cr>
+	nnoremap <A-i> :tabnext<cr>
+	nnoremap <A-n> :tabprev<cr>
+	nnoremap <A-m> :tabnext<cr>
+	inoremap <A-u> :tabprev<cr>
+	inoremap <A-i> :tabnext<cr>
+	inoremap <A-n> :tabprev<cr>
+	inoremap <A-m> :tabnext<cr>
+	tnoremap <A-u> <C-\><C-N>:tabprev<cr>
+	tnoremap <A-i> <C-\><C-N>:tabnext<cr>
+	tnoremap <A-n> <C-\><C-N>:tabprev<cr>
+	tnoremap <A-m> <C-\><C-N>:tabnext<cr>
+endif
 
 nnoremap t1 :tabfirst<cr>
 nnoremap t2 :tabn 2<cr>
@@ -475,17 +500,13 @@ nnoremap tH :tabmove -1<cr>
 nnoremap tL :tabmove +1<cr>
 
 " holy fucking gods of Vim, browse only buffers for current tab
-nnoremap tj :CtrlSpaceGoDown<cr>
-nnoremap tk :CtrlSpaceGoUp<cr>
+" nnoremap tj :CtrlSpaceGoDown<cr>
+" nnoremap tk :CtrlSpaceGoUp<cr>
 
 " doesn't seems particularly useful:
 "nnoremap <leader>- <Plug>AirlineSelectPrevTab
 "nnoremap <leader>+ <Plug>AirlineSelectNextTab
 
-nnoremap tm :tabnew<cr>:CtrlPMRUFiles<CR>
-nnoremap to :tabnew<cr>:CtrlP<CR>
-" because it's close to O, and sometimes there is a need to just open a file
-nnoremap ti :tabedit<space>
 " XXX 170609 will fuckup CtrlP completition
 nnoremap te :tabedit<space>
 
@@ -552,6 +573,12 @@ if has('nvim')
 	inoremap <A-BS> <C-w>
 	inoremap <A-d> <C-o>dw
 	"inoremap <A-d> <C-o>diw
+
+	cnoremap <A-d> <Delete>
+	cnoremap <A-h> <C-w>
+	" INFO this need some tweaking to work under tmux:
+	" cnoremap <A-b> <S-Left>
+	" cnoremap <A-f> <S-Right>
 endif
 
 " command line (:) shortcuts
@@ -563,6 +590,7 @@ cnoremap <C-b> <Left>
 cnoremap <C-f> <Right>
 cnoremap <C-d> <Delete>
 cnoremap <C-h> <Backspace>
+" TODO 170901 C-k
 if has('nvim')
 	cnoremap <A-d> <Delete>
 	cnoremap <A-h> <C-w>
@@ -585,16 +613,16 @@ nnoremap <esc>[ <esc>[
 imap <C-c> <C-o>:echoe "Use esc, bogajebo"<cr>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 " TODO better, check if highlight is active (HOW?):
-nnoremap <silent> <esc> :noh<cr><esc>:echo "hlsearch disabled"<cr>
+nnoremap <silent> <Esc><Esc> <Esc>:nohlsearch<CR><Esc>:echo "hlsearch disabled"<cr>
 "		leader mappings														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" muliple leader (just in case, not really needed in my case):
-"nmap , \
-"nmap <space> \ " won't work because space is used for fold toggle
+" another leader keys:
+nmap ; <leader>
+nmap , <leader>
 
 "temporarily disable search highlighting until the next search.
 " INFO this is NOT the same as set nohlsearch
-nnoremap <leader>h :noh<cr>
+nnoremap <leader>H :noh<cr>
 " TODO make this to toggle highlight, probably will not be possible
 
 nnoremap <leader>s :setlocal spell!<cr>
@@ -610,28 +638,14 @@ nnoremap <silent> <leader>ML :call AppendModeline()<cr>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		plugin mappings														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-nnoremap <leader>t :TagbarToggle<cr>
-nnoremap <leader>f :NERDTreeToggle<cr>
-nnoremap <leader>ff :NERDTreeToggle<cr>
-nnoremap <leader>c :SyntasticToggleMode<cr>
-nnoremap <leader>o :CtrlP<cr>
-nnoremap <leader>m :CtrlPMRUFiles<cr>
-nnoremap <leader>M :CtrlPMixed<cr>
-nnoremap <leader>b :CtrlPBuffer<cr>
-" Open a new tab and search for something
-" map <leader>a :tab split<cr>:Ag ""<Left>
-"Immediately search for the word under the cursor in a new tab
-" map <leader>A :tab split<cr>:Ag <C-r><C-w><CR>
-"
-" TODO open new tab (duplicate), there open Ack!
-nnoremap <leader>a :tab split<cr>:Ack! <C-r><C-w><CR>
-" nnoremap <leader>a :tab split<cr>:Ack! -a<C-r><C-w><CR>
-nnoremap <leader>A :tab split<cr>:Ack! ""<left>
-command! FixWhiteSpace StripWhitespace
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-map g<C-]> :cs find 3 <C-R>=expand("<cword>")<CR><CR>
+nnoremap <leader>a :tab split<cr>:Rg <C-r><C-w><CR>
+nnoremap <leader>A :tab split<cr>:Rg ""<left>
 
-"		copy & paste mappings												{{{
+command! FixWhiteSpace StripWhitespace	" function from 'better white space' plugin
+" call SetupCommandAlias("fws", "FixWhiteSpace")
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+
+"		copy paste mappings													{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " C/P registers:
 " ": unnamed register (dd/yy)
@@ -639,10 +653,10 @@ map g<C-]> :cs find 3 <C-R>=expand("<cword>")<CR><CR>
 " +: X11 secondanry   (Ctrl-C/V)
 
 " paste and adjuste indent
-" nnoremap p ]p
-" nnoremap P ]P
-nnoremap p p=`]
-nnoremap P P=`]
+nnoremap p ]p
+nnoremap P ]P
+" nnoremap p p=`]
+" nnoremap P P=`]
 
 " delete to the black hole register
 nnoremap dd "_dd
@@ -664,13 +678,27 @@ nnoremap yW yw
 " p vim paste buffer
 " f filename with extension
 " F filename with full path
-	" INFO stuff that won't work:
-	" aligning text after <C-o>
-	" echoing text after paste (cursor will be moved one place to the left)
+" INFO stuff that won't work:
+" aligning text after <C-o>
+" echoing text after paste (cursor will be moved one place to the left)
 inoremap <C-r>c <C-o>":]p<C-o>:echo "pasted last used command"<cr>
-" TODO: change \<something\> to something		in C-r /
-inoremap <C-r>/ <C-r>/<C-o>:echo "pasted highlighted/searched text"<cr>
+inoremap <C-r>: <C-o>":]p<C-o>:echo "pasted last used command"<cr>
+inoremap <C-r>/ <C-o>:call RemoveBrackets()<cr><C-r>/<C-o>:echo "pasted highlighted/searched text"<cr>
+" cnoremap <C-r>/ <C-o>:call RemoveBrackets()<cr><C-r>/
+
+function! RemoveBrackets()
+	" removes '\<' and '\>' in '/' register
+	" INFO created 171022, used for <C-R>/ after */#
+	let @/ = substitute(@/, "\\\\\<", "", "")
+	let @/ = substitute(@/, "\\\\\>", "", "")
+endfunction
+
+" author variable used in licence snippets, remove NULL (^@) char:
+" let g:snips_author=substitute(strtrans(system('git config user.name')), '\^@','','g')
+
 inoremap <C-r>p <C-o>]p<C-o>:echo "pasted from Vim paste buffer"<cr>
+cnoremap <C-r>p <C-r>"
+" TODO 170819: remove '\n'
 inoremap <C-r>f <C-r>=expand("%:t")<CR>
 cnoremap <C-r>f <C-r>=expand("%:t")<CR>
 inoremap <C-r>F <C-r>%
@@ -699,7 +727,18 @@ nnoremap <leader>y7 "uyy :echo "copied to the register 7(u)"<cr>
 nnoremap <leader>y8 "iyy :echo "copied to the register 8(i)"<cr>
 nnoremap <leader>y9 "oyy :echo "copied to the register 9(o)"<cr>
 nnoremap <leader>y0 "pyy :echo "copied to the register 0(p)"<cr>
-" append
+" append - normal mode
+nnoremap <leader>Y1 "Qy :echo "added to the register 1(q)"<cr>
+nnoremap <leader>Y2 "Wy :echo "added to the register 2(w)"<cr>
+nnoremap <leader>Y3 "Ey :echo "added to the register 3(e)"<cr>
+nnoremap <leader>Y4 "Ry :echo "added to the register 4(r)"<cr>
+nnoremap <leader>Y5 "Ty :echo "added to the register 5(t)"<cr>
+nnoremap <leader>Y6 "Yy :echo "added to the register 6(y)"<cr>
+nnoremap <leader>Y7 "Uy :echo "added to the register 7(u)"<cr>
+nnoremap <leader>Y8 "Iy :echo "added to the register 8(i)"<cr>
+nnoremap <leader>Y9 "Oy :echo "added to the register 9(o)"<cr>
+nnoremap <leader>Y0 "Py :echo "added to the register 0(p)"<cr>
+" append - visual mode
 vnoremap <leader>Y1 "Qy :echo "added to the register 1(q)"<cr>
 vnoremap <leader>Y2 "Wy :echo "added to the register 2(w)"<cr>
 vnoremap <leader>Y3 "Ey :echo "added to the register 3(e)"<cr>
@@ -759,19 +798,20 @@ if has('clipboard')	" not really needed for all options under this
 	" { - Vim paste
 	" INFO vim: only used X11 1st and 2nd
 
-	" TODO TODO IDEA
+	" TODO IDEA
 	" y - vim yank
 	" Y - X11 2nd (clipboard) yank (without leader key)
 	" <leader>y - tmux yank
 	" <leader>Y - X11 1nd yank
 	" TODO TODO TODO reorganize all this
-	vnoremap <leader>Y :w! /tmp/vim_buffer<cr>:echo "vselection copied to /tmp/vim_buffer"<cr>
+	" mnomoic: yank for tmux
+	vnoremap <leader>yt :w! /tmp/vim_buffer<cr>:echo "vselection copied to /tmp/vim_buffer"<cr>
 
 
 	" X11 primary buffer		"*
-	"vnoremap <leader>Y "*y:echo "copied to the X11 1nd clipboard"<cr>
-	vnoremap <leader>D "*d:echo "cutted to the X11 1nd clipboard"<cr>
-	vnoremap <leader>X "*d:echo "cutted to the X11 1nd clipboard"<cr>
+	vnoremap <leader>Y "*y:echo "copied to the X11 1nd clipboard"<cr>
+	" vnoremap <leader>D "*d:echo "cutted to the X11 1nd clipboard"<cr>
+	" vnoremap <leader>X "*d:echo "cutted to the X11 1nd clipboard"<cr>
 	nnoremap <leader>P "*p:echo "pasted from the X11 1nd clipboard"<cr>
 	vnoremap <leader>P "*p:echo "pasted from the X11 1nd clipboard"<cr>
 
@@ -780,822 +820,44 @@ if has('clipboard')	" not really needed for all options under this
 	" TODO TODO set paste mode before pasting
 	vnoremap <leader>y "+y :echo  "copied to the X11 2nd clipboard"<cr>
 	nnoremap <leader>y "+yy :echo "copied to the X11 2nd clipboard"<cr>
-	vnoremap <leader>d "+d :echo  "cutted to the X11 2nd clipboard"<cr>
-	nnoremap <leader>d "+dd :echo "cutted to the X11 2nd clipboard"<cr>
-	vnoremap <leader>x "+d :echo  "cutted to the X11 2nd clipboard"<cr>
+	nnoremap <leader>y "+yy :echo "copied to the X11 2nd clipboard"<cr>
+	" vnoremap <leader>d "+d :echo  "cutted to the X11 2nd clipboard"<cr>
+	" nnoremap <leader>d "+dd :echo "cutted to the X11 2nd clipboard"<cr>
+	" vnoremap <leader>x "+d :echo  "cutted to the X11 2nd clipboard"<cr>
 	nnoremap <leader>p "+p :echo  "pasted from the X11 2nd clipboard"<cr>
 	vnoremap <leader>p "+p :echo  "pasted from the X11 2nd clipboard"<cr>
 
+	" compat with C-r Shift-1/2
+	vnoremap <leader>y! "*y :echo "copied to the X11 1nd clipboard"<cr>
+	vnoremap <leader>y@ "+y :echo "copied to the X11 2nd clipboard"<cr>
+	nnoremap <leader>p! "*p  :echo "pasted from the X11 1nd clipboard"<cr>
+	nnoremap <leader>p@ "+p  :echo "pasted from the X11 2nd clipboard"<cr>
+
+	cnoremap <C-r>! <C-r>*
+	cnoremap <C-r>@ <C-r>+
+
+	" Windows compat:
+	inoremap <S-Insert> <C-r>*
 endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-	" Easier copy/paste to the named registers
-	" INFO this will slowdown copy to the X11 clipboard (<leader>y)
-	" TODO :set paste [y/d/p] :set nopaste
+" Easier copy/paste to the named registers
+" INFO this will slowdown copy to the X11 clipboard (<leader>y)
+" TODO :set paste [y/d/p] :set nopaste
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-
 "		mouse mappings														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " double click select all occurrences
-" nnoremap <2-LeftMouse> *N
-" inoremap <2-LeftMouse> <c-o>*N
-" vnoremap <2-LeftMouse> *N
+nnoremap <2-LeftMouse> *N
+inoremap <2-LeftMouse> <c-o>*N
+vnoremap <2-LeftMouse> *N
 " TODO interface with indexed search plugin
 " TODO Shift and/or Alt + 2 mouse click: goto tag
 
 " triple click to toggle fold
 " nnoremap <3-LeftMouse> za
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"				Plugins
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"				Plugins														{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-call plug#begin('~/.vim/plugged')
-if has("nvim")
-	Plug 'roxma/nvim-completion-manager'
-else
-	Plug 'Shougo/neocomplete.vim' " Needs Lua
-	" Plug 'vim-syntastic/syntastic'
-	" Plug 'scrooloose/syntastic'		" synthax checker in the window at the bottom
 
-	" nvim completion manager for Vim8:
-    Plug 'roxma/vim-hug-neovim-rpc'
-endif
-"Plug 'Shougo/neoinclude.vim', {'for': 'c,cpp'}	" headers autocomplete
-Plug 'Shougo/echodoc.vim'	" show functions in commad line window (:) insted of in preview
-" Plug 'Shougo/neopairs.vim'	" Auto insert pairs when complete done
-"Plug 'ervandew/supertab'
-" Plug 'Shougo/denite.nvim'
-
-Plug 'timonv/vim-cargo'		" simple plugin, cmds: Cargo{Build, Run, Test, Bench}
-
-" nvim-completion-manager addon for Rust:
-Plug 'rust-lang/rust.vim'
-Plug 'racer-rust/vim-racer'	" Rust autocomplete, needs cargo install racer, not really needed for deoplete-rust
-Plug 'roxma/nvim-cm-racer'
-
-" Plug 'vim-scripts/Conque-GDB'
-
-Plug 'Raimondi/delimitMate'		" automatic closing quotes, brackets, ...  remaps <BS>
-"Plug 'Shougo/neosnippet-snippets'	" needed for neosnippet
-"Plug 'Shougo/neosnippet.vim' 		" dodatak za neocomplete
-"Plug 'garbas/vim-snipmate' 		" autocomplete for loops and etc
-
-Plug 'vim-airline/vim-airline'		" fancy status and tabbar
-	" TODO change color of default theme: autoload/airline/themes/dark.vim
-	" "tabs" and "buffers" to blue color, activate tab: orange, active buffer: yellow
-	" TODO why sometimes buffers have blue/cyan color?
-"Plug 'vim-airline/vim-airline-themes'
-
-Plug 'ctrlpvim/ctrlp.vim'			" fuzzy file/buffer/MRU finder
-Plug 'bogado/file-line'				" open file.txt:123
-Plug 'dietsche/vim-lastplace'		" Open file at last edit position
-Plug 'qpkorr/vim-bufkill'			" kill buffer without killing split :BD :BW
-Plug 'henrik/vim-indexed-search'	" show search as: result 123 of 456
-Plug 'ntpeters/vim-better-whitespace'	" show red block when there is a trailing whitespace
-
-Plug 'kshenoy/vim-signature'		" show marks visually
-"Plug 'romgrk/winteract.vim'
-" Plug 'ronakg/quickr-preview.vim'	" preview file without opening
-
-"Plug 'tpope/vim-speeddating'		" Ctrl-A/X now works on dates	XXX TODO
-
-"Plug 'vim-scripts/taglist.vim'		" list functions
-" Plug 'majutsushi/tagbar'			" show tags in the window at the right
-
-
-Plug 'ciaranm/securemodelines'
-"Plug 'rking/ag.vim'			" multifile grep - faster version of ack
-Plug 'mileszs/ack.vim'			" ack plugin, but for 'ag'
-"Plug 'gcmt/taboo.vim'			" rename tabs XXX don't work with CtrlSpace and AirLine
-"Plug 'ronakg/quickr-cscope.vim'" cscope XXX
-Plug 'brookhong/cscope.vim'		" cscope
-" Plug 'rhysd/vim-clang-format'
-
-"Plug 'tpope/vim-characterize'	" show dec/hex/oct for char under the cursos, (ga), unicode style
-" čć
-
-
-Plug 'tpope/vim-fugitive'		" Git commands for Vim
-"Plug 'airblade/vim-gitgutter'	" Show +-~ left of number column
-Plug 'mhinz/vim-signify'		" Show marks for modified/added/removed: svn, git, ...
-
-
-Plug 'xolox/vim-misc'				" Needed for easytags and vim-session
-" Plug 'xolox/vim-easytags'			" XXX XXX XXX XXX XXX fucking slow on work PC
-Plug 'scrooloose/nerdcommenter'		" comments
-Plug 'scrooloose/nerdtree',		{ 'on': 'NERDTreeToggle' }	" project tree (file explorer)
-"Plug 'jistr/vin-nerdtree-tabs' 	" Nerdtree for all tabs
-Plug 'Xuyuanp/nerdtree-git-plugin'
-Plug 'godlygeek/tabular'			" aligning/tabulating text
-Plug 'regedarek/ZoomWin'			" toggle between one window and multi-window (Ctrl-W o)	newer version than vim-scripts
-"Plug 'terryma/vim-multiple-cursors'		" rename var at multiple places at once	 INFO not really useful for me (Vim's ways are OK for me)
-Plug 'tpope/vim-unimpaired'				" TODO
-" Plug 'gioele/vim-autoswap'
-" Plug 'chrisbra/NrrwRgn'				" plugin for focussing on a selected region
-" Plug 'MarcWeber/vim-addon-mw-utils'	" Needed for snipmate
-" Plug 'tomtom/tlib_vim'				" Needed for snipmate
-"Plug 'dyng/ctrlsf.vim'				" search and replace in multiple files
-"Plug 'jez/vim-superman'		" man pages
-"Plug 'xolox/vim-session'		" won't restore multiple buffers in a tab
-" Plug 'Shougo/vimproc.vim'		" Needed for vim shell
-" Plug 'Shougo/vimshell.vim'
-
-Plug 'vim-ctrlspace/vim-ctrlspace'	" tabs/buffer/file management, sessions, bookmarks		:CtrlSpaceGo{Up,Down}
-"Plug '~/.vim/plugged/vim-ctrlspace2'
-Plug 'sheerun/vim-polyglot'			" A collection of language packs for Vim. won't affect your startup time
-Plug 'easymotion/vim-easymotion'	" leader leader and magic begins
-Plug 'myusuf3/numbers.vim'		" disable relative numbers in insert mode and other windows
-
-
-"Plug 'tpope/vim-surround'
-"Plug 'tpope/vim-repeat'
-"Plug 'tpope/vim-endwise'
-"Plug 'hyiltiz/vim-plugins-profile'
-"Plug 'vim-scripts/gitignore'
-"Plug 'mattn/webapi-vim' 	" needed for comment
-"Plug 'tpope/vim-repeat'
-"Plug 'tpope/vim-sleuth'
-
-" programming plugins
-Plug 'tpope/vim-commentary'
-
-"Plug 'mmozuras/vim-github-comment'
-"Plug 'spolu/dwm.vim'
-"Plug 'chriskempson/base16'
-"Plug 'jiangmiao/auto-pairs'
-"Plug 'junegunn/vim-easy-align'
-"Plug 'matze/vim-move'
-"Plug 'tpope/vim-projectionist'
-
-"Plug 'mtth/scratch.vim'
-"Plug 'vim-scripts/c.vim'
-"Plug 'mhinz/vim-startify'
-"Plug 'zhaocai/GoldenView.Vim'
-" Plug 'vim-scripts/AutoTag'
-"Plug 'ludovicchabant/vim-gutentags' " XXX uspori kad krene sortirat tagove
-"Plug 'gilligan/vim-lldb'
-"Plug 'LucHermitte/vim-refactor'
-"Plug 'xmementoit/vim-ide'
-"Plug 'tpope/vim-markdown'
-"Plug 'plasticboy/vim-markdown'
-
-Plug 'tpope/vim-obsession'	" restore session, needed for tmux ressurect
-
-"			themes 															{{{
-"Plug 'edkolev/tmuxline.vim'	" enable tmux to pickup Vim airline style
-Plug 'tpope/vim-vividchalk'
-Plug 'gosukiwi/vim-atom-dark'	" not-to-high contrast
-Plug 'lisposter/vim-blackboard'	" pretty ugly
-Plug 'dracula/vim'
-Plug 'tomasr/molokai'
-Plug 'altercation/vim-colors-solarized'
-Plug 'chriskempson/base16-vim'
-Plug 'jpo/vim-railscasts-theme'
-Plug 'morhetz/gruvbox'				" too little contrast
-Plug 'chriskempson/tomorrow-theme'
-Plug 'sheerun/vim-wombat-scheme'
-Plug 'kristijanhusak/vim-hybrid-material'
-" Plug 'sjl/badwolf'
-" Plug 'vim-scripts/asu1dark.vim'
-" Plug 'vim-scripts/borland.vim'
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-
-Plug 'vim-scripts/tinymode.vim'
-
-Plug 'kien/rainbow_parentheses.vim'
-Plug 'vim-scripts/TagHighlight'	" color typedefs as variables
-Plug 'octol/vim-cpp-enhanced-highlight'
-
-Plug 'ryanoasis/vim-devicons'		" fonts
-Plug 'vim-scripts/Workspace-Manager'
-
-call plug#end()
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"				Plugins setup												{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""{{{
-"				auto-complete
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"		nvim-completion-manager  											{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" builtin: current buffer, tmux, ctags, filepath
-"" use a single command :PythonSupportInit to initialize python support for neovim.
-
-" OS as user: pip3 install --upgrade --user neovim
-
-" let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'jedi')
-" language specific completions on markdown file
-" let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'mistune')
-
-" utils, optional
-" let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'psutil')
-" let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'setproctitle')
-
-
-" don't give |ins-completion-menu| messages:
-set shortmess+=c
-
-" 170708 don't use this with nvim-completition-manager (it will go to new line)
-" inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
-inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-
-" enable for buffers, explicitly
-let g:cm_smart_enable = 1
-" enable all registered sources
-let g:cm_sources_enable	= 1
-" let g:cm_matcher = {'module': 'cm_matchers.prefix_matcher', 'case': 'smartcase'}
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		racer																{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Rust autocompleter (cargo install racer)
-" plugin 'vim-racer' is not really needed for deoplete-rust, but racer_cmd is.
-let g:racer_cmd = $HOME."/.cargo/bin/racer"
-let $RUST_SRC_PATH = $HOME."/src/rust-src/src"
-
-" show the complete function definition (e.g. its arguments and return type):
-let g:racer_experimental_completer = 1
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-
-
-"		airline																{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" TODO reenable this when CtrlSpace can be disabled
-
-" INFO nisam uspio nac da radi kao bez CtrlSpace (buffers on the left, tabs on
-" the rigt)
-" enable/disable enhanced tabline
-" otherwise standard vim tabline will be shown
-let g:airline#extensions#tabline#enabled = 1
-
-" enable/disable displaying open splits per tab (only when tabs are opened). >
-let g:airline#extensions#tabline#show_splits = 1
-
-" switch position of buffers and tabs on splited tabline (c)
-let g:airline#extensions#tabline#switch_buffers_and_tabs = 0
-" INFO doesn't seems to have any effect
-
-" show tabline even when there is only one tab
-let g:airline#extensions#tabline#show_buffers = 1
-"
-" enable/disable displaying tabs, regardless of number. (c)
-" INFO will only be displayed if there is more than one tab
-let g:airline#extensions#tabline#show_tabs = 1
-
-" enable/disable display preview window buffer in the tabline. >
-let g:airline#extensions#tabline#exclude_preview = 1
-
-"let g:airline#extensions#tabline#tab_nr_type = 0 " # of splits (default)
-let g:airline#extensions#tabline#tab_nr_type = 1 " tab number
-"let g:airline#extensions#tabline#tab_nr_type = 2 " splits and tab number
-" INFO this will show "3.1 [No Name] for 3rd tab with one window (zero splits)
-
-" enable/disable displaying tab type (far right) >
-let g:airline#extensions#tabline#show_tab_type = 1
-
-let g:airline#extensions#tabline#buffer_idx_mode = 1
-" configure whether buffer numbers should be shown. >
-"let g:airline#extensions#tabline#buffer_nr_show = 1
-" INFO i bez ovoga nekako pokazuje brojeve, ako se ovo omoguci bit ce samo jos
-" dodatno zasran ispis, npr 3. tab: 			3.1 3: [No Name]
-" configure how buffer numbers should be formatted with |printf()|. >
-let g:airline#extensions#tabline#buffer_nr_format = '%s: '
-
-" configure the minimum number of buffers needed to show the tabline. >
-let g:airline#extensions#tabline#buffer_min_count = 1
-
-
-" configure the minimum number of tabs needed to show the tabline. >
-let g:airline#extensions#tabline#tab_min_count = 0
-" Note: this setting only applies when `show_buffers` is false.
-
-" configure whether close button should be shown: >
-let g:airline#extensions#tabline#show_close_button = 1
-" configure symbol used to represent close button >
-"let g:airline#extensions#tabline#close_symbol = 'X'
-
-
-" enable/disable vim-ctrlspace integration >
-let g:airline#extensions#ctrlspace#enabled = 1
-
-
-
-
-
-
-let g:airline_detect_paste=1					" Show PASTE if in paste mode
-
-" enable/disable syntastic integration
-"let g:airline#extensions#syntastic#enabled = 1
-
-"" XXX djeluje da ne radi:
-"let g:airline#extensions#tabline#show_close_button = 1
-"let g:airline#extensions#tabline#close_symbol = 'X'
-
-" enable/disable vim-obsession integration
-let g:airline#extensions#obsession#enabled = 1
-
-" set marked window indicator string
-let g:airline#extensions#obsession#indicator_text = '$'
-
-" INFO fonts need to be installed, and xterm configured to use them, otherwise this won't work
-let g:airline_powerline_fonts = 1
-let g:Powerline_symbols = 'fancy'
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		Ctrl-Space															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Plugin for tabs/buffers/file/sessions/bookmarks
-" only used for binding buffers to specific tabs and saving that layout
-
-" Should Vim-CtrlSpace change your default tabline to its own?
-let g:CtrlSpaceUseTabline = 1	" default 1
-let g:CtrlSpaceSymbols = { "File": "F", "CTab": "ct", "Tabs": "T" }
-if executable("ag")
-	let g:CtrlSpaceGlobCommand = 'ag -l --nocolor -g ""'
-endif
-
-let g:CtrlSpaceUseUnicode = 0 " unicode will show just 1 and 2
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		CtrlP																{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:ctrlp_map = '<leader>o'	" override default Ctrl-P
-let g:ctrlp_arg_map = 0			" Stop CtrlP from using Ctrl-O as his shortcut
-" Disable Ctrl-o as CtrlP shortcut, he has better things to do
-let g:ctrlp_prompt_mappings = {
-			\ 'OpenMulti()':          [''],
-			\ }
-
-let g:ctrlp_max_height=30
-" TODO provjerit
-"let g:ctrlp_by_filename = 1
-"let g:ctrlp_regex_search = 1
-"let g:ctrlp_use_caching = 1
-
-" Search from current directory instead of project root
-let g:ctrlp_working_path_mode = 0
-
-" This is already set in Vim's wildignore
-" let g:ctrlp_custom_ignore = {
-			" \ 'dir':  '\v[\/]\.(git|hg|svn)$',
-			" \ 'file': '\v\.(exe|so|dll|o)$',
-			" \ 'link': 'some_bad_symbolic_links',
-			" \ }
-
-" CtrlP Emacs shortcuts and some other
-let g:ctrlp_prompt_mappings = {
-	\ 'PrtBS()':				['<c-h>',	'<bs>',	'<c-]>'],
-	\ 'PrtDelete()':			['<c-d>',	'<del>'],
-	\ 'PrtDeleteWord()':		['<c-w>'],
-	\ 'PrtClear()':				['<c-u>'],
-	\ 'PrtSelectMove("j")':		['<c-n>',	'<c-j>',		'<down>'],
-	\ 'PrtSelectMove("k")':		['<c-p>',	'<c-k>',		'<up>'],
-	\ 'PrtSelectMove("t")':		['<a-a>',	'<Home>',		'<kHome>'],
-	\ 'PrtSelectMove("b")':		['<a-e>',	'<End>',		'<kEnd>'],
-	\ 'PrtSelectMove("u")':		['<a-b>',	'<PageUp>',		'<kPageUp>'],
-	\ 'PrtSelectMove("d")':		['<a-f>',	'<PageDown>',	'<kPageDown>'],
-	\ 'PrtHistory(-1)':			['<a-p>'],
-	\ 'PrtHistory(1)':			['<a-n>'],
-	\ 'AcceptSelection("e")':	['<c-m>',				'<cr>', '<2-LeftMouse>'],
-	\ 'AcceptSelection("h")':	['<c-s>',	'<a-s>',	'<c-cr>'],
-	\ 'AcceptSelection("t")':	[			'<a-t>'],
-	\ 'AcceptSelection("v")':	['<c-v>',	'<a-v>',			'<RightMouse>'],
-	\ 'ToggleFocus()':			['<s-tab>'],
-	\ 'ToggleRegex()':			['<c-r>'],
-	\ 'ToggleByFname()':		[''],
-	\ 'ToggleType(1)':			['<tab>',	'<c-up>'],
-	\ 'ToggleType(-1)':			['',		'<c-down>'],
-	\ 'PrtExpandDir()':			[''],
-	\ 'PrtInsert("c")':			['<MiddleMouse>', '<insert>'],
-	\ 'PrtInsert()':			['<c-\>'],
-	\ 'PrtCurStart()':			['<c-a>'],
-	\ 'PrtCurEnd()':			['<c-e>'],
-	\ 'PrtCurLeft()':			['<c-b>', '<left>', '<c-^>'],
-	\ 'PrtCurRight()':			['<c-l>', '<right>'],
-	\ 'PrtClearCache()':		['<a-r>', '<F5>'],
-	\ 'PrtDeleteEnt()':			['<F7>'],
-	\ 'CreateNewFile()':		['<c-y>'],
-	\ 'MarkToOpen()':			['<c-z>'],
-	\ 'OpenMulti()':			['<c-o>'],
-	\ 'PrtExit()':				['<esc>', '<c-c>', '<c-g>'],
-	\ }
-
-let g:ctrlp_clear_cache_on_exit = 0	" Use F5 in CtrlP for refresh, calls CtrlPClear{,All}Caches
-let g:ctrlp_cache_dir = $HOME.'/.cache/ctrlp'
-"let g:ctrlp_show_hidden = 1		" will not search .git because of wildignore
-let g:ctrlp_max_files = 30000
-let g:ctrlp_max_depth = 40			" max dirs
-let g:ctrlp_match_current_file = 1	" show current file when searching
-
-" MRU options
-let g:ctrlp_mruf_max = 250
-let g:ctrlp_mruf_exclude = '/tmp/.*\|/temp/.*'
-
-" extension, should be enabled
-let g:ctrlp_buftag_ctags_bin = ''
-
-" CtrlP by default use OS find program. Use ag to respect .gitignore, tags,...
-if executable('ag')
-	let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
-endif
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		rust															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Rust lang support - compiling and running program, not autocomplete
-let g:rustc_path = $HOME."/.cargo/bin/rustc"
-" let g:rustc_path = $HOME."/.cargo/bin/rustc -A non_camel_case"
-" let g:ftplugin_rust_source_path = $HOME.'/dev/rust'
-let g:rust_recommended_style = 0	" don't expandtab and other stuff
-inoremap <A-r> <C-o>:w<cr><C-o>:RustRun<cr>
-nnoremap <A-r> :w<cr>:RustRun<cr>
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-
-
-
-
-
-"		empty  															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-
-
-
-
-
-
-
-
-
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-
-"		lastplace															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" INFO reopen files where you left off
-let g:lastplace_open_folds = 1 " auto open folder, default: 1 XXX don't work for nested folds
-let g:lastplace_ignore = "gitcommit,gitrebase,svn,hgcommit"
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		WhiteSpace															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" INFO highlight trailing spaces in red
-" :ToggleWhitespace
-let g:better_whitespace_filetypes_blacklist = ['help', 'Help', 'quickfix', 'vim-plug', 'man', 'diff', 'location']
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		indexed search														{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" INFO shows search 1 of 123
-let g:indexed_search_center = 1			" center the screen, default 0
-let g:indexed_search_max_lines = 10000	" default 3000
-let g:indexed_search_shortmess = 1		" shorter messages, default 0
-let g:indexed_search_dont_move = 1		" don't move to the next match
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		NERD commenter														{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" INFO:
-" [count]<leader>cX
-" cc	comment
-" cn	comment, forced nesting
-" cu	uncomment
-" c<space>	toggle
-" ci	invert
-" cy	yanking + commenting
-" c$	comment from the cursor to the end of line
-" cA	add comment to the end of line and go to insert mode
-" c{l,b}	aligned left/right
-
-" add one space after the comment char
-let NERDSpaceDelims=1
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		signature															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" INFO visually shows Vim marks (and more)
-" mx	toggle mark x
-" dmx	delete mark x
-" m,	place the next available mark
-" m.	remove mark if exist, if not, add the next available marker
-" m-	delete all marks from the current line
-" m<space>	delete all marks from the current buffer
-" ]' ['	jump to the next/prev mark
-" m/	show marks in window below
-
-" verbose maps:
-"nnoremap m, m, :echo "Next available marker was added"<CR>
-
-" functions:
-" SignatureToggleSigns
-" SignatureRefresh
-" SignatureListBufferMarks [n]
-" SignatureListGlobalMarks [n]
-" SignatureListMarkers [marker] [n]
-
-" Ctrl-W m to show marks
-nnoremap <C-w>m :SignatureListBufferMarks<cr>
-nnoremap <C-w>M :SignatureListGlobalMarks<cr>
-
-" TODO guard
-autocmd QuickFixCmdPost * pclose
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		speed dating														{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" INFO Ctrl-A/X working on dates
-
-" XXX doesn't work
-
-" need custom format for EU standard dates as 28.1.2011.
-" help: SpeedDatingFormat to list all formats
-
- ""%Y-%m-%d                         2016-11-16
- "autocmd VimEnter *     TODO
-augroup autogroup_speeddating
-	autocmd!
-	"SpeedDatingFormat %Y.%m.%d.
-augroup END
-" 2016.11.16.
-" 2016-11-16
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		bufkill																{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" INFO used for :BD
-" don't create various <leader>b* mapping (which will slowdown <leader>b for CtrlPBuffer)
-let g:BufKillCreateMappings = 0
-" To move backwards/forwards through recently accessed buffers, use: :BB/:BF
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		tagbar																{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" INFO shows tags (variables, enums, typedes, functions on the windows on the right)
-" :TagbarToggle
-" :TagbarOpenAutoClose - useful for jumping to the function (with preview window)
-let g:tagbar_width = 50		" default: 40
-"let g:tagbar_zoomwidth = 0	" default: 0 (Use the width of the longest currently visible tag)
-"let g:tagbar_autoclose = 1	" default: 0
-let g:tagbar_autofocus = 1	" auto jump to the Tagbar	default: 0
-let g:tagbar_sort = 0		" default: 1
-let g:tagbar_show_linenumbers = 2	" show relative
-"let g:tagbar_singleclick = 1
-let g:tagbar_iconchars = ['►', '▼']		" changed first symbol because powerline font
-let g:tagbar_previewwin_pos = "aboveleft"
-let g:tagbar_autopreview = 0
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		git plugins															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" INFO show +-~ on the left of line if line is added/removed/changed
-" GitGutter{Enable,Disable,Toggle}
-" update: GitGutter{,All}	current/all buffers
-" keys: [c ]c goto prev/next
-
-
-let g:gitgutter_enabled = 0				" default
-"let g:gitgutter_highlight_lines = 1
-" Required after having changed the colorscheme
-"hi clear SignColumn
-
-
-" In vim-airline, only display "hunks" if the diff is non-zero
-let g:airline#extensions#hunks#non_zero_only = 1
-
-let g:gitgutter_sign_added = '+'
-let g:gitgutter_sign_removed = 'x'
-let g:gitgutter_sign_modified = 'm'
-let g:gitgutter_sign_modified_removed = 'xm'
-
-
-"let g:gitgutter_override_sign_column_highlight = 0
-highlight GitGutterAdd			ctermfg=green	ctermbg=236
-highlight GitGutterChange		ctermfg=14		ctermbg=236
-highlight GitGutterDelete		ctermfg=red		ctermbg=236
-highlight GitGutterChangeDelete	ctermfg=11		ctermbg=236
-
-
-" TODO disable this plugin in non active split
-" used only git and SVN
-let g:signify_vcs_list = [ 'git', 'svn', 'hg' ]
-let g:signify_update_on_focusgained = 0
-let g:signify_sign_add               = '+'
-let g:signify_sign_delete            = '-'
-let g:signify_sign_delete_first_line = '‾'
-let g:signify_sign_change            = 'm'
-"let g:signify_sign_changedelete      = g:signify_sign_change
-let g:signify_sign_show_count = 1
-" TODO interface with indexed search
-" INFO not nnoremap
-nmap ]c <plug>(signify-next-hunk)zz
-nmap [c <plug>(signify-prev-hunk)zz
-nmap ]C <plug>(signify-next-hunk)
-nmap [C <plug>(signify-prev-hunk)
-" TODO wrap around if indexed search is active (now it just stop at the end which is not a bad thing)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		ack																	{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" INFO ack Vim plugin but systems 'ag' binary will be used
-" :AckAdd:		add results to the current search list in quickfix
-" :AckWindow:	search current tab
-
-let g:ack_apply_qmappings = 0	" disable QuickFix mappings
-let g:ack_apply_lmappings = 0
-" let g:ack_mappings
-" Default: {
-	" \ "t": "<C-W><CR><C-W>T",
-	" \ "T": "<C-W><CR><C-W>TgT<C-W>j",
-	" \ "o": "<CR>",
-	" \ "O": "<CR><C-W><C-W>:ccl<CR>",
-	" \ "go": "<CR><C-W>j",
-	" \ "h": "<C-W><CR><C-W>K",
-	" \ "H": "<C-W><CR><C-W>K<C-W>b",
-	" \ "v": "<C-W><CR><C-W>H<C-W>b<C-W>J<C-W>t",
-	" \ "gv": "<C-W><CR><C-W>H<C-W>b<C-W>J" }
-let g:ack_mappings = {
-	\ "p": ":pedit ' . expand('<cfile>')"} " TODO open in preview window
-let g:ackhighlight = 1		" highlight the searched term.
-"let g:ack_autoclose = 1		" specify whether to close the quickfix window after using any of the shortcuts.
-"let g:ack_autofold_results = 1	" fold results in QF window, they are be auto unfolder when cursor is on them
-"let g:ackpreview = 1		" autopreview file under cursor
-	" INFO default mapping must be enabled, not really preview but open
-"let g:ack_use_dispatch = 1		" XXX syntax error when enabled
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		quickr-preview														{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" INFO show preview without opening
-
-"let g:quickr_preview_keymaps = 0
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		taboo																{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" INFO rename tabs XXX don't work with CtrlSpace (which manages Airline tabline)
-
-" remember tab names after restore
-"set sessionoptions+=tabpages,globals
-
-let g:taboo_tabline = 0		" AirLine is OK for this purpose
-let g:airline#extensions#taboo#enabled = 1
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		clang-format														{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" INFO reformat code
-let g:clang_format#command="clang-format-3.5"
-let g:clang_format#code_style="mozilla"
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		zoom-win															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" temporary put current split (window) as maximized window
-" default shortcut would report error about unsupported vim options which will be preserved after switching
-" copied s:localoptlist from help and removed parameters that would cause error (key, oft, sn, tx)
-let g:zoomwin_localoptlist   = [
-			\ "ai"  , "ar"  , "bh"  , "bin", "bl"  ,
-			\ "bomb", "bt"  , "cfu" , "ci" , "cin" ,
-			\ "cink", "cino", "cinw", "cms", "com" ,
-			\ "cpt" , "efm" , "eol" , "ep" , "et"  ,
-			\ "fenc", "fex" , "ff"  , "flp", "fo"  ,
-			\ "ft"  , "gp"  , "imi" , "ims", "inde",
-			\ "inex", "indk", "inf" , "isk",
-			\ "kmp" , "lisp", "mps" , "ml" , "ma"  ,
-			\ "mod" , "nf"  , "ofu" ,         "pi" ,
-			\ "qe"  , "ro"  , "sw"  ,         "si" ,
-			\ "sts" , "spc" , "spf" , "spl", "sua" ,
-			\ "swf" , "smc" , "syn" , "ts" ,
-			\ "tw"  , "udf" , "wm"]
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-
-"		multicursor															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:multi_cursor_use_default_mapping=0
-"let g:multi_cursor_next_key='D'
-let g:multi_cursor_prev_key='<c-p>'
-let g:multi_cursor_skip_key='<c-x>'
-let g:multi_cursor_quit_key='<c-c>'
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		Tabularize															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" INFO
-" :Tabularize /,		tabularize at the commas
-" :Tabularize /,/l0r2	tabularize at the commas, left of comma 0 space, right 1
-if exists(":Tabularize")
-	" visual -> Tabularize /{PATTERN}
-	" Tabularize /:\zs      // ispadne varA:    10  	// : ostane uz var, tabulira s charom iza delimitera
-
-	" not really useful shortcuts
-	nnoremap <leader>a= :Tabularize /=<cr>
-	vnoremap <leader>a= :Tabularize /=<cr>
-	nnoremap <leader>a: :Tabularize /:\zs<cr>
-	vnoremap <leader>a: :Tabularize /:\zs<cr>
-endif
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		EasyTags															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:easytags_events = ['BufReadPost', 'BufWritePost']
-let g:easytags_async = 1
-"let g:easytags_dynamic_files = 2
-"let g:easytags_resolve_links = 1
-"let g:easytags_suppress_ctags_warning = 1
-"let g:easytags_file = "~/.vim/tags"
-
-"set regexpengine=1 " old engine, faster (maybe), no changes
-" let g:easytags_auto_highlight=0		" fix slowiness
-
-
-let g:easytags_suppress_ctags_warning = 1
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		delimitMate															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"let delimitMate_expand_cr = 1
-augroup mydelimitMate
-	au!
-	au FileType markdown let b:delimitMate_nesting_quotes = ["`"]
-	au FileType python let b:delimitMate_nesting_quotes = ['"', "'"]
-	" removed <:> :
-	au FileType rust let delimitMate_matchpairs = "(:),[:],{:}"
-augroup END
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		NERDTree															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:NERDTreeChDirMode=2
-let g:NERDTreeAutoDeleteBuffer=1
-let g:NERDTreeHijackNetrw = 0
-let g:NERDTreeShowBookmarks = 1
-let g:NERDTreeMinimalUI = 1
-"noremap <space> :NERDTreeToggle<cr>
-"noremap <leader>. :NERDTreeFind<cr>
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		tinymode															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" INFO
-" TODO
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-
-" 					colors and TERM setup									{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-colorscheme molokai
-" highlight Normal		ctermbg=233	" XXX change in theme file
-
-highlight Todo			ctermfg=196 ctermbg=232
-highlight Debug			ctermfg=226 ctermbg=234
-
-" color of tw bar at right (funny color for bad LCD panels)
-"highlight ColorColumn ctermbg=93 guibg=DarkMagenta
-let g:color_ColorColumn = 234 " must be global (otherwise function ToggleColorColumn won't see it)
-execute "highlight ColorColumn ctermbg=".color_ColorColumn
-highlight clear ColorColumn		" disable on default
-
-" highlight all afer 80 chars
-let &colorcolumn=join(range(81,999),",")
-" double highlight, 80 and 120 chars:
-"let &colorcolumn="80,".join(range(120,999),",")
-
-highlight VertSplit		ctermfg=202 ctermbg=232
-
-" change color of tab chars (:set list)
-highlight SpecialKey	ctermfg=236
-
-" change concel to match background
-highlight Conceal		ctermfg=7 ctermbg=233
-
-" longer vertical bar for vertical splits, space for folds (default was -)
-set fillchars=fold:\ ,vert:\│
-
-" change the colors in diff mode
-highlight DiffAdded		ctermfg=81
-highlight DiffRemoved	ctermfg=208
-
-" auto completion menu
-" highlight pmenu			ctermfg=white ctermbg=52
-" highlight pmenu			ctermfg=120 ctermbg=8
-" highlight pmenu 			ctermbg=232 ctermfg=120
-highlight pmenu 			ctermbg=243 ctermfg=120
-
-" hide ANSCI escape chars
-syntax match Ignore /\%o33\[[0-9]\{0,5}m/ conceal
-
-" ugly but easier to read
-highlight Comment		ctermfg=101
-
-highlight ExtraWhitespace	ctermbg=162
-"highlight ExtraWhitespace ctermbg=202
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"				GUI settings												{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if has("gui_running")
-	"set lines=150 columns=230
-	set guioptions -=T		" toolbar
-	set guioptions -=r		" right scrollbar
-	set guioptions -=L		" left scrollbar
-
-	" gvim ispravno generira u fajlu ▸ ali ne i kad se stisne tab
-
-	"Invisible character colors
-	highlight NonText guifg=#2a4a59
-	highlight SpecialKey guifg=#2a4a59
-
-	set winaltkeys=no		" Turn off <Alt>/<Meta> pulling down GUI menu
-
-	set showbreak=…		" char to be displayed on the beggining of broken line
-	"set listchars=tab:\|·,eol:¬,trail:·
-endif
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "				custom functions											{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! AppendModeline() " {{{
@@ -1604,36 +866,8 @@ function! AppendModeline() " {{{
 	call append(line("$"), l:modeline)
 endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-function! CursorEdge()	" {{{
-	" check if cursor is EDGE_LINES from end of the screen
-	let l:CURSOR_EDGE = 5
-	let l:from_start = winline()
-	let l:max_lines = winheight(0)
-	let l:from_end = winheight(0) - winline()
-	echo l:from_start l:from_end l:max_lines
-
-	if l:from_start < l:CURSOR_EDGE || l:from_end < l:CURSOR_EDGE
-		echo "Cursor is near the edge"
-		nnoremap * *<Plug>(indexed-search-*)zz
-		nnoremap # #<Plug>(indexed-search-#)zz
-		nnoremap n n<Plug>(indexed-search-n)zz
-		nnoremap N N<Plug>(indexed-search-N)zz
-		nnoremap / /<Plug>(indexed-search-/)zz
-		nnoremap ? ?<Plug>(indexed-search-?)zz
-	else
-		echom "Cursor"
-		nnoremap * *<Plug>(indexed-search-*)
-		nnoremap # #<Plug>(indexed-search-#)
-		nnoremap n n<Plug>(indexed-search-n)
-		nnoremap N N<Plug>(indexed-search-N)
-		nnoremap / /<Plug>(indexed-search-/)
-		nnoremap ? ?<Plug>(indexed-search-?)
-	endif
-	" XXX uzima u obzir trenutnu lokaciju kursora, a ne gdje se nalazi iduci hit
-endfunction
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 function! s:VSetSearch() "													{{{
-" visual mode */#
+	" visual mode */#
 	let temp = @@
 	norm! gvy
 	let @/ = '\V' . substitute(escape(@@, '\'), '\n', '\\n', 'g')
@@ -1642,11 +876,9 @@ endfunction
 
 vnoremap * :<C-u>call <SID>VSetSearch()<CR>//<CR>
 vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR>
-
-" TODO combo with indexed_search
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 function! ZeroMove() "														{{{
-" INFO toggle between ^ and 0
+	" INFO toggle between ^ and 0
 	let l:column_old = col('.')
 
 	" goto first non blank char
@@ -1677,18 +909,21 @@ endfunction
 set foldtext=NeatFoldText()
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 " toggle ColorColumn														{{{
+
+" check if highlight group exists and is it highlighed
 " http://vim.1045645.n5.nabble.com/Check-if-highlight-exists-and-not-quot-cleared-quot-td1185235.html
-func! HlExists(hl)
-		if !hlexists(a:hl)
-			return 0
-		endif
-		redir => hlstatus
-		exe "silent hi" a:hl
-		redir END
-		return (hlstatus !~ "cleared")
+function! HlExists(hl)
+	if !hlexists(a:hl)
+		return 0
+	endif
+	redir => hlstatus
+	exe "silent hi" a:hl
+	redir END
+	return (hlstatus !~ "cleared")
 endfunc
 
 function! ToggleColorColumn()
+	" INFO 170813: Heh, ovo sam ja napisao negdje na ljeto/jesen 2016.
 	let l:state = HlExists('ColorColumn')
 
 	if (l:state == 1)
@@ -1757,116 +992,1118 @@ function! TmuxResize(direction, amount)
 	exec l:action.a:amount
 endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+function! PreviewWindowOpened()											"{{{
+	" from: https://stackoverflow.com/a/14300184/8078624
+	for nr in range(1, winnr('$'))
+		if getwinvar(nr, "&pvw") == 1
+			" found a preview
+			return 1
+		endif
+	endfor
+	return 0
+endfun
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+function! s:HelpTag(reverse)											" {{{
+	" INFO 170817: jumps to next/previous help tag
+	"http://sillybytes.net/2015/02/vim-jump-to-nextprevious-help-file-tags.html
+	call search('|\S\+|', a:reverse ? 'bW' : 'W')
+endfunction
+" nmap [g <Plug>HelpTagPrevious
+" nmap ]g <Plug>HelpTagNext
+nmap [t <Plug>HelpTagPrevious
+nmap ]t <Plug>HelpTagNext
+nmap [h <Plug>HelpTagPrevious
+nmap ]h <Plug>HelpTagNext
+
+nnoremap <silent> <Plug>HelpTagPrevious :call <SID>HelpTag(1)<CR>
+nnoremap <silent> <Plug>HelpTagNext     :call <SID>HelpTag(0)<CR>
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"	auto swap and file reloading if it is changed on the disk {{{
+
+
+" https://github.com/neovim/neovim/issues/2127
+" from tim pope's, iirc:
+"	file changed in buffer, but not on disk: allocate a swapfile for it
+"	file not changed in buffer: remove swap file, so that if vim is killed it
+"		doesn't leave one lying around (and allows multiple editing, which
+"		with the above rules, I'm fine with)
+
+" from some stackoverflow or other:
+"	file changed on disk, but not in buffer: load it
+"	file changed on disk and in buffer: warn user, ask what to do
+
+" edited from autoswap plugin:
+"	opening file that has changed swapfile, and file is not newer: ask the
+"		user, as normal.
+"	opening file that has changed swapfile, and file is newer: swapfile has
+"		already been abandoned, delete it
+
+" augroup AutoSwap
+" 	autocmd!
+" 	autocmd SwapExists *  call AS_HandleSwapfile(expand('<afile>:p'), v:swapname)
+" augroup END
+
+" function! AS_HandleSwapfile (filename, swapname)
+" 	" if swapfile is older than file itself, just get rid of it
+" 	if getftime(v:swapname) < getftime(a:filename)
+" 		call delete(v:swapname)
+" 		let v:swapchoice = 'e'
+" 	endif
+" endfunction
+
+" autocmd CursorHold,BufWritePost,BufReadPost,BufLeave *
+" 			\ if isdirectory(expand("<amatch>:h")) | let &swapfile = &modified | endif
+
+" augroup checktime
+" 	au!
+" 	if !has("gui_running")
+" 		"silent! necessary otherwise throws errors when using command
+" 		"line window.
+" 		" autocmd BufEnter,CursorHold,CursorHoldI,CursorMoved,CursorMovedI,FocusGained,BufEnter,FocusLost,WinLeave * checktime
+" 	endif
+" augroup END
+
+
+	" This will mirror the functionality of Gvim, at least for right now.
+	" au FocusGained * :checktime
+
+" XXX 170909:
+" - doesn't work on nvim: it will never ask to reload file, it will reload it automatically
+" - with autogroups above it will reload without question
+" - default: just warning when trying to write to the file
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
-"" Add set path=.,<relative include dir> for searching for header in particular directories. For more information do ":help file-searching".
+" Plugins																	{{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+call plug#begin('~/.vim/plugged')
+" call plug#begin('~/vim/plugged')
 
-" open tag in a new tab TEST modified line
-nnoremap <C-\> :tab split<cr>:exec("tag ".expand("<cword>"))<CR>
-" this is remapped to C-]
-" open tag in a new split
-" XXX will open split when tag is not found
-"map <A-]> :vsp <cr>:exec("tag ".expand("<cword>"))<CR>
+" Shorthand notation; fetches https://github.com/junegunn/vim-easy-align
+Plug 'junegunn/vim-easy-align'
 
-" cscope "																	{{{
+" Any valid git URL is allowed
+Plug 'https://github.com/junegunn/vim-github-dashboard.git'
+
+" AutoComplete
+Plug 'roxma/nvim-completion-manager'
+" NCM fork without Python dependency
+" Plug ''prabirshrestha/asyncomplete'
+if !has('nvim')
+    Plug 'roxma/vim-hug-neovim-rpc'
+endif
+Plug 'roxma/clang_complete'
+Plug 'rust-lang/rust.vim'
+Plug 'racer-rust/vim-racer'
+Plug 'roxma/nvim-cm-racer'
+Plug 'roxma/ncm-github'
+Plug 'huawenyu/neogdb.vim'
+Plug 'tpope/vim-dispatch'	" async make, needed for cscope code snippet below
+Plug 'easymotion/vim-easymotion'
+Plug 'tpope/vim-unimpaired'
+
+Plug 'w0rp/ale'					" Linter
+" snippets engine and collection
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
+" Auto generate incremetal tags
+" Plug 'ludovicchabant/vim-gutentags', { 'for': 'c,cpp,rust' }
+Plug 'ludovicchabant/vim-gutentags'
+Plug 'majutsushi/tagbar'
+" Plug 'vim-scripts/TagHighlight'	" color typedefs as variables, needs
+" :UpdateTypesFile
+" Plug 'octol/vim-cpp-enhanced-highlight'	" simpler works out-of-the books, but not as good as TagHighlight
+" Plug 'jeaye/color_coded'	" semantic highlighter INFO 170818: doesn't work in nvim
+
+
+" ******************** files
+" CtrlP look-a-like
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+Plug 'pbogut/fzf-mru.vim'
+" minimalistic file browser, insirated by netrw
+" only list and open files, no rm/cp
+Plug 'jeetsukumaran/vim-filebeagle'
+Plug 'dietsche/vim-lastplace'		" Open file at last edit position
+Plug 'bogado/file-line'				" open file.txt:123
+Plug 'scrooloose/nerdtree'
+Plug 'Xuyuanp/nerdtree-git-plugin'
+" Plug 'vim-nerdtree-tabs'		" Not maintained, one NERDtree for all buffers
+
+
+
+Plug 'vim-airline/vim-airline'
+Plug 'gcmt/taboo.vim'				" Rename tabs
+
+" ******************** basics
+Plug 'ciaranm/securemodelines'
+Plug 'henrik/vim-indexed-search'	" show search as: result 123 of 456
+Plug 'osyo-manga/vim-anzu'			" show search matches in statusline
+									" (second from the right)
+Plug 'jiangmiao/auto-pairs'			" auto close quotes, brackets, ...
+Plug 'tpope/vim-surround'			" replace quotes, brackets,...
+Plug 'tpope/vim-commentary'
+Plug 'troydm/zoomwintab.vim'		" <C-w>o wil zoom/unzoom windows/split
+Plug 'AndrewRadev/undoquit.vim'
+Plug 'ntpeters/vim-better-whitespace'	" show red block when there is a trailing whitespace
+
+
+" Plug 'ervandew/supertab'
+
+
+Plug 'jremmen/vim-ripgrep'
+
+Plug 'tomasr/molokai'
+" Plug 'brookhong/cscope.vim'		" cscope
+
+" Show shell ANSI colors as colors
+Plug 'powerman/vim-plugin-AnsiEsc'
+
+" marks in sign column and with easier shortcuts
+" use fzf :Marks for search
+Plug 'kshenoy/vim-signature'
+" git: show +-m in sign column, shortcuts [c ]c
+Plug 'airblade/vim-gitgutter'
+
+" Vim session plugins
+Plug 'tpope/vim-obsession'	" restore session, needed for tmux ressurect
+Plug 'mhinz/vim-startify'	" Fancy Vim startup screen (shows MRU, session, ...)
+Plug 'xolox/vim-session'
+Plug 'xolox/vim-misc'		" Required for vim-session
+
+
+" TODO 170813: check one day
+" Plug 'timonv/vim-cargo'		" simple plugin, cmds: Cargo{Build, Run, Test, Bench}
+" Plug 'qpkorr/vim-bufkill'			" kill buffer without killing split :BD :BW
+Plug 'tpope/vim-fugitive'		" Git commands for Vim
+" Plug 'easymotion/vim-easymotion'	" leader leader and magic begins
+" Plug 'myusuf3/numbers.vim'		" disable relative numbers in insert mode and other windows
+" Plug 'tpope/vim-repeat'
+" Plug 'hyiltiz/vim-plugins-profile'
+" Plug 'junegunn/vim-easy-align'
+" Plug 'matze/vim-move'
+" Plug 'gilligan/vim-lldb'
+" Plug 'LucHermitte/vim-refactor'
+" Plug 'tpope/vim-markdown'
+" Plug 'plasticboy/vim-markdown'
+" Plug 'vim-scripts/tinymode.vim'
+" Plug 'kien/rainbow_parentheses.vim'
+Plug 'octol/vim-cpp-enhanced-highlight'
+
+Plug 'Carpetsmoker/auto_autoread.vim'
+
+
+" Initialize plugin system
+call plug#end()
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" Plugin configuration
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" put this after the theme plugin is installed, but before custom "highlight"
+" overrides
+colorscheme molokai
+" NCM																		{{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Supress the annoying completion messages:
+set shortmess+=c
+" use <Tab> to cycle through completion
+inoremap <expr><tab> 	pumvisible() ? "\<C-n>" : "\<tab>"
+inoremap <expr><S-tab>	pumvisible() ? "\<C-p>" : "\<S-tab>"
+" inoremap <expr><C-_>	deoplete#undo_completion()
+" inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
+
+
+" Here is an example for expanding snippet in the popup menu with <Enter> key.
+" Suppose you use the <C-U> key for expanding snippet.
+" imap <expr> <CR>  (pumvisible() ?  "\<c-y>\<Plug>(expand_or_nl)" : "\<CR>")
+" imap <expr> <Plug>(expand_or_nl) (cm#completed_is_snippet() ? "\<C-U>":"\<CR>")
+
+" info 170926: moj pokusaj za UltiSnips
+" imap <expr> <CR>  (pumvisible() ?  "\<c-y>\<Plug>(expand_or_nl)" : "\<CR>")
+" imap <expr> <Plug>(expand_or_nl) (UltiSnips#ExpandSnippet() ? "\<C-U>":"\<CR>")
+" imap <expr> <CR>  (pumvisible() ?  "\<c-y>\<Plug>(ultisnips_expand)" : "\<CR>")
+" inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ultisnips_expand)")<cr>
+" "<Plug>(ultisnips_expand)"
+
+" UltiSnips example:
+" let g:UltiSnipsExpandTrigger = "<Plug>(ultisnips_expand)"
+" inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ultisnips_expand)")<cr>
+
+let g:cm_matcher = {'module': 'cm_matchers.fuzzy_matcher', 'case': 'smartcase'}
+"cm_matchers.abbrev_matcher"`	" not really fuzzy
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" clang_complete															{{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" path to directory where library can be found
+" let g:clang_library_path='/usr/local/llvm40/lib'
+" -> Already set in OS specific part
+" or path directly to the library file
+" let g:clang_library_path='/usr/local/llvm40/lib/libclang.so.4.0'
+
+" <Plug>(clang_complete_goto_declaration_preview)
+au FileType c,cpp  nmap gd <Plug>(clang_complete_goto_declaration)
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" Linter																	{{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" INFO 170812: Will only show the first error, can't show multiple errors
+"              Maybe linter's fault
+" keep the sign gutter open at all times
+let g:ale_sign_column_always = 1
+" INFO 170813: It will be always 2 chars wide, and space is not allowed
+let g:ale_sign_error = '─>'
+let g:ale_sign_warning = '─>'
+
+" for moving between warnings and errors quickly.
+" INFO 170812: There is no support to recognize warnings and errors
+nmap <silent> ]e <Plug>(ale_next_wrap)
+nmap <silent> [e <Plug>(ale_prev_wrap)
+
+" run linter only on save
+let g:ale_lint_on_text_changed = 'never'
+" You can disable this option too
+" if you don't want linters to run on opening a file
+" let g:ale_lint_on_enter = 0
+
+" use the quickfix list instead of the loclist
+" let g:ale_set_loclist = 0
+" let g:ale_set_quickfix = 1
+
+" Disable linting for some filetypes
+let g:ale_pattern_options = {'\.txt$': {'ale_enabled': 0}}
+
+" XXX razjebat ce ako se napise to nasred linije
+
+cabbrev lintoff ALEDisable
+cabbrev linton ALEenable
+cabbrev lint ALEToggle
+
+" Set this. Airline will handle the rest.
+let g:airline#extensions#ale#enabled = 1
+
+" install rls:
+" rustup component add rls --toolchain nightly
+" rustup component add rust-analysis --toolchain nightly
+" rustup component add rust-src --toolchain nightly
+let g:ale_linters = {'rust': ['rustc']}
+" let g:ale_linters = {'rust': ['rls']}
+"  g:ale_rust_rls_executable
+" let g:ale_rust_ignore_error_codes = ['E0432', 'E0433']
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" Rust																	{{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" don't expand tab (and other things)
+let g:rust_recommended_style = 0
+
+if has('nvim')
+	inoremap <A-r> <C-o>:RustRun<cr>
+	nnoremap <A-r> :RustRun<cr>
+endif
+" nnoremap <F5> :RustRun<cr>
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" Airline																	{{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:airline_powerline_fonts = 1
+" Automatically displays all buffers when there's only one tab open.
+let g:airline#extensions#tabline#enabled = 1
+
+" Show just the filename in the tab
+let g:airline#extensions#tabline#fnamemod = ':t'
+
+" show tab numbers in the tab
+let g:airline#extensions#tabline#show_tab_nr = 1 " enable
+" let g:airline#extensions#tabline#tab_nr_type = 1 " tab number
+let g:airline#extensions#tabline#tab_nr_type = 2 " splits and tab number (<tab no>.<no of splits>)
+" enable/disable displaying tab type (far right) >
+let g:airline#extensions#tabline#show_tab_type = 1
+
+" Disable showing "mixed ident", override with :AirlineToggleWhitespace
+let g:airline#extensions#whitespace#enabled = 0
+
+" let g:airline_section_z = '%3p%% %#__accent_bold#%{g:airline_symbols.linenr}%4l:%3v%#__restore__#%#__accent_bold#/%L%{g:airline_symbols.maxlinenr}%#__restore__# '
+" let g:airline_section_warning =  %{airline#util#wrap(airline#extensions#ale#get_warning(),0)}%{airline#util#wrap(airline#extensions#whitespace#check(),0)}
+" let g:airline_section_warning = '%t %{ObsessionStatus()}'
+
+" let g:airline_exclude_preview=1	" fix semi-randomly hiding of Airline tabbar
+" tabbline would disappear after :bd	INFO 170909: ZoomWin fault, fixed
+" https://github.com/vim-airline/vim-airline/issues/399
+" autocmd BufDelete * call airline#extensions#tabline#buflist#invalidate()
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+
+" snippets																	{{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" NCM + UltiSnips
+" XXX 170819: shortcut mapped as ExpandTrigger won't work as normal shortcut
+" anymore (tested with CR and C-e)
+" let g:UltiSnipsExpandTrigger			= '<cr>' " works, but won't work as
+" 				It will work, but then normal <Enter> won't
+" let g:UltiSnipsExpandTrigger			= '<C-e>'	" 	XXX 170926: won't work as normal <C-e> (<End>)
+" let g:UltiSnipsExpandTrigger			= '<C-u>'	" 	XXX 170926: won't work, works as <tab>/<C-n>
+" let g:UltiSnipsExpandTrigger			= '<C-u>'	" 	XXX 170926: won't work, works as <tab>/<C-n>
+" let g:UltiSnipsExpandTrigger			= '<C-y>'	" works
+let g:UltiSnipsExpandTrigger			= '<C-o>'	" works
+" let g:UltiSnipsExpandTrigger			= '<Cr>'	" doesn't work
+" let g:UltiSnipsExpandTrigger="<tab>"
+" let g:UltiSnipsExpandTrigger="<C-u>"
+let g:UltiSnipsJumpForwardTrigger="<tab>"	" jump between $1, $2, ...
+let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+
+" When the expand key is pressed and nothing has been typed, a popup list for snippets will be triggered.
+" let g:UltiSnipsExpandTrigger = "<Plug>(ultisnips_expand)"
+" inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ultisnips_expand)")<cr>
+
+let g:UltiSnipsRemoveSelectModeMappings = 0
+
+" author variable used in licence snippets, remove NULL (^@) char:
+let g:snips_author=substitute(strtrans(system('git config user.name')), '\^@','','g')
+
+let g:UltiSnipsEditSplit="vertical"
+call SetupCommandAlias("snipe", "UltiSnipsEdit")
+
+	" don't search for directory, use only tihs:
+	" let g:UltiSnipsSnippetDirectories=$HOME.'/.vim/UltiSnips'
+set runtimepath+=~/.vim/my-snippets/	" radi, ali unutar tog foldera mora bit subfolder "snippets" ili "UltiSnips""
+" let g:UltiSnipsSnippetsDir = "~/.vim/my-snippets/UltiSnips"	" CP s neta, njima radi, meni ne
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" Commenter {{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" for tpope commenter, muscle memory from NERDcommenter
+" INFO 170812: Yes, nmap, not nnoremap
+nmap <leader>c<space> <Plug>CommentaryLine
+vmap <leader>c<space> <Plug>Commentary
+nmap <leader>cc <Plug>CommentaryLine
+vmap <leader>cc <Plug>Commentary
+nmap <leader>cy yy<Plug>CommentaryLine
+vmap <leader>cy yy<Plug>Commentary
+
+" patch for pf.conf (don't use /* */, use # instead)
+autocmd FileType pf setlocal commentstring=#\ %s
+autocmd FileType dnsmasq setlocal commentstring=#\ %s
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" fuzzy open {{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" :Files, :Commits, :Windows, :Tags, :BTags
+nnoremap <leader>o :Files<CR>
+nnoremap <leader>m :FZFMru<CR>
+nnoremap <leader>b :Buffers<CR>
+nnoremap <leader>w :Windows<CR>
+nnoremap to :tabnew<cr>:Files<CR>
+nnoremap tm :tabnew<cr>:FZFMru<CR>
+nnoremap tb :tabnew<cr>:Buffers<cr>
+nnoremap tt :tabnew<cr>:Tags<cr>
+
+imap <c-x><c-l> <plug>(fzf-complete-line)
+
+let g:fzf_action = {
+			\ 'ctrl-t': 'tab split',
+			\ 'ctrl-x': 'split',
+			\ 'ctrl-v': 'vsplit' }
+
+" Default fzf layout
+" - down / up / left / right
+let g:fzf_layout = { 'down': '~40%' }
+" In Neovim, you can set up fzf window using a Vim command:
+" let g:fzf_layout = { 'window': 'enew' }
+" let g:fzf_layout = { 'window': '-tabnew' }
+
+" [Buffers] Jump to the existing window if possible
+let g:fzf_buffers_jump = 0
+
+" [[B]Commits] Customize the options used by 'git log':
+" let g:fzf_commits_log_options = '--graph --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr"'
+
+" 171205 close FZF windows with <esc> (insted of <C-W>c)
+if has('nvim')
+aug fzf_setup
+  au!
+  au TermOpen term://*FZF tnoremap <silent> <buffer><nowait> <esc> <c-c>
+aug END
+end
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" File managers {{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nnoremap <leader>f :NERDTreeToggle<cr>
+nnoremap <leader>F :NERDTreeFind<cr>
+" TODO <space> to expand folder
+let g:NERDTreeMapActivateNode = "<space>"
+
+" FileBeagle - simple file manager
+let g:filebeagle_suppress_keymaps = 1
+" map <silent> <Leader>f  <Plug>FileBeagleOpenCurrentWorkingDir
+map <silent> -          <Plug>FileBeagleOpenCurrentBufferDir
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+nnoremap ; :Buffers<cr>
+" git plugins																{{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" GitGutter
+" - shows +-m in sign column
+" - shortcuts: [c ]c
+
+let g:gitgutter_sign_added = '+'
+let g:gitgutter_sign_modified = '~'
+let g:gitgutter_sign_removed = '-'
+let g:gitgutter_sign_modified_removed = '-~'
+highlight GitGutterAdd				ctermbg=234 ctermfg=10 guifg=green
+highlight GitGutterDelete			ctermbg=234 ctermfg=9  guifg=red
+highlight GitGutterChange			ctermbg=234 ctermfg=3  guifg=yellow
+highlight link GitGutterChangeDelete GitGutterChange
+
+" unmap all keys (<leader>hX are not useful to me)
+" let g:gitgutter_map_keys = 0
+" default keybindings:
+" nmap ]c <Plug>GitGutterNextHunk
+" nmap [c <Plug>GitGutterPrevHunk
+" omap ic <Plug>GitGutterTextObjectInnerPending
+" omap ac <Plug>GitGutterTextObjectOuterPending
+" xmap ic <Plug>GitGutterTextObjectInnerVisual
+" xmap ac <Plug>GitGutterTextObjectOuterVisual
+
+" TODO 170813: goto first line of the preview window
+nmap <Leader>gv <Plug>GitGutterPreviewHunk :wincmd P<CR> :1<CR>
+" nmap <Leader>gp <Plug>GitGutterPreviewHunk
+nmap <Leader>ga <Plug>GitGutterStageHunk
+nmap <Leader>gr <Plug>GitGutterUndoHunk
+nmap <Leader>gu <Plug>GitGutterUndoHunk
+
+call SetupCommandAlias("gitt","GitGutterToggle")
+
+" let g:gitgutter_realtime = 0
+" let g:gitgutter_eager = 0
+
+" Fugitive
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" ripgrep																	{{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" fast grep
+" :Rg :RgRoot
+
+" let g:rg_command="rg --vimgrep"	" default
+" let g:rg_command="rg --vimgrep -g '!.*.tags' -g '!.*tags' -g '!tags' -g '!.*.src'"
+if has('windows')
+	" Windows 171030:
+	let g:rg_command="rg --vimgrep"
+else
+	" let g:rg_command="rg --vimgrep -g '!tags' -g '!.*.src'"
+	let g:rg_command="rg --vimgrep -g '!tags' -g '!*.src'"
+endif
+let g:rg_command="rg --vimgrep -g '!*tags'"
+" don't show column (%c):
+let g:rg_format="%f:%l:%m"
+let g:rg_highlight=1						" 1 if you want matches highlighted
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" easymotion																{{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" press <leader><leader>X where X is char for modes (it can be f,w,...)
+" <Leader>f{char} to move to {char}
+map  <leader><leader>f <Plug>(easymotion-bd-f)
+nmap <leader><leader>f <Plug>(easymotion-overwin-f)
+map  <leader><leader>c <Plug>(easymotion-bd-f)
+nmap <leader><leader>c <Plug>(easymotion-overwin-f)
+
+" s{char}{char} to move to {char}{char}
+" nmap s <Plug>(easymotion-overwin-f2)
+nmap C <Plug>(easymotion-overwin-f2)
+
+" Move to line
+map  <leader><leader>l <Plug>(easymotion-bd-jk)
+nmap <leader><leader>l <Plug>(easymotion-overwin-line)
+
+" Move to word
+map  <Leader>w <Plug>(easymotion-bd-w)
+nmap <Leader>w <Plug>(easymotion-overwin-w)
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+
+
+" ctags																		{{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" INFO will auto create tags, auto update on save (incremental update)
+" it will generate a new tag file if there is none (but it needs time, it will report "no tags file found")
+let g:gutentags_ctags_executable = g:ctags_exe
+nnoremap <C-]> g<C-]>
+nnoremap <C-\> g<C-]>
+" buffer
+call SetupCommandAlias("tagsu","GutentagsUpdate")
+call SetupCommandAlias("tagu","GutentagsUpdate")
+" project
+call SetupCommandAlias("tagsu!","GutentagsUpdate!")
+call SetupCommandAlias("tagu!","GutentagsUpdate!")
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		tagbar																{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if has('cscope')
-	" include cscope when searching for tag (Ctrl-])
-	" show verbose info when loading cscope DB
-	" set cscopetag cscopeverbose	" XXX iritating - ALWAYS will show  multiple choices (as g] would do)
+" INFO shows tags (variables, enums, typedes, functions on the windows on the right)
+" :TagbarToggle
+" :TagbarOpenAutoClose - useful for jumping to the function (with preview window)
+let g:tagbar_width = 50		" default: 40
+"let g:tagbar_zoomwidth = 0	" default: 0 (Use the width of the longest currently visible tag)
+"let g:tagbar_autoclose = 1	" default: 0
+let g:tagbar_autofocus = 1	" auto jump to the Tagbar	default: 0
+let g:tagbar_sort = 0		" default: 1
+let g:tagbar_show_linenumbers = 2	" show relative
+"let g:tagbar_singleclick = 1
+let g:tagbar_iconchars = ['►', '▼']		" changed first symbol because powerline font
+let g:tagbar_previewwin_pos = "aboveleft"
+let g:tagbar_autopreview = 0
 
-	if has('quickfix')
-		set cscopequickfix=s-,c-,d-,i-,t-,e-
-	endif
+nnoremap <leader>t :TagbarToggle<CR>
+let g:tagbar_type_rust = {
+			\ 'ctagstype' : 'rust',
+			\ 'kinds' : [
+			\'T:types,type definitions',
+			\'f:functions,function definitions',
+			\'g:enum,enumeration names',
+			\'s:structure names',
+			\'m:modules,module names',
+			\'c:consts,static constants',
+			\'t:traits,traits',
+			\'i:impls,trait implementations',
+			\]
+			\}
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" C/C++ highlighter															{{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" INFO 170818: works for C also
+" let g:cpp_class_scope_highlight = 1
+let g:cpp_member_variable_highlight = 1		" object.*var1*
+" let g:cpp_class_decl_highlight = 1
+let g:cpp_concepts_highlight = 1
+" XXX 170818: won't highlight object name, nor typedefed variable/type
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"	tag highlight															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" INFO tag custom types and functions - useful for C
+" needs tags file
 
-	command! -nargs=0 Cscope cs add $VIMSRC/src/cscope.out $VIMSRC/src
+" in C: file do:
+" :UpdateTypesFile
+" after exit:
+" :ReadTypes
 
-	nnoremap <leader>fs :cs find s <C-r><C-w><cr>:echo "cscope searching symbol"<cr>
-	nnoremap <leader>fg :cs find g <C-r><C-w><cr>:echo "cscope searching definition"<cr>
-	nnoremap <leader>fd :cs find g <C-r><C-w><cr>:echo "cscope searching definition"<cr>
-	"nnoremap <leader>fd :cs find d <C-r><C-w><cr>:echo "cscope searching functions called by"<cr>
-	nnoremap <leader>fC :cs find d <C-r><C-w><cr>:echo "cscope searching functions called by"<cr>
-	nnoremap <leader>fc :cs find c <C-r><C-w><cr>:echo "cscope searching functions calling this"<cr>
-	nnoremap <leader>ft :cs find t <C-r><C-w><cr>:echo "cscope searching text"<cr>
-	nnoremap <leader>ff :cs find f <C-r><C-w><cr>:echo "cscope searching file"<cr>
-	nnoremap <leader>fh :cs find i <C-r><C-w><cr>:echo "cscope searching header/include"<cr>
-	nnoremap <leader>fa :cs find a <C-r><C-w><cr>:echo "cscope searching where assigned"<cr>
-	nnoremap <C-g> :cs find find c <C-r><C-w><cr>:echo "cscope searching functions calling this"<cr>
+" STD libs:
+" download http://www.cgtk.co.uk/data/vim-scripts/taghighlight/taghighlight_standard_libraries_r2.1.4.zip
+" and extract to ~/.vim/plugged/TagHighlight
+" INFO 170815: probably not needed (QT, Android and similiar libs)
+" XXX 170815: this will not color malloc() and printf()
 
-	let g:cscope_silent = 1	" don't show message when autoupdating DB
+
+" $HOME/.vim/syntax/c.vim
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+
+" undoquit 																	{{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" undo quit window/split/tab/buffer
+
+let g:undoquit_mapping = '<C-w>u'
+
+" <C-w>c doesn't call QuitPre autocmd, patch it to works with this plugin
+nnoremap <c-w>c :call undoquit#SaveWindowQuitHistory()<cr><c-w>c
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		taboo																{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" INFO rename tabs XXX don't work with CtrlSpace (which manages Airline tabline)
+
+" remember tab names after restore
+"set sessionoptions+=tabpages,globals
+
+let g:taboo_tabline = 0		" AirLine is OK for this purpose
+let g:airline#extensions#taboo#enabled = 1
+" INFO 171104: remove "%m" - modified flag, Airline will take care of that
+" otherwise modified tab will show "%#TabModifiedSelected#*%#TabLineSel#"
+let g:taboo_tab_format = "%f"
+nnoremap tr :TabooRename<space>
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		zoom-win															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" temporary put current split (window) as maximized window
+" default shortcut would report error about unsupported vim options which will be preserved after switching
+" copied s:localoptlist from help and removed parameters that would cause error (key, oft, sn, tx)
+let g:zoomwin_localoptlist   = [
+			\ "ai"  , "ar"  , "bh"  , "bin", "bl"  ,
+			\ "bomb", "bt"  , "cfu" , "ci" , "cin" ,
+			\ "cink", "cino", "cinw", "cms", "com" ,
+			\ "cpt" , "efm" , "eol" , "ep" , "et"  ,
+			\ "fenc", "fex" , "ff"  , "flp", "fo"  ,
+			\ "ft"  , "gp"  , "imi" , "ims", "inde",
+			\ "inex", "indk", "inf" , "isk",
+			\ "kmp" , "lisp", "mps" , "ml" , "ma"  ,
+			\ "mod" , "nf"  , "ofu" ,         "pi" ,
+			\ "qe"  , "ro"  , "sw"  ,         "si" ,
+			\ "sts" , "spc" , "spf" , "spl", "sua" ,
+			\ "swf" , "smc" , "syn" , "ts" ,
+			\ "tw"  , "udf" , "wm"]
+" after calling this, tabbar (Airline included) would be hidden
+let g:zoomwintab_hidetabbar = 0
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+
+" sessions																	{{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Obsession - autosave session (":mksession")
+""""""""""""""""""""""""""""""""""""""""
+" INFO: will track and autosave session, but only in current folder
+" statusline - add %{ObsessionStatus()}
+
+" INFO usage:
+" :Obsession <custom filename>		save session
+" :Obsession . (or custom dir)		save session to Session.vim
+" :Obsession!						delete file and stop saving/tracking
+" :load <session file>				load
+" vim -S <session file>				load
+
+call SetupCommandAlias("sess", ":Obsession .")
+call SetupCommandAlias("css", ":Obsession .")
+
+" vim-startify
+""""""""""""""""""""""""""""""""""""""""
+" Fancy Vim startup screen (shows MRU, session, ...)
+" works out of the box
+
+" vim-session
+""""""""""""""""""""""""""""""""""""""""
+" - doesn't have support for vim-startify
+" - neat - save session in one folder, tab completition, later remembers the session name
+
+" commands:
+" :SaveSession
+" :OpenSession
+" :RestartVim
+" :CloseSession
+" :DeleteSession
+" :ViewSession
+
+" g:session_directory = '~/.vim/sessions' "" or ~\vimfiles\sessions (on Windows).
+" Don't save hidden and unloaded buffers in sessions.
+set sessionoptions-=buffers
+
+" let g:session_autosave = 'no'	" Don't ask when exiting Vim
+" let g:session_autosave_periodic = '5'	" Auto save every 5 minutes
+let g:session_autosave_periodic = '1'	" Auto save every 5 minutes
+" let g:session_autosave = 'no'	" Don't ask when exiting Vim
+
+
+" Disable all session locking - I know what I'm doing :-).
+" Enables multiple loading of the same session
+" let g:session_lock_enabled = 0
+" let g:session_default_name='default_'.getcwd().'_'.system('date +%y%d%m_%H%M') " This will be evaluated only on Vim start
+" XXX 171102: This will not work on Windows gVim:
+if has('unix')
+	let g:session_default_name='default_'.system('date +%y%d%m_%H%M') " This will be evaluated only on Vim start
 endif
 
-" Ctrl-\ to jump to the tag (like Ctrl-] but easier to type on ANSI keyboard)
-" nnoremap <C-\> :tag <C-r><C-w><cr>
-" from help:
-map g<C-]> :cs find 3 <C-R>=expand("<cword>")<CR><CR>
-map g<C-\> :cs find 0 <C-R>=expand("<cword>")<CR><CR>
+let g:session_command_aliases = 1	" :SomethingSession is :SessionSomething
+call SetupCommandAlias("ss", ":SaveSession")
+call SetupCommandAlias("sl", ":OpenSession")	" 'ls' is used
+call SetupCommandAlias("os", ":OpenSession")
+" TODO 170926: Autosave sessions but only if session is loaded/named (don't save session which are not saved by :SaveSession)
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" marks																	{{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" :SignatureList{Buffer,Global, }Markers
+let g:SignatureMap = {
+			\ 'Leader'             :  "m",
+			\ 'PlaceNextMark'      :  "m,",
+			\ 'ToggleMarkAtLine'   :  "m.",
+			\ 'PurgeMarksAtLine'   :  "m-",
+			\ 'DeleteMark'         :  "dm",
+			\ 'PurgeMarks'         :  "m<Space>",
+			\ 'PurgeMarkers'       :  "m<BS>",
+			\ 'GotoNextLineAlpha'  :  "']",
+			\ 'GotoPrevLineAlpha'  :  "'[",
+			\ 'GotoNextSpotAlpha'  :  "`]",
+			\ 'GotoPrevSpotAlpha'  :  "`[",
+			\ 'GotoNextLineByPos'  :  "]m",
+			\ 'GotoPrevLineByPos'  :  "[m",
+			\ 'GotoNextSpotByPos'  :  "]`",
+			\ 'GotoPrevSpotByPos'  :  "[`",
+			\ 'GotoNextMarker'     :  "]-",
+			\ 'GotoPrevMarker'     :  "[-",
+			\ 'GotoNextMarkerAny'  :  "]=",
+			\ 'GotoPrevMarkerAny'  :  "[=",
+			\ 'ListBufferMarks'    :  "m/",
+			\ 'ListBufferMarkers'  :  "m?"
+			\ }
+" old defaults:
+" \ 'GotoNextLineByPos'  :  "]'",
+" \ 'GotoPrevLineByPos'  :  "['",
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" {{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+
+"		lastplace															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" INFO reopen files where you left off
+let g:lastplace_open_folds = 1 " auto open folder, default: 1 XXX don't work for nested folds
+let g:lastplace_ignore = "gitcommit,gitrebase,svn,hgcommit"
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		WhiteSpace															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" INFO highlight trailing spaces in red
+" :ToggleWhitespace
+let g:better_whitespace_filetypes_blacklist = ['help', 'Help', 'quickfix', 'vim-plug', 'man', 'diff', 'location']
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		indexed search														{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" INFO shows search 1 of 123
+let g:indexed_search_center = 1			" center the screen, default 0
+let g:indexed_search_max_lines = 10000	" default 3000
+let g:indexed_search_shortmess = 1		" shorter messages, default 0
+let g:indexed_search_dont_move = 1		" don't move to the next match (*N)
+
+" anzu - other plugin - shows search match in Airline
+let g:airline#extensions#anzu#enabled = 1
+
+let g:indexed_search_mappings = 0		" patched shortcuts will be used
+nnoremap * *N:call RemoveBrackets()<cr>:ShowSearchIndex<cr>
+nnoremap # #N:call RemoveBrackets()<cr>:ShowSearchIndex<cr>
+
+" centered search:
+nnoremap n nzz
+nnoremap N Nzz
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		bufkill																{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" INFO used for :BD
+" don't create various <leader>b* mapping (which will slowdown <leader>b for CtrlPBuffer)
+let g:BufKillCreateMappings = 0
+" To move backwards/forwards through recently accessed buffers, use: :BB/:BF
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		multicursor															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:multi_cursor_use_default_mapping=0
+"let g:multi_cursor_next_key='D'
+let g:multi_cursor_prev_key='<c-p>'
+let g:multi_cursor_skip_key='<c-x>'
+let g:multi_cursor_quit_key='<c-c>'
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		Tabularize															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" INFO
+" :Tabularize /,		tabularize at the commas
+" :Tabularize /,/l0r2	tabularize at the commas, left of comma 0 space, right 1
+if exists(":Tabularize")
+	" visual -> Tabularize /{PATTERN}
+	" Tabularize /:\zs      // ispadne varA:    10  	// : ostane uz var, tabulira s charom iza delimitera
+
+	" not really useful shortcuts
+	nnoremap <leader>a= :Tabularize /=<cr>
+	vnoremap <leader>a= :Tabularize /=<cr>
+	nnoremap <leader>a: :Tabularize /:\zs<cr>
+	vnoremap <leader>a: :Tabularize /:\zs<cr>
+endif
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+"" cscope																	{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"if has('cscope')
+"	set cscopetag cscopeverbose
+
+"	if has('quickfix')
+"		set cscopequickfix=s-,c-,d-,i-,t-,e-
+"	endif
+
+"	" a: Find assignments to this symbol
+
+"	" s: Find this C symbol
+"	nmap <C-\>s :cs find s <C-R>=expand("<cword>")<CR><CR>
+"	" g: Find this definition
+"	nmap <C-\>g :cs find g <C-R>=expand("<cword>")<CR><CR>
+"	" c: Find functions calling this function
+"	nmap <C-\>c :cs find c <C-R>=expand("<cword>")<CR><CR>
+"	" t: Find this text string
+"	nmap <C-\>t :cs find t <C-R>=expand("<cword>")<CR><CR>
+"	" e: Find this egrep pattern
+"	nmap <C-\>e :cs find e <C-R>=expand("<cword>")<CR><CR>
+"	" f: Find this file
+"	nmap <C-\>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
+"	" i: Find files #including this file
+"	nmap <C-\>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
+"	" d: Find functions called by this function
+"	nmap <C-\>d :cs find d <C-R>=expand("<cword>")<CR><CR>
+
+"	" command -nargs=0 Cscope cs add $VIMSRC/src/cscope.out $VIMSRC/src
+"endif
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" TODO 170812: <leader>sX for searching with ripgrep
+
+" NeoVim terminal															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" example: :vsplit term://htop
+" 			:terminal htop		:te htop
+
+if has('nvim')
+	" <Esc> will exit terminal insert mode, close it as normal buffer
+	tnoremap <Esc> <C-\><C-n>
+	" To simulate |i_CTRL-R| in terminal-mode:
+	" tnoremap <expr> <C-R> '<C-\><C-N>"'.nr2char(getchar()).'pi'
+endif
+
+" auto-insert when in terminal window
+" INFO match buffer name (term://)
+autocmd BufWinEnter,WinEnter term://* startinsert
+
+" set guicursor=
+" let $NVIM_TUI_ENABLE_CURSOR_SHAPE = 1
+"   let &t_SI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=1\x7\<Esc>\\"
+"   let &t_EI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=0\x7\<Esc>\\"
+" let &t_SR = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=2\x7\<Esc>\\"
+
+" change cursor color
+" set termguicolors
+" highlight Cursor guifg=white guibg=black
+" highlight iCursor guifg=white guibg=steelblue
+" set guicursor=n-v-c:block-Cursor
+" set guicursor+=i:ver100-iCursor
+" set guicursor+=n-v-c:blinkon0
+" set guicursor+=i:blinkwait10
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+
+" Fast grep
+" set grepprg=rg\ --vimgrep
+if executable("rg")
+	" ne radi na Windowsima:
+	" set grepprg='rg --vimgrep --no-heading'
+	set grepformat=%f:%l:%c:%m,%f:%l:%m
+else
+	echoe "ag executable not found"
+endif
+" Easier way to jump to alternate file
+" nnoremap <BS> <C-^>
+
+" editing binary files:
+" 		https://vi.stackexchange.com/questions/343/how-to-edit-binary-files-with-vim
+nmap <leader>hr :set binary<CR> :%!xxd<CR> :set filetype=xxd<CR>
+nmap <leader>hw :%!xxd -r<CR> :set binary<CR> :set filetype=<CR> :set fileencoding=<CR> :w<CR> :set nobinary<CR>
+
+" 					colors and TERM setup									{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" highlight Normal		ctermbg=233	" XXX change in theme file
+
+highlight Todo			ctermfg=196 ctermbg=232
+highlight Debug			ctermfg=226 ctermbg=234
+
+highlight Search		ctermfg=0 ctermbg=222 guifg=#000000 guibg=#FFE792
+highlight Folded		ctermbg=234	ctermfg=69
+highlight CursorLine	ctermbg=235
+
+highlight TermCursor ctermfg=red guifg=red
+
+" invisible chars (:set line)
+highlight NonText ctermfg=239
+
+" XXX XXX XXX only work in first buffer
+" Highlight TODO, FIXME, NOTE, etc. FIXME:
+if has("autocmd")
+	if v:version > 701
+		autocmd Syntax * call matchadd('Todo',  '\W\zs\(TODO\|FIXME\|CHANGED\|XXX\|BUG\|HACK\|ZAJEB\)')
+		autocmd Syntax * call matchadd('Debug', '\W\zs\(NOTE\|INFO\|IDEA\)')
+		autocmd Syntax * call matchadd('Debug', '\W\zs\(INFO_START\|INFO_END\|ERROR\|DEBUG_START\|DEBUG_END\|DEBUG_INFO\)')
+	endif
+endif
+
+" color of tw bar at right (funny color for bad LCD panels)
+"highlight ColorColumn ctermbg=93 guibg=DarkMagenta
+let g:color_ColorColumn = 234 " must be global (otherwise function ToggleColorColumn won't see it)
+execute "highlight ColorColumn ctermbg=".color_ColorColumn
+highlight clear ColorColumn		" disable on default
+
+" highlight all afer 80 chars
+let &colorcolumn=join(range(81,999),",")
+" double highlight, 80 and 120 chars:
+"let &colorcolumn="80,".join(range(120,999),",")
+
+highlight VertSplit		ctermfg=202 ctermbg=232 guifg=orange
+
+" change color of tab chars (:set list)
+highlight SpecialKey	ctermfg=236
+
+" change concel to match background
+highlight Conceal		ctermfg=7 ctermbg=233
+
+" longer vertical bar for vertical splits, space for folds (default was -)
+set fillchars=fold:\ ,vert:\│
+
+" change the colors in diff mode, similiar to git diff
+highlight DiffAdded		ctermfg=87	guifg=cyan
+highlight DiffRemoved	ctermfg=196	guifg=red
+
+" auto completion menu
+" highlight pmenu			ctermfg=white ctermbg=52
+" highlight pmenu			ctermfg=120 ctermbg=8
+" highlight pmenu 			ctermbg=232 ctermfg=120
+highlight pmenu				ctermbg=237 ctermfg=254
+
+" hide ANSCI escape chars
+syntax match Ignore /\%o33\[[0-9]\{0,5}m/ conceal
+
+" ugly but easier to read
+highlight Comment		ctermfg=101
+" highlight Comment		ctermfg=114 guifg=#80a0ff
+
+" highlight ExtraWhitespace	ctermbg=162
+highlight ExtraWhitespace ctermbg=202
+
+" highlight Error			ctermfg=15 ctermbg=9 guifg=White guibg=Red
+" highlight WarningMsg	ctermfg=210 guifg=Red
+
+" linter colors
+" highlight link ALEError			SpellBad
+" highlight link ALEErrorSign		Error
+" highlight link ALEWarning			SpellCap
+" highlight ALEWarning			ctermbg=18 gui=undercurl guisp=Blue
+highlight ALEWarning			ctermbg=235 gui=undercurl guisp=Blue
+" highlight ALEWarningSign		ctermfg=130 ctermbg=220 guifg=Blue guibg=Yellow
+highlight ALEWarningSign		ctermfg=15 ctermbg=240 guifg=Blue guibg=Yellow
+" highlight ALEError		 		ctermbg=236 gui=undercurl guisp=Red
+highlight ALEError		 		ctermbg=234 gui=undercurl guisp=Red
+highlight ALEErrorSign			ctermfg=15 ctermbg=9 guifg=White guibg=Red
+
+" sign column (git +-m, marks, linter signs)
+highlight SignColumn			ctermfg=118 ctermbg=0 guifg=#A6E22E guibg=#232526
+
+" brighter, easier to read line numbers (column left)
+" INFO line column is the same for numbers, git marks, vim marks, linter,...
+highlight LineNr				ctermfg=253	guifg=white
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"				GUI settings												{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has("gui_running")
+	"Invisible character colors
+	highlight NonText guifg=#2a4a59
+	highlight SpecialKey guifg=#2a4a59
+	highlight Normal	guibg=#0F0F0F
+
+	" Windows and Unix gVim:
+	" set encoding=utf-8
+	set winaltkeys=no		" Turn off <Alt>/<Meta> pulling down GUI menu
+	" set guifont=Droid\ Sans\ Mono\ Dotted\ for\ Powe:h10
+
+	set listchars=tab:│·,extends:>,precedes:<
+	set showbreak=…		" char to be displayed on the beggining of broken line
+	"set listchars=tab:\|·,eol:¬,trail:·
+
+	"	"set lines=150 columns=230
+	set guioptions -=T		" toolbar
+	set guioptions -=r		" right scrollbar
+	set guioptions -=L		" left scrollbar
+	set guioptions -=m		" menubar
+	set guioptions +=a		" auto-copy selected text"
+	" set guioptions -=m		" menu bar (possible Windows only)
+
+	set hlsearch
+	set backspace=2		"indent,eol,start, needed for Windows gVim
+	let g:airline_powerline_fonts = 1
+	" set guifont=Droid\ Sans\ Mono\ Dotted\ for\ Powe:h10
+
+	" initial size:
+	" set lines=70 columns=200
+
+	set mousefocus
+
+	" disable bell
+	autocmd GUIEnter * set vb t_vb=
+
+	" gVim by default has italic char for tab, make it non italic:
+	" highlight SpecialKey		term=bold ctermfg=236 gui=italic guifg=#465457
+	highlight SpecialKey		term=bold ctermfg=236 gui=none guifg=#465457
+
+
+
+	"Invisible character colors
+	highlight NonText guifg=#2a4a59
+	" highlight SpecialKey guifg=#2a4a59
+
+	" TODO same font as xterm
+endif
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+
+" todo 1708 Windows Airline font:
+" XXX
+" set rop=type:directx,gamma:1.0,contrast:0.5,level:1,geom:1,renmode:4,taamode:1
 
 " " work specific stuff														{{{
 " """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if !has('windows')
+" on Linux PC for team H
+" if !has('windows')
+" team H: Linux PC
+" team A: Windows PC
 	let g:work_pc=system('is_work_pc')
 	let g:work_dir=system('is_work_dir')
+	let g:team_a=system('is_sverige') " TODO 170831
+	" sverige: if Windows and work_dir exists
 
 	if work_pc == 1
 		set list
 
 		if work_dir == 1
 			" expand only if we are working on work stuff
+			if team_a == 1
+				" weird North men use 3 spaces as a tab
+				set tabstop=3		" tab size
+				set shiftwidth=3 	" when indenting with '>'
+			endif
 			set expandtab
 			highlight clear ColorColumn	" don't color background after textwidth
 		endif
 	endif
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nnoremap <C-\> :Tags <C-R><C-W><CR>
+nmap <C-Enter> <C-w>g<C-]><C-w>T
+" Not saying it is required but I enjoy this one more than <C-]> but I guess it is already sort of covered by g<C-]>.
+
+
+if has('cscope')
+    set cscopetagorder=0
+    set cscopetag
+    set cscopeverbose
+    set cscopequickfix=s-,c-,d-,i-,t-,e-
+    set cscopepathcomp=3
+
+    function! LoadCscope()
+        let db = findfile("cscope.out", ".;")
+        if (!empty(db))
+            let path = strpart(db, 0, match(db, "/cscope.out$"))
+            set nocscopeverbose " suppress 'duplicate connection' error
+            exe "cs add " . db . " " . path
+            set cscopeverbose
+        endif
+    endfunction
+    au BufEnter /* call LoadCscope()
+
+    nnoremap T :cs find c <C-R>=expand("<cword>")<CR><CR>
+    nnoremap t <C-]>
+    nnoremap gt <C-W><C-]>
+    nnoremap gT <C-W><C-]><C-W>T
+    nnoremap <silent> <leader>z :Dispatch echo "Generating tags and cscope database..." &&
+                        \ /usr/local/bin/ctags -R --fields=+aimSl --c-kinds=+lpx --c++-kinds=+lpx --exclude=.svn 
+                        \ --exclude=.git && find . -iname '*.c' -o 
+                        \ -iname '*.cpp' -o -iname '*.h' -o -iname '*.hpp' 
+                        \ > cscope.files && cscope -b -i cscope.files -f cscope.out &&
+                        \ echo "Done." <cr><cr>
+
+    cnoreabbrev csa cs add
+    cnoreabbrev csf cs find
+    cnoreabbrev csk cs kill
+    cnoreabbrev csr cs reset
+    " cnoreabbrev css cs show
+    cnoreabbrev csh cs help
+    cnoreabbrev csc Cscope
+    command! Cscope :call LoadCscope()
 endif
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
-" tab jumps to the previous active window
-" TODO make this to call wincmd w when there is no previous active window
-" 		maybe <expr> if window nubmer greater than X/there is next window
-" 		then...
-" TODO skip syntastic window
-nnoremap <tab> :wincmd w<cr>
-" TODO S-Tab jump to "special" windows - syntastic, quick fix, ...
+" TODO 171029: put this in the right place
+nnoremap <A-w> :BD<cr>
+inoremap <A-w> <C-o>:BD<cr>
 
 
-" TODO
-" when Ag quickfix window is active: <space> (or p) for preview file (now is "go")
-" Ag ignore: .o tags
-" when quickfix is active: Ctrl-W c should close main buffer and quickfix
-" put cursor at the end of the pasted part
+" INFO {{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" fold moving:
+" zj/zk - move to start/end of prev/next fold
+" [z/]z - move to start/end of current open fold
 
-" tab_complete example " 													{{{
-""I'm using tab for cycling over the items in a completion menu (instead of c-n). But I also use tab when there is no completion menu to expand a snippet, and jump to the next placeholder inside the snippet. So the tab key needed some love:
-"function! s:tab_complete()
-  "" is completion menu open? cycle to next item
-  "if pumvisible()
-	"return "\<c-n>"
-  "endif
-
-  "" is there a snippet that can be expanded?
-  "" is there a placholder inside the snippet that can be jumped to?
-  "if neosnippet#expandable_or_jumpable()
-	"return "\<Plug>(neosnippet_expand_or_jump)"
-  "endif
-
-  "" if none of these match just use regular tab
-  "return "\<tab>"
-"endfunction
-" from https://github.com/fatih/dotfiles/blob/master/vimrc
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-
-"imap <silent><expr><TAB> <SID>tab_complete()
-" U in visual mode will convert to UPPERCASE
-" 10| will move to the 10-th column
-" g* like * but will not search only whole words
-" C-W T window to tab
-" gx open an URL/image/something from Vim
-" q/ open search history in command window
-" // to quickly search again, works in substitution mode also (s//b/g)
-" :lcd	cd only for current window
-
-" TODO :help sort
 
 " programmers vim 															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1930,7 +2167,6 @@ set isfname+=32	" <space> is part of filename
 ":%!/usr/local/bin/zsh!/opt/bin/zsh		-> ! as delimiter (# also works)
 "/some_text.*							-> '.' and wild wildcard starts working
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-" TODO replace <C-r><C-w> shortcuts with expand('<cword>')
 " moving		 															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " '[ '] jump to the beggining or end of last change
@@ -2030,52 +2266,79 @@ set isfname+=32	" <space> is part of filename
 " get line under the cursors: getline('.')
 "									}}}
 
-
 " variables:
 " % - buffer (or file) TODO
 " ^ - alternate file
 " TODO :h pattern-atoms
-
 " Vim debug:
 " vim -V9myVimLog
-" TODO ag sredit da nema praznu liniju ispod svake korisne u quickfix
-" TODO napravit da oboja jednako i TODO2
-" TODO remember highlight state after reloading vimrc
-" TODO n (next match) skip if the next match is line after cursor
-" TODO if normal mode and highlight search is active: <esc> to turn off highlighting
-" TODO <leader>n toggle relative numbers and numbers plugin
-" TODO hide ^M in dos files (or at least dont paint them red)
-" TODO map ]p only in .c and .h files
-" TODO K to show tag in preview window, another K to close preview window (:pclose)
-" INFO moglo bi bit korisno jednog dana: "&& bufname("%") != "[Command Line]"
 
-" TODO make :BD plays nice with CtrlSpace and buffers per tab
-" INFO CtrlSpaceSaveWorspace would work OK for ctrl-space tabs and buffers
-" TODO even full and default CtrlSpace wont recognize multiple buffers when vim file1.txt file2.txt (and CtrlSpaceGoUp/Down won't work)
-
-" show leading whitespaces
-" setlocal conceallevel=2 concealcursor=nv
-" syn match LeadingWS /\(^\s*\)\@<=\s/ conceal cchar=·
-" XXX and this will also change how tabs are showed
+" INFO maybe will be useful some day: "&& bufname("%") != "[Command Line]"
 " INFO highlight ALL whitespace (and tabs): /\s
 " INFO highlight all whitespace at the beggining: /^<space>
-" sctrach buffer: enew (buffer withou file)
-" TODO yank da bude zapravo set paste mode, set ono da poravna (]p) i onda nopaste
-" TODO jump to header under cursor
-" TODO q for close if it's last file/window in Vim
-" TODO code snippets
-" TODO dont' autocomplete second " in Vim (probably some plugin)
-" INFO set paste! will realign folds text
-" TODO Ag skip tags file
-" TODO disable swap file in paste mode (otherwise very slow on copying multiple lines)
-" TODO <Tab>/<C-i> switch window if there are multiple windows, othervise normal Ctrl-I
-" TODO another '*' should disable highlight
-" TODO <enter> - if it's link under cursor then "gx", if it's tag under cursor then :tag... othervise "o"
 
-" INFO cscope cmd: cscope -R -b
-" XXX something disables WhiteSpace after reloading vimrc
-" See :help function-list for a high-level overview of vimscript functions.
-"
+" export MYVIMRC="~/vim_ide"		" change .vim position
+" vim -U ~/vim_ide/vimrc
+
+" Unicode characters can be inserted by typing ctrl-vu followed by the 4 digit hexadecimal code.
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" TODO 16xxxx <Tab>/<C-i> switch window if there are multiple windows, othervise normal Ctrl-I
+" TODO 16xxxx another '*' should disable highlight
+" TODO 16xxxx <enter> - if it's link under cursor then "gx", if it's tag under cursor then :tag... othervise "o"
+" TODO 170717: tmux <C-j>p -> enter/exit paste mode before/after that command
 " INFO: remmaping Esc will fuckup scroll (scrolling will start to insert chars)
+"
+" INFO 170901: Ako se razjebe ista sta koristi python (npr ncm na Windowsima): pip install --upgrade neovim
+" TODO 170909: nvim Windows: CP to clipboard. gVim works
+" TODO 170921: Rg/ack skip tags file
+" TODO 170921: snippets
+" TODO 170921: <leader>r -> references to function
+" INFO 170926: vim slowiness
+" syntax off, relative number off, cursorline off -> speedup
+" autocommand spam: :au CursorMoved
+" :syntime on, move around in your ruby file and then, :syntime report
+" old regex engine: :set re=1
+" group autocommands
+" => moze se ubrzat malo, ali i dalje bude spor, i dalje se vidi cursosr
+" TODO 171001: search for keyword in all buffers
 
-" vim: set ts=4 sw=4 tw=0 foldmethod=marker noet :
+" DBG layout:
+" registers: 
+" vsplit
+" vertical resize 24
+" set nocursorline
+
+" posao 170725
+" set expandtab
+" set shiftwidth=3
+" set tabstop=3
+" ignore whitespace changes and also newlines (^M)
+" set diffopt+=iwhite
+
+
+
+
+" open header:
+nnoremap <leader>h :e %:r.h<cr>
+" "bubble" move the lines (will have weird things on edge of the buffer)
+" nnoremap <A-k> ddkP
+" nnoremap <A-j> ddp
+" vnoremap <A-k> xkP`[V`]
+" vnoremap <A-j> xp`[V`]
+inoremap <A-k> <C-o>dd<C-o>k<C-o>P
+inoremap <A-j> <C-o>dd<C-o>p
+" bubble move the lines with unimpared plugin
+nmap <A-k> [e
+nmap <A-j> ]e
+vmap <A-k> [egv
+vmap <A-j> ]egv
+" " manually create that dirs:
+" inoremap <A-k> <C-o>[e
+" inoremap <A-j> <C-o>]e
+
+" closer than Ctrl-PgUp/PgDn. Ctrl-[/] is already used
+nnoremap <A-[> :tabprev<cr>
+nnoremap <A-]> :tabnext<cr>
+nnoremap T1 :tabmove 0<cr>:echo "current tab moved to position 1"<cr>
+
+" 171127

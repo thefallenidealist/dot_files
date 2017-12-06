@@ -16,7 +16,7 @@ xterm*foreground:	grey
 ! xterm*foreground:	green
 XTerm*boldMode: 	true
 XTerm*allowBoldFonts: true
-!xterm*cursorColor:	yellow
+!xterm*cursorColor:	green
 !xterm*cursor:		false
 !elegantnije definirano u .fluxbox/apps
 !ali fluxbox slijedi volju bozju pa ne radi na racionalan nacin
@@ -45,6 +45,7 @@ xterm*scrollTtyOutput:       false
 xterm*scrollKey:             true
 XTerm*renderFont:               true
 !tamno siva pozadina, korisno za sysinstall
+! INFO 170902: disabled because register names will be too dark in GDB + dashboard
 xterm*color7:		#c0c0c0
 !Da Alt radi
 XTerm*metaSendsEscape: true
@@ -180,10 +181,10 @@ XCalendar*daynumbers.21*Foreground: Red
 XCalendar*daynumbers.28*Foreground: Red
 XCalendar*daynumbers.35*Foreground: Red
 
-*VT100.translations: #override\
+/* *VT100.translations: #override\ */
 !<Key>Prior: scroll-back(1,pages) \n\
 !<Key>Next: scroll-forw(1,pages)\n\
-<Key> plus: larger-vt-font() \n\
+/* <Key> plus: larger-vt-font() \n\ */
 !Shift <Key> C: select-cursor-start() select-cursor-end(PRIMARY, CUT_BUFFER0) \n\
 ! XXX something from below will fuck up =/+ key
 !Shift <Key> V: insert-selection(PRIMARY, CUT_BUFFER0) \n\
@@ -264,7 +265,16 @@ mupdf*Background: black
 ! comment out to enable tmux to set xterm title
 ! allows other processes to send keypress and mouse events to the xterm window. Because of the security risk, do not enable this unless you are very sure you know what you are doing.
 ! XTerm*allowSendEvents: true
-!
-!
-!
-!
+
+
+
+
+! 170909: change cursor shape:
+! echo -ne "\e[2 q"
+!    Ps = 0  -> blinking block.
+!    Ps = 1  -> blinking block (default).
+!    Ps = 2  -> steady block.
+!    Ps = 3  -> blinking underline.
+!    Ps = 4  -> steady underline.
+!    Ps = 5  -> blinking bar (xterm).
+!    Ps = 6  -> steady bar (xterm).

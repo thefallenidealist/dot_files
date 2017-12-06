@@ -11,25 +11,42 @@
 	helper = cache --timeout=1440
 	username = thefallenidealist
 [alias]
-	# SVN like aliases
-	st = status
+	s = status
+	; ! means pass the whole line to the shell
+	; s = !git remote get-url origin && git status	# TODO posao
 	co = checkout
+	com = checkout master
 	br = branch
-	up = rebase
+	a = add
+	cl = clone
+	#s = show
+	su = submodule update --init --recursive
+	# up = rebase	# SVN muscle memory
+	#
 	last = log -1 HEAD
 	l = log --decorate
-	c = commit --allow-empty-message -am
-	cl = clone
-	ls = ls-files
+	c = commit --allow-empty-message -m	# TODO posao
+	ca = commit --amend --no-edit
+	am = commit --amend --no-edit
+	ls = diff --name-only	# only show filenames of changed files between commits
+	ls2 = ls-files		# list tracked files
 	sh = stash
-	shp = stash pop
 	sp = stash pop
+	ss = stash show
 	# some aliases for lazy shits like me
 	d = diff
-	s = status
-	b = branch
-	a = add
-	su = submodule update --recursive --init
+	dc = diff --cached
+	dd = diff --submodule
+	dd0 = foreach --recursive git diff
+	dd1 = foreach --recursive git diff --name-status
+
+	dt = difftool
+	lol = log --graph --branches --remotes --pretty=oneline --abbrev-commit
+	lsh = log --graph --branches --remotes --pretty=short --abbrev-commit
+	ll = log --pretty=format:"%C(green)%h\\ %C(yellow)[%ad]%Cred%d\\ %Creset%s%C('blue bold')\\ [%cn]" --decorate --date=relative
+	ap = apply --ignore-space-change --ignore-whitespace
+	ap2 = apply --reject --whitespace=fix
+	app = apply --reject --whitespace=fix
 [log]
 	decorate = full
 [color]
@@ -50,5 +67,6 @@
 	untracked = red
 [core]
 	pager = less -F -X
+	# autocrlf = false	# s posla
 [apply]
     whitespace = nowarn

@@ -45,6 +45,9 @@ abbrev tg tabgroups
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 " buffers/tabs  														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nnoremap h :tabprev<cr>
+nnoremap l :tabnext<cr>
+
 nnoremap <A-,> :tabprev<CR>
 nnoremap <A-.> :tabnext<CR>
 
@@ -53,12 +56,9 @@ nnoremap <A-j> :tabnext<cr>
 nnoremap <A-k> :tabprev<cr>
 nnoremap <A-l> :tabnext<cr>
 
-nnoremap <A-S-H> :tabmove -1<cr>
-nnoremap <A-S-L> :tabmove +1<cr>
-
 " because there are close to default "gt" and easier than gT
-nnoremap gy :tabprev<cr>
-nnoremap gr :tabprev<cr>
+" nnoremap gy :tabprev<cr>
+" nnoremap gr :tabprev<cr>
 
 " practicing for newer ThinkPad keyboard with bad, bad layout:
 " XXX won't work if not followed by <Esc>
@@ -66,13 +66,17 @@ nnoremap gr :tabprev<cr>
 " nnoremap ] :tabnext<cr>
 nnoremap { :tabprev<cr>
 nnoremap } :tabnext<cr>
-nnoremap <C-]> :tabprev<cr>
-nnoremap <C-\\> :tabnext<cr>
-inoremap <C-]> <esc>:tabprev<cr>
-inoremap <C-\\> <esc>:tabnext<cr>
 
-nnoremap ';' <PageUp>
-nnoremap \' <PageDown>
+" keys between '0' and <BS>
+nnoremap \- :tabprev<cr>
+nnoremap \= :tabnext<cr>
+
+nnoremap <A-S-H> :tabmove -1<cr>
+nnoremap <A-S-L> :tabmove +1<cr>
+
+
+" nnoremap ';' <PageUp>
+" nnoremap \' <PageDown>
 
 " XXX won't unmap, "No such mapping: H"
 " unmap <S-h>
@@ -82,11 +86,23 @@ nnoremap <S-k> :back<cr>
 nnoremap <S-h> :tabprev<cr>
 nnoremap <S-l> :tabnext<cr>
 
-nnoremap h :tabprev<cr>
-nnoremap l :tabnext<cr>
+nnoremap <leader>td	:tabduplicate<cr>
+nnoremap <C-w>d		:tabduplicate<cr>
+nnoremap <C-w>c		:tabclose<cr>
+nnoremap <C-w>w		<C-S-e>
+nnoremap <C-w><C-w> <C-S-e>
+nnoremap <C-w>l		<C-S-e>
+
+nnoremap <leader>t :tabgroups list<cr>:tabgroups switch<space>
+
+nnoremap [[ <nop>
+nnoremap [f <nop>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 nnoremap <leader>r :source ~/.vimperatorrc<cr>:echom "config reloaded"<cr>
-
+" zoom (- is now for tab switching, + is default)
+nnoremap z+ :zoom +10<cr>
+nnoremap z- :zoom -10<cr>
+nnoremap z0 :zoom 100<cr>
 
 " vimperator default:
 " C-S-p/n prev/next tab group
