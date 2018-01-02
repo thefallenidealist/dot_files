@@ -10,6 +10,7 @@
 	# 1440s = 1 day
 	helper = cache --timeout=1440
 	username = thefallenidealist
+
 [alias]
 	s = status
 	; ! means pass the whole line to the shell
@@ -22,14 +23,15 @@
 	#s = show
 	su = submodule update --init --recursive
 	# up = rebase	# SVN muscle memory
-	#
 	last = log -1 HEAD
 	l = log --decorate
 	c = commit --allow-empty-message -m	# TODO posao
-	ca = commit --amend --no-edit
-	am = commit --amend --no-edit
+	; ca = commit --amend --no-edit
+	ca = commit --amend
+	; am = commit --amend --no-edit
 	ls = diff --name-only	# only show filenames of changed files between commits
 	ls2 = ls-files		# list tracked files
+	st = stash
 	sh = stash
 	sp = stash pop
 	ss = stash show
@@ -49,6 +51,8 @@
 	app = apply --reject --whitespace=fix
 [log]
 	decorate = full
+	# decorate with branch pointers
+	; decorate = short
 [color]
 	ui = auto
 [color "branch"]
