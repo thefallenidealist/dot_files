@@ -1,4 +1,6 @@
 
+! xterm -------------------------------------------------------------------- {{{
+! ------------------------------------------------------------------------------
 UXTerm*faceName: Source Code Pro for Powerline
 UXTerm*faceSize: 12
 
@@ -46,7 +48,7 @@ xterm*scrollKey:             true
 XTerm*renderFont:               true
 !tamno siva pozadina, korisno za sysinstall
 ! INFO 170902: disabled because register names will be too dark in GDB + dashboard
-xterm*color7:		#c0c0c0
+xterm*color7:		!c0c0c0
 !Da Alt radi
 XTerm*metaSendsEscape: true
 !XTerm*eightBitInput: false
@@ -86,37 +88,96 @@ XTerm*metaSendsEscape: true
 ! XTerm*VT100.colorUL:		yellow
 ! XTerm*VT100.colorBD:		white	
 ! XTerm*VT100.cursorColor:	lime green
+! -------------------------------------------------------------------------- }}}
+! urxvt -------------------------------------------------------------------- {{{
+! ------------------------------------------------------------------------------
+! URxvt.background:	black
+! URxvt.foreground:	green
+! URxvt.font:		xft:Bitstream Vera Sans Mono:pixelsize=12
+! URxvt.fading:		80
+! URxvt.scrollBar: 	false
+! URxvt.url-launcher:      /usr/local/bin/firefox
+! URxvt.matcher.button:   1
+! !To color all matching text in a blue color for quickly finding links, use the following setting or any color in the form of !RRGGBB you like instead.
+! URxvt.colorUL: !4682B4
+! URxvt.perl-ext-common:  default,tabbed
 
-!!!!!	xpdf
+URxvt.background:	black
+URxvt.foreground:	grey
+! URxvt.termName:		screen-256color
+URxvt.termName:		xterm-256color
+! URxvt.termName:		rxvt-unicode
+! URxvt.background:       !1E2B20
+! URxvt.foreground:       wheat
+urxvt*font:				xft:Literation Mono Powerline:pixelsize=13
+! URxvt.font:				xft:Droid Sans Mono for Powerline:pixelsize=13
+/* URxvt.font:				xft:Droid Sans Mono for Powerline:size=10 */
+! reduce spacing by N pixels - fix for fonts under URxvt
+URxvt.letterSpace: -2
+! "xft:Terminus:pixelsize=12"
+URxvt.scrollBar: 	0
+urxvt.perl-ext-common: default,tabbed,matcher,resize-font,-tabbed
+URxvt.keysym.C-minus:		resize-font:smaller
+URxvt.keysym.C-underscore:	resize-font:smaller
+URxvt.keysym.C-plus:		resize-font:bigger
+URxvt.keysym.C-equal:		resize-font:reset
+URxvt.keysym.C-question:	resize-font:show
+! disable something when Ctrl+Shift are pressed
+URxvt.iso14755:			False
+URxvt.iso14755_52:		False
+! tmux will take care of that:
+URxvt.saveLines:		100
+
+
+! transparency with desktop background
+URxvt*inheritPixmap: true
+URxvt*transparent: true
+! URxvt*shading: 0 to 99 darkens, 101 to 200 lightens
+URxvt*shading: 90
+! TODO
+!URxvt.iconFile:    /usr/share/icons/Clarity/scalable/apps/terminal.svg
+! use urxvt instead gmrun
+!urxvt -geometry 80x3 -name 'sh_run' -e sh -c "bash -i -t"
+!Xterm escapes, word by word movement
+URxvt.keysym.Control-Left:		\033[1;5D
+URxvt.keysym.Control-Right:		\033[1;5C
+! URxvt.bell-command: aplay /path/to/a/file.wav
+! -------------------------------------------------------------------------- }}}
+! xpdf --------------------------------------------------------------------- {{{
+! ------------------------------------------------------------------------------
 xpdf*Background: black
 xpdf*Foreground: yellow
 xpdf.paperColor: black
 ! boja pozadine iza papira
 xpdf.matteColor: black
 ! mora se inace su crna slova na crnom papiru
-xpdf.reverseVideo: true		
+xpdf.reverseVideo: true
 xpdf*geometry:	1024x745+0+23
-
+! -------------------------------------------------------------------------- }}}
+! xcalc -------------------------------------------------------------------- {{{
+! ------------------------------------------------------------------------------
 XCalc.ti.Command.background:  gray10
 XCalc.ti.Command.foreground:  green
 xcalc.ti.bevel.background: red
-xcalc.ti.bevel.screen.background: #000000
-xcalc.ti.bevel.screen.DEG.background: #000000
+xcalc.ti.bevel.screen.background: !000000
+xcalc.ti.bevel.screen.DEG.background: !000000
 xcalc.ti.bevel.screen.DEG.foreground: LightSeaGreen
-xcalc.ti.bevel.screen.GRAD.background: #000000
+xcalc.ti.bevel.screen.GRAD.background: !000000
 xcalc.ti.bevel.screen.GRAD.foreground: LightSeaGreen
-xcalc.ti.bevel.screen.RAD.background: #000000
+xcalc.ti.bevel.screen.RAD.background: !000000
 xcalc.ti.bevel.screen.RAD.foreground: LightSeaGreen
-xcalc.ti.bevel.screen.INV.background: #000000
+xcalc.ti.bevel.screen.INV.background: !000000
 xcalc.ti.bevel.screen.INV.foreground: Red
-xcalc.ti.bevel.screen.LCD.background: #000000
+xcalc.ti.bevel.screen.LCD.background: !000000
 xcalc.ti.bevel.screen.LCD.foreground: LightSeaGreen
 xcalc.ti.bevel.screen.LCD.shadowWidth: 0
-xcalc.ti.bevel.screen.M.background: #000000
+xcalc.ti.bevel.screen.M.background: !000000
 xcalc.ti.bevel.screen.M.foreground: LightSeaGreen
-xcalc.ti.bevel.screen.P.background: #000000
+xcalc.ti.bevel.screen.P.background: !000000
 xcalc.ti.bevel.screen.P.foreground: Yellow
-
+! -------------------------------------------------------------------------- }}}
+! xmessage ----------------------------------------------------------------- {{{
+! ------------------------------------------------------------------------------
 xmessage*background:		black
 xmessage*foreground:		green
 xmessage.form.okay.shapeStyle:	rectangle
@@ -125,7 +186,9 @@ xmessage.form.okay.foreground:	snow
 xmessage*message*background:	grey10
 xmessage*defaultButton:		okay
 Xmessage.form.message.Scroll:	WhenNeeded
-
+! -------------------------------------------------------------------------- }}}
+! xcalendar ---------------------------------------------------------------- {{{
+! ------------------------------------------------------------------------------
 xcalendar*firstDay:		1
 xcalendar*calendar*background:	black
 !xcalendar*daynumbers.foreground:	green
@@ -180,8 +243,9 @@ XCalendar*daynumbers.14*Foreground: Red
 XCalendar*daynumbers.21*Foreground: Red
 XCalendar*daynumbers.28*Foreground: Red
 XCalendar*daynumbers.35*Foreground: Red
+! -------------------------------------------------------------------------- }}}
 
-/* *VT100.translations: #override\ */
+/* *VT100.translations: !override\ */
 !<Key>Prior: scroll-back(1,pages) \n\
 !<Key>Next: scroll-forw(1,pages)\n\
 /* <Key> plus: larger-vt-font() \n\ */
@@ -195,72 +259,21 @@ XCalendar*daynumbers.35*Foreground: Red
 !Shift <Key>Delete:      string(0x1b) string(0x08) \n\
 !Shift <Key>Tab:         string(0x1b) string("*") \n\
 
+! aterm -------------------------------------------------------------------- {{{
+! ------------------------------------------------------------------------------
 aterm*geometry:         118x49+1+23
 aterm*transparent:	true
 aterm*background:	black
 aterm*foreground:	green
 aterm*shading:		60
 aterm*scrollBar:	no
-
-! URxvt.background:	black
-! URxvt.foreground:	green
-! URxvt.font:		xft:Bitstream Vera Sans Mono:pixelsize=12
-! URxvt.fading:		80
-! URxvt.scrollBar: 	false
-! URxvt.url-launcher:      /usr/local/bin/firefox
-! URxvt.matcher.button:   1
-! !To color all matching text in a blue color for quickly finding links, use the following setting or any color in the form of #RRGGBB you like instead.
-! URxvt.colorUL: #4682B4
-! URxvt.perl-ext-common:  default,tabbed
-
-URxvt.background:	black
-URxvt.foreground:	grey
-! URxvt.termName:		screen-256color
-URxvt.termName:		xterm-256color
-! URxvt.termName:		rxvt-unicode
-! URxvt.background:       #1E2B20
-! URxvt.foreground:       wheat
-! urxvt*font:				xft:Literation Mono Powerline:pixelsize=13
-! URxvt.font:				xft:Droid Sans Mono for Powerline:pixelsize=13
-URxvt.font:				xft:Droid Sans Mono for Powerline:size=10
-! reduce spacing by N pixels - fix for fonts under URxvt
-URxvt.letterSpace: -2
-! "xft:Terminus:pixelsize=12"
-URxvt.scrollBar: 	0
-urxvt.perl-ext-common: default,tabbed,matcher,resize-font,-tabbed
-URxvt.keysym.C-minus:		resize-font:smaller
-URxvt.keysym.C-underscore:	resize-font:smaller
-URxvt.keysym.C-plus:		resize-font:bigger
-URxvt.keysym.C-equal:		resize-font:reset
-URxvt.keysym.C-question:	resize-font:show
-! disable something when Ctrl+Shift are pressed
-URxvt.iso14755:			False
-URxvt.iso14755_52:		False
-! tmux will take care of that:
-URxvt.saveLines:		100
-
-
-! transparency with desktop background
-URxvt*inheritPixmap: true
-URxvt*transparent: true
-! URxvt*shading: 0 to 99 darkens, 101 to 200 lightens
-URxvt*shading: 90
-! TODO
-!URxvt.iconFile:    /usr/share/icons/Clarity/scalable/apps/terminal.svg
-! use urxvt instead gmrun
-!urxvt -geometry 80x3 -name 'sh_run' -e sh -c "bash -i -t"
-!Xterm escapes, word by word movement
-URxvt.keysym.Control-Left:		\033[1;5D
-URxvt.keysym.Control-Right:		\033[1;5C
-! URxvt.bell-command: aplay /path/to/a/file.wav
-
+! -------------------------------------------------------------------------- }}}
 
 mupdf*Background: black
 
-
 ! TODO igrat se sa ovim u nadi da se Ctrl-Enter moze remapat u nesta (npr Ctrl-J) i onda to remapat u Vimu kao Ctrl-]
-! *VT100.Translations: #override Shift <Key>Up	string("s-up")
-! *VT100.Translations: #override Ctrl <Key>Up	string("c-up")
+! *VT100.Translations: !override Shift <Key>Up	string("s-up")
+! *VT100.Translations: !override Ctrl <Key>Up	string("c-up")
 
 ! comment out to enable tmux to set xterm title
 ! allows other processes to send keypress and mouse events to the xterm window. Because of the security risk, do not enable this unless you are very sure you know what you are doing.
@@ -278,3 +291,4 @@ mupdf*Background: black
 !    Ps = 4  -> steady underline.
 !    Ps = 5  -> blinking bar (xterm).
 !    Ps = 6  -> steady bar (xterm).
+/* vim: set ft=xdefaults ts=4 sw=4 tw=0 fdm=marker noet :*/
