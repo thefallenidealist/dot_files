@@ -72,7 +72,9 @@ set encoding=utf-8	" otherwise gVim will complain about listchars and showbreak
 """""""""""""""""""""""""""""""""""""""
 set tabstop=4		" tab size
 set shiftwidth=4 	" when indenting with '>'
-" set expandtab		" convert tab to spaces
+" 180114: I surrender, spaces as tab:
+set expandtab		" convert tab to spaces
+set softtabstop=4	" smart <BS> - delete 4 chars"
 
 " soft wrap
 set wrap			" soft break when line is wider than Vim window (not tw)
@@ -90,6 +92,7 @@ set formatoptions=""
 " c: add comment in new line a: format line every time when it is
 " changed (no more longer or shorter lines) 		pretty annoying
 " TODO (if possible): soft wrap lines on tw
+
 """"""""""""""""""""""""""""""""""""}}}
 "	commandline completion			{{{
 """""""""""""""""""""""""""""""""""""""
@@ -263,6 +266,8 @@ augroup my_group_with_a_very_uniq_name
 	" autocmd BufEnter * if bufname("%") == "[Command Line]" | nnoremap <buffer> q :q<cr> | endif
 	" autocmd BufEnter * if @% == "[Command Line]" | echo "QQQQQQ" | endif
 	" autocmd VimEnter * if @% == "[Command Line]" | echo "QQQQQQ" | else | "AAAAAA" | endif
+
+	autocmd Filetype xdefaults set commentstring=!%s
 augroup END
 
 " setup when in diff mode:
@@ -476,10 +481,10 @@ if has('nvim')
 	nnoremap <A-l> <C-w>l
 
 	" because they are close to hjkl
-	nnoremap <A-u> :tabprev<cr>
-	nnoremap <A-i> :tabnext<cr>
-	nnoremap <A-n> :tabprev<cr>
-	nnoremap <A-m> :tabnext<cr>
+	" nnoremap <A-u> :tabprev<cr>
+	" nnoremap <A-i> :tabnext<cr>
+	" nnoremap <A-n> :tabprev<cr>
+	" nnoremap <A-m> :tabnext<cr>
 	inoremap <A-u> :tabprev<cr>
 	inoremap <A-i> :tabnext<cr>
 	inoremap <A-n> :tabprev<cr>
@@ -534,6 +539,8 @@ nnoremap te :tabedit<space>
 " jumping, Ctrl-I (tab) is used for switching splits
 nnoremap <C-p> :pop<cr>:echo "Tag jump -1"<cr>
 nnoremap <C-n> :tag<cr>:echo "Tag jump +1"<cr>
+" INFO 180114 <C-[> is rempapped to <F16> with xbindkeys
+nnoremap <F16> :pop<cr>:echo "Taglist jump -1"<cr>
 
 " IDEA
 " <leader>n 	for switching buffers
@@ -2197,7 +2204,7 @@ if has('cscope')
     au BufEnter /* call LoadCscope()
 
     nnoremap T :cs find c <C-R>=expand("<cword>")<CR><CR>
-    nnoremap t <C-]>
+    " nnoremap t <C-]>
     nnoremap gt <C-W><C-]>
     nnoremap gT <C-W><C-]><C-W>T
     nnoremap <silent> <leader>z :Dispatch echo "Generating tags and cscope database..." &&
@@ -2484,3 +2491,7 @@ nnoremap <C-w>f :NERDTreeFocus<cr>
 nnoremap <C-w>F :NERDTreeClose<cr>
 
 cmap w!! w !sudo tee %
+
+" 180106 - useful when reading man pages
+nnoremap <Home> gg
+nnoremap <End> G

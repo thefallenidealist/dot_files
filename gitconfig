@@ -13,6 +13,7 @@
 
 [alias]
 	s = status
+	sn = status -uno
 	; ! means pass the whole line to the shell
 	; s = !git remote get-url origin && git status	# TODO posao
 	co = checkout

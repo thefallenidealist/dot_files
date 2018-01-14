@@ -1,4 +1,11 @@
 
+! XTerm.vt100.translations: #override \n\
+!     Ctrl <Key>M: maximize() \n\
+!     Ctrl <Key>R: restore()
+XTerm.vt100.translations: #override \n\
+    Ctrl <Key>+: larger-vt-font() \n\
+	Ctrl <Key>-: smaller-vt-font()
+
 ! xterm -------------------------------------------------------------------- {{{
 ! ------------------------------------------------------------------------------
 UXTerm*faceName: Source Code Pro for Powerline
@@ -91,57 +98,66 @@ XTerm*metaSendsEscape: true
 ! -------------------------------------------------------------------------- }}}
 ! urxvt -------------------------------------------------------------------- {{{
 ! ------------------------------------------------------------------------------
-! URxvt.background:	black
-! URxvt.foreground:	green
-! URxvt.font:		xft:Bitstream Vera Sans Mono:pixelsize=12
-! URxvt.fading:		80
-! URxvt.scrollBar: 	false
-! URxvt.url-launcher:      /usr/local/bin/firefox
-! URxvt.matcher.button:   1
-! !To color all matching text in a blue color for quickly finding links, use the following setting or any color in the form of !RRGGBB you like instead.
-! URxvt.colorUL: !4682B4
-! URxvt.perl-ext-common:  default,tabbed
-
-URxvt.background:	black
-URxvt.foreground:	grey
-! URxvt.termName:		screen-256color
-URxvt.termName:		xterm-256color
-! URxvt.termName:		rxvt-unicode
-! URxvt.background:       !1E2B20
-! URxvt.foreground:       wheat
-urxvt*font:				xft:Literation Mono Powerline:pixelsize=13
-! URxvt.font:				xft:Droid Sans Mono for Powerline:pixelsize=13
-/* URxvt.font:				xft:Droid Sans Mono for Powerline:size=10 */
-! reduce spacing by N pixels - fix for fonts under URxvt
-URxvt.letterSpace: -2
-! "xft:Terminus:pixelsize=12"
-URxvt.scrollBar: 	0
-urxvt.perl-ext-common: default,tabbed,matcher,resize-font,-tabbed
-URxvt.keysym.C-minus:		resize-font:smaller
-URxvt.keysym.C-underscore:	resize-font:smaller
-URxvt.keysym.C-plus:		resize-font:bigger
-URxvt.keysym.C-equal:		resize-font:reset
-URxvt.keysym.C-question:	resize-font:show
-! disable something when Ctrl+Shift are pressed
-URxvt.iso14755:			False
-URxvt.iso14755_52:		False
-! tmux will take care of that:
-URxvt.saveLines:		100
-
+urxvt.background:	black
+! urxvt.foreground:	grey
+urxvt.foreground:	wheat
 
 ! transparency with desktop background
-URxvt*inheritPixmap: true
-URxvt*transparent: true
-! URxvt*shading: 0 to 99 darkens, 101 to 200 lightens
-URxvt*shading: 90
-! TODO
-!URxvt.iconFile:    /usr/share/icons/Clarity/scalable/apps/terminal.svg
+! urxvt*inheritPixmap: true
+! urxvt*transparent: true
+! urxvt*shading: 0 to 99 darkens, 101 to 200 lightens
+! urxvt*shading: 20
+
+urxvt*font:				xft:Literation Mono Powerline:pixelsize=13
+! reduce spacing by N pixels - fix for fonts under urxvt, -1 is same as xterm
+! urxvt.letterSpace: -2
+urxvt.letterSpace: -1
+
+urxvt.scrollBar: 	0
+
+! INFO 180113 experimenti da radi č i ć u terminalu koji awesome pokrene
+urxvt.imlocale:		en_US.UTF-8
+
+
+! INFO 180113 termName is needed for tmux 256 colors (can be screen-, or xterm-)
+! urxvt.termName:		screen-256color
+urxvt.termName:		xterm-256color
+! urxvt.perl-ext-common: default,tabbed,matcher,resize-font,-tabbed
+urxvt.keysym.C-minus:		resize-font:smaller
+urxvt.keysym.C-underscore:	resize-font:smaller
+urxvt.keysym.C-plus:		resize-font:bigger
+urxvt.keysym.C-equal:		resize-font:reset
+urxvt.keysym.C-question:	resize-font:show
+! disable something when Ctrl+Shift are pressed
+urxvt.iso14755:			False
+urxvt.iso14755_52:		False
+! tmux will take care of that:
+urxvt.saveLines:		100
+
+! icon must be an absolute path
+urxvt.iconFile:			/home/johnny/.themes/mini.xterm_48x48.xpm
 ! use urxvt instead gmrun
 !urxvt -geometry 80x3 -name 'sh_run' -e sh -c "bash -i -t"
 !Xterm escapes, word by word movement
-URxvt.keysym.Control-Left:		\033[1;5D
-URxvt.keysym.Control-Right:		\033[1;5C
-! URxvt.bell-command: aplay /path/to/a/file.wav
+urxvt.keysym.Control-Left:		\033[1;5D
+urxvt.keysym.Control-Right:		\033[1;5C
+! urxvt.bell-command: aplay /path/to/a/file.wav
+
+! open link with left click
+URxvt.perl-ext-common:	default,matcher
+URxvt.url-launcher:		waterfox
+URxvt.matcher.button: 1
+! yellow color for URLs:
+URxvt.matcher.rend.0: Uline Bold fg5
+
+
+! map Ctrl-shift-<key>
+! https://pastebin.com/85P6Rkwf
+! XXX will insert ~<key> when pressed in shell
+! URxvt.keysym.C-T              : \033[26~t
+! URxvt.keysym.C-i              : \033[25~i
+URxvt.keysym.C-T              : \033[26
+URxvt.keysym.C-i              : \033[25
 ! -------------------------------------------------------------------------- }}}
 ! xpdf --------------------------------------------------------------------- {{{
 ! ------------------------------------------------------------------------------
@@ -244,6 +260,14 @@ XCalendar*daynumbers.21*Foreground: Red
 XCalendar*daynumbers.28*Foreground: Red
 XCalendar*daynumbers.35*Foreground: Red
 ! -------------------------------------------------------------------------- }}}
+
+! Xft.dpi: 180
+! Xft.autohint: 0
+! Xft.lcdfilter:  lcddefault
+! Xft.hintstyle:  hintfull
+! Xft.hinting: 1
+! Xft.antialias: 1
+! Xft.rgba: rgb
 
 /* *VT100.translations: !override\ */
 !<Key>Prior: scroll-back(1,pages) \n\
