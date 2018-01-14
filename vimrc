@@ -586,7 +586,7 @@ nnoremap <C-w>L :call TmuxResize('l', 1)<CR>
 " blasphemy, Emacs shortcuts in Vim
 " INFO C-BS won't work in xterm
 inoremap <C-a> <Home>
-" inoremap <C-e> <End>
+inoremap <C-e> <End>
 inoremap <C-p> <Up>
 inoremap <C-n> <Down>
 inoremap <C-b> <Left>
@@ -1048,6 +1048,7 @@ function! RemoveBrackets()                                                " {{{
 endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+
 " Plugins																	{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 call plug#begin('~/.vim/plugged')
@@ -1060,9 +1061,12 @@ if !has('nvim')
 endif
 " Plug 'roxma/clang_complete' " can be used for gotoDeclaration
 Plug 'roxma/ncm-clang'
-Plug 'rust-lang/rust.vim'
-" Plug 'racer-rust/vim-racer'
-Plug 'roxma/nvim-cm-racer'
+
+" rust
+Plug 'rust-lang/rust.vim'   " Rust lang support
+Plug 'racer-rust/vim-racer' " Rust autocompleter
+Plug 'roxma/nvim-cm-racer'  " Rust enginge for NCM
+
 Plug 'roxma/ncm-github'
 Plug 'huawenyu/neogdb.vim'
 Plug 'tpope/vim-dispatch'	" async make, needed for cscope code snippet below
@@ -1105,7 +1109,7 @@ Plug 'ciaranm/securemodelines'
 Plug 'henrik/vim-indexed-search'	" show search as: result 123 of 456
 Plug 'osyo-manga/vim-anzu'			" show search matches in statusline
 									" (second from the right)
-" Plug 'jiangmiao/auto-pairs'			" auto close quotes, brackets, ...
+Plug 'jiangmiao/auto-pairs'			" auto close quotes, brackets, ...
 Plug 'tpope/vim-surround'			" replace quotes, brackets,...
 Plug 'tpope/vim-commentary'
 Plug 'troydm/zoomwintab.vim'		" <C-w>o wil zoom/unzoom windows/split
@@ -1181,43 +1185,19 @@ colorscheme molokai
 inoremap <expr><tab> 	pumvisible() ? "\<C-n>" : "\<tab>"
 inoremap <expr><S-tab>	pumvisible() ? "\<C-p>" : "\<S-tab>"
 
-let g:AutoPairsMapCR = 0 " This will fuckup NCM
-
 " Assuming you're using `<c-u>` for snippet expansion
-" imap <expr> <CR>  (pumvisible() ?  "\<c-o>\<Plug>(expand_or_nl)" : "\<CR>")
-" imap <expr> <Plug>(expand_or_nl) (cm#completed_is_snippet() ? "\<C-o>":"\<CR>")
-" imap <expr> <CR>  (pumvisible() ?  "\<c-u>\<Plug>(expand_or_nl)" : "\<CR>")
-" imap <expr> <Plug>(expand_or_nl) (cm#completed_is_snippet() ? "\<C-u>":"\<CR>")
+imap <expr> <CR>  (pumvisible() ?  "\<c-y>\<Plug>(expand_or_nl)" : "\<CR>")
+imap <expr> <Plug>(expand_or_nl) (cm#completed_is_snippet() ? "\<C-U>":"\<CR>")
 
-
-" imap <expr> <Plug>(expand_or_nl) (has_key(v:completed_item,'snippet')?"\<c-x>" : "")
-" imap <expr> <silent> <cr>  (pumvisible() ? "\<c-y>\<Plug>(cm_inject_snippet)\<Plug>(expand_or_nl)\<Plug>DiscretionaryEnd\<c-r>=AutoPairsReturn()\<cr>" : "\<cr>\<Plug>DiscretionaryEnd\<c-r>=AutoPairsReturn()\<cr>")
+inoremap <C-space> <C-o><Plug>(cm_force_refresh)
 
 " let g:cm_refresh_length = "[[1,4],[7,3]]" " default
 " let g:cm_refresh_length = "[[1,4],[7,1]]"
 " Supress the annoying completion messages:
 set shortmess+=c
 
-
-" Here is an example for expanding snippet in the popup menu with <Enter> key.
-" Suppose you use the <C-U> key for expanding snippet.
-" imap <expr> <CR>  (pumvisible() ?  "\<c-y>\<Plug>(expand_or_nl)" : "\<CR>")
-" imap <expr> <Plug>(expand_or_nl) (cm#completed_is_snippet() ? "\<C-U>":"\<CR>")
-
-" info 170926: moj pokusaj za UltiSnips
-" imap <expr> <CR>  (pumvisible() ?  "\<c-y>\<Plug>(expand_or_nl)" : "\<CR>")
-" imap <expr> <Plug>(expand_or_nl) (UltiSnips#ExpandSnippet() ? "\<C-U>":"\<CR>")
-" imap <expr> <CR>  (pumvisible() ?  "\<c-y>\<Plug>(ultisnips_expand)" : "\<CR>")
-" inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ultisnips_expand)")<cr>
-" "<Plug>(ultisnips_expand)"
-
-" UltiSnips example:
-" let g:UltiSnipsExpandTrigger = "<Plug>(ultisnips_expand)"
-" inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ultisnips_expand)")<cr>
-
 let g:cm_matcher = {'module': 'cm_matchers.fuzzy_matcher', 'case': 'smartcase'}
 "cm_matchers.abbrev_matcher"`	" not really fuzzy
-
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " clang_complete															{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1281,6 +1261,7 @@ let g:ale_linters = {'rust': ['rustc']}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " don't expand tab (and other things)
 let g:rust_recommended_style = 0
+let g:ftplugin_rust_source_path = $HOME.'~/src/rust-src/rust'
 
 if has('nvim')
 	inoremap <A-r> <C-o>:RustRun<cr>
@@ -1320,26 +1301,9 @@ let g:airline#extensions#obsession#indicator_text = 'Ses' " default: '$'
 
 " snippets																	{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-" NCM + UltiSnips
-" XXX 170819: shortcut mapped as ExpandTrigger won't work as normal shortcut
-" anymore (tested with CR and C-e)
-" let g:UltiSnipsExpandTrigger			= '<cr>' " works, but won't work as
-" 				It will work, but then normal <Enter> won't
-" let g:UltiSnipsExpandTrigger			= '<C-e>'	" 	XXX 170926: won't work as normal <C-e> (<End>)
-" let g:UltiSnipsExpandTrigger			= '<C-u>'	" 	XXX 170926: won't work, works as <tab>/<C-n>
-" let g:UltiSnipsExpandTrigger			= '<C-u>'	" 	XXX 170926: won't work, works as <tab>/<C-n>
-" let g:UltiSnipsExpandTrigger			= '<C-u>'
-" let g:UltiSnipsExpandTrigger			= '<C-y>'	" works
-let g:UltiSnipsExpandTrigger			= '<C-o>'	" works
-" let g:UltiSnipsExpandTrigger			= '<Cr>'	" doesn't work
-" let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger="<tab>"	" jump between $1, $2, ...
-let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
-
-" When the expand key is pressed and nothing has been typed, a popup list for snippets will be triggered.
-" let g:UltiSnipsExpandTrigger = "<Plug>(ultisnips_expand)"
-" inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ultisnips_expand)")<cr>
+let g:UltiSnipsExpandTrigger        = '<C-u>'   " manually expand, C-o also works
+let g:UltiSnipsJumpForwardTrigger   = "<tab>"   " jump between $1, $2, ...
+let g:UltiSnipsJumpBackwardTrigger  = "<s-tab>"
 
 let g:UltiSnipsRemoveSelectModeMappings = 0
 
@@ -1809,6 +1773,11 @@ let g:quickr_preview_keymaps = 0
 " nmap <space> <plug>(quickr_preview) " XXX 171215: This will interfere <space> for folds
 " nmap q <plug>(quickr_preview_qf_close)
 " XXX won't close preview window after closing quickfix
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+" autopairs {{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Plugin to autoclose branckets ()
+let g:AutoPairsMapCR = 0    " otherwise NCM expansion with <CR> won't work
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 
 " {{{
