@@ -1,0 +1,25 @@
+# created 180113
+# to reload: xbindkey -p  (it will reload ~/.xbindkeysrc)
+# to identify key: xbindkey -k
+
+# Example: F7 and F8 for volume control
+# "mixer vol -5"
+# 	F7
+# "mixer vol +5"
+# 	F8
+
+# Ctrl + i will generate F14 key
+# Release - if not present, then not every keypress will be registered
+"xdotool key --clearmodifiers F14"
+    control + i + Release
+
+# "xdotool key --clearmodifiers F15"
+#     control + o + Release
+
+# Ctrl + [ = F16
+"xdotool key --clearmodifiers F16"
+    control + bracketleft + Release
+
+# Ctrl + ; = Ctrl + v
+# "xvkbd -xsendevent -text "\Cv""
+# 	control + semicolon

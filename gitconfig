@@ -1,4 +1,5 @@
-# INFO to view options: git config --list (or -l)
+; INFO to view options: git config --list (or -l)
+;  vim: set ft=gitconfig ts=4 sw=4 tw=0 fdm=manual et :
 [user]
 	email = propaliidealist@gmail.com
 	name = Johnny Sorocil
@@ -13,6 +14,7 @@
 
 [alias]
 	s = status
+	sn = status -uno
 	; ! means pass the whole line to the shell
 	; s = !git remote get-url origin && git status	# TODO posao
 	co = checkout
@@ -26,8 +28,8 @@
 	last = log -1 HEAD
 	l = log --decorate
 	c = commit --allow-empty-message -m	# TODO posao
-	; ca = commit --amend --no-edit
 	ca = commit --amend
+    cA = commit --amend --no-edit
 	; am = commit --amend --no-edit
 	ls = diff --name-only	# only show filenames of changed files between commits
 	ls2 = ls-files		# list tracked files
@@ -49,6 +51,7 @@
 	ap = apply --ignore-space-change --ignore-whitespace
 	ap2 = apply --reject --whitespace=fix
 	app = apply --reject --whitespace=fix
+
 [log]
 	decorate = full
 	# decorate with branch pointers
