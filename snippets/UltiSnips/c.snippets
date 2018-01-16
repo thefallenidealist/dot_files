@@ -1,0 +1,61 @@
+# Snippets for C
+# Created 2018.01.14. 21:55 by Johnny Sorocil.
+
+snippet while
+while (${1})
+{
+	${2}
+}
+endsnippet
+
+snippet inculude "io int"
+#include <stdio.h>
+#include <stdint.h>${0}
+endsnippet
+
+snippet imain "int main(void)"
+int main(void)
+{
+	${0}
+}
+endsnippet
+
+snippet vmain "void main(void)"
+void main(void)
+{
+	${0}
+}
+endsnippet
+
+snippet vfn "void function()"
+void ${1}(${2})
+{
+	${0}
+}
+endsnippet
+
+snippet u8 "expand u8 uint8_t" b
+uint8_t 
+endsnippet
+
+snippet u16 "expand u16 uint16_t"
+uint16_t 
+endsnippet
+
+snippet u32 "expand u32 uint32_t"
+uint32_t 
+endsnippet
+
+snippet i8 "expand i8 int8_t"
+int8_t 
+endsnippet
+
+snippet i16 "expand i16 int16_t"
+int16_t 
+endsnippet
+
+snippet i32 "expand i32 int32_t"
+int32_t 
+endsnippet
+
+# vim:ft=snippets:

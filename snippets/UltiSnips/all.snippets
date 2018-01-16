@@ -1,0 +1,78 @@
+# Created 17.08.13. 21:03 by Johnny Sorocil.
+# INFO: $0 - last stop
+
+snippet test
+/*
+---
+title: ${1:Prva linija}
+date: ${2: `date +%y%m%d`}
+tags: $3
+---
+Mirror effect, title is: $1, date is $2
+*/
+$0
+endsnippet
+
+# ${1:`date +%y%m%d`}
+snippet date "yymmdd"
+`!v strftime("%y")``!v strftime("%m")``!v strftime("%d")`
+endsnippet
+
+snippet datetime "yymmdd" w
+`!v strftime("%y")`.`!v strftime("%m")`.`!v strftime("%d")`. `!v strftime("%H")`:`!v strftime("%M")` 
+endsnippet
+
+snippet date2 "yy.mm.dd." w
+`!v strftime("%y")`.`!v strftime("%m")`.`!v strftime("%d")`. 
+endsnippet
+
+snippet date3 "dd.mm.yyyy" w
+`!v strftime("%d")`.`!v strftime("%m")`.`!v strftime("%Y")`. 
+endsnippet
+
+snippet time "hh:mm" w
+`!v strftime("%H")`:`!v strftime("%M")` 
+endsnippet
+
+snippet todo "TODO YYMMDD:<space>"
+TODO `!v strftime("%y%m%d")`: 
+endsnippet
+
+snippet todo2 "TODO YYMMDD"
+TODO `!v strftime("%y%m%d")`
+endsnippet
+
+snippet xxx
+XXX `!v strftime("%y%m%d")`: 
+endsnippet
+
+snippet xxx2
+XXX `!v strftime("%y%m%d")`
+endsnippet
+
+snippet info
+INFO `!v strftime("%y%m%d")`: 
+endsnippet
+
+snippet zajeb
+ZAJEB `!v strftime("%y%m%d")`: 
+endsnippet
+
+snippet intro
+${1:One line to give the program's name and a brief description.}
+Created `!v strftime("%Y.%m.%d. %H:%M")` by `!v g:snips_author`.
+$0
+endsnippet
+
+snippet beerware
+Copyright `!v strftime("%Y")` ${1:`!v g:snips_author`}
+
+"THE BEER-WARE LICENSE" (Revision 42):
+<${2:`!v g:snips_mail`}> wrote this file. As long as you retain this notice
+you can do whatever you want with this stuff. If we meet some day, and you
+think this stuff is worth it, you can buy me a beer or coffee in return.
+${3:`!v g:snips_author`}
+${0}
+endsnippet
+
+# vim:ft=snippets:

@@ -38,7 +38,8 @@ set splitbelow
 set splitright
 
 set timeoutlen=300		" [ms] long enough for <leader><shift>F, was 1000
-set ttimeoutlen=0		" delay for the esc key, 10ms XXX
+" set ttimeoutlen=0		" delay for the esc key, 10ms XXX
+set ttimeoutlen=20		" delay for the esc key, 10ms XXX
 "set exrc		" source .vimrc file if it present in working directory
 set secure		" This option will restrict usage of some commands in non-default .vimrc files;
 " commands that wrote to file or execute shell commands are not allowed and map commands are displayed.
@@ -67,6 +68,7 @@ set shortmess+=I	" don't show intro message at startup
 set cursorline		" color the line when the cursor is
 set matchpairs+=<:>	" Include angle brackets in matching.
 set showmatch
+set shortmess+=c    " don't give ins-completion-menu messages
 
 set encoding=utf-8	" otherwise gVim will complain about listchars and showbreak
 "		<tab> and wrapping			{{{
@@ -440,6 +442,9 @@ nnoremap <M-x> ga
 " INFO 180114: xbindkeys will transform <C-i> to <F14>,
 " only in insert mode, muscle memory. Doesn't work in 100% of cases
 inoremap <F14> <Tab>
+
+" don't 'insert char above cursor, it's confusing'
+" inoremap <C-y> <nop> " XXX 180115: will break snippets and NCM
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		buffers/windows/tabs keymaps										{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1185,16 +1190,16 @@ colorscheme molokai
 inoremap <expr><tab> 	pumvisible() ? "\<C-n>" : "\<tab>"
 inoremap <expr><S-tab>	pumvisible() ? "\<C-p>" : "\<S-tab>"
 
-" Assuming you're using `<c-u>` for snippet expansion
+" <enter> for expanding snippet
+" <C-u> is UltiSnipsExpandTrigger, <C-y> cancels completition menu
 imap <expr> <CR>  (pumvisible() ?  "\<c-y>\<Plug>(expand_or_nl)" : "\<CR>")
-imap <expr> <Plug>(expand_or_nl) (cm#completed_is_snippet() ? "\<C-U>":"\<CR>")
+imap <expr> <Plug>(expand_or_nl) (cm#completed_is_snippet() ? "\<C-u>":"\<CR>")
+
+" <esc> to close autocomplete menu
+" imap <expr> <esc>  (pumvisible() ?  "<c-y>" : "\<esc>") " 2018-01-16: iritating
+" imap <expr> <cr>  (pumvisible() ?  "<c-y>" : "\<cr>") " XXX
 
 inoremap <C-space> <C-o><Plug>(cm_force_refresh)
-
-" let g:cm_refresh_length = "[[1,4],[7,3]]" " default
-" let g:cm_refresh_length = "[[1,4],[7,1]]"
-" Supress the annoying completion messages:
-set shortmess+=c
 
 let g:cm_matcher = {'module': 'cm_matchers.fuzzy_matcher', 'case': 'smartcase'}
 "cm_matchers.abbrev_matcher"`	" not really fuzzy
@@ -1301,11 +1306,15 @@ let g:airline#extensions#obsession#indicator_text = 'Ses' " default: '$'
 
 " snippets																	{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:UltiSnipsExpandTrigger        = '<C-u>'   " manually expand, C-o also works
+let g:UltiSnipsExpandTrigger        = '<C-u>'   " expand snippet
+" INFO 180115: <C-o> works but it will break Vim's <C-o> (exit insert mode for
+" one command)
 let g:UltiSnipsJumpForwardTrigger   = "<tab>"   " jump between $1, $2, ...
 let g:UltiSnipsJumpBackwardTrigger  = "<s-tab>"
+let g:UltiSnipsListSnippets         = '<C-l>'
 
 let g:UltiSnipsRemoveSelectModeMappings = 0
+let g:UltiSnipsEnableSnipMate       = 0 " no need to look for SnipMate snippets
 
 " author variable used in licence snippets, remove NULL (^@) char:
 let g:snips_author=substitute(strtrans(system('git config user.name')), '\^@','','g')
@@ -1316,8 +1325,15 @@ call SetupCommandAlias("snipe", "UltiSnipsEdit")
 
 	" don't search for directory, use only tihs:
 	" let g:UltiSnipsSnippetDirectories=$HOME.'/.vim/UltiSnips'
-set runtimepath+=~/.vim/my-snippets/	" radi, ali unutar tog foldera mora bit subfolder "snippets" ili "UltiSnips""
+" set runtimepath+=~/.vim/my-snippets/	" radi, ali unutar tog foldera mora bit subfolder "snippets" ili "UltiSnips""
 " let g:UltiSnipsSnippetsDir = "~/.vim/my-snippets/UltiSnips"	" CP s neta, njima radi, meni ne
+"
+" Where user snippets can be found (cannot be named "snippets")
+set runtimepath+=~/.vim/snippets
+" for :UltiSnipsEdit command
+let g:UltiSnipsSnippetsDir = "~/.vim/snippets/UltiSnips"
+" Where snippets can be found, subfolder in "runtimepath" above
+let g:UltiSnipsSnippetDirectories = ["UltiSnips"]
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " Commenter                                                                  {{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1778,6 +1794,9 @@ let g:quickr_preview_keymaps = 0
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Plugin to autoclose branckets ()
 let g:AutoPairsMapCR = 0    " otherwise NCM expansion with <CR> won't work
+
+" disable <A-b> it's used as Emacs type A-b
+let g:AutoPairsShortcutBackInsert = '<nop>'
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 
 " {{{
@@ -1886,6 +1905,46 @@ highlight HighlightedyankRegion cterm=reverse gui=reverse
 
 "	" command -nargs=0 Cscope cs add $VIMSRC/src/cscope.out $VIMSRC/src
 "endif
+
+
+" if has('cscope')
+"     set cscopetagorder=0
+"     set cscopetag
+"     set cscopeverbose
+"     set cscopequickfix=s-,c-,d-,i-,t-,e-
+"     set cscopepathcomp=3
+
+"     function! LoadCscope()
+"         let db = findfile("cscope.out", ".;")
+"         if (!empty(db))
+"             let path = strpart(db, 0, match(db, "/cscope.out$"))
+"             set nocscopeverbose " suppress 'duplicate connection' error
+"             exe "cs add " . db . " " . path
+"             set cscopeverbose
+"         endif
+"     endfunction
+"     au BufEnter /* call LoadCscope()
+
+"     nnoremap T :cs find c <C-R>=expand("<cword>")<CR><CR>
+"     " nnoremap t <C-]>
+"     nnoremap gt <C-W><C-]>
+"     nnoremap gT <C-W><C-]><C-W>T
+"     nnoremap <silent> <leader>z :Dispatch echo "Generating tags and cscope database..." &&
+"                         \ /usr/local/bin/ctags -R --fields=+aimSl --c-kinds=+lpx --c++-kinds=+lpx --exclude=.svn 
+"                         \ --exclude=.git && find . -iname '*.c' -o 
+"                         \ -iname '*.cpp' -o -iname '*.h' -o -iname '*.hpp' 
+"                         \ > cscope.files && cscope -b -i cscope.files -f cscope.out &&
+"                         \ echo "Done." <cr><cr>
+
+"     cnoreabbrev csa cs add
+"     cnoreabbrev csf cs find
+"     cnoreabbrev csk cs kill
+"     cnoreabbrev csr cs reset
+"     " cnoreabbrev css cs show
+"     cnoreabbrev csh cs help
+"     cnoreabbrev csc Cscope
+"     command! Cscope :call LoadCscope()
+" endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " TODO 170812: <leader>sX for searching with ripgrep
 
@@ -2106,48 +2165,6 @@ endif
 nnoremap <C-\> :Tags <C-R><C-W><CR>
 nmap <C-Enter> <C-w>g<C-]><C-w>T
 " Not saying it is required but I enjoy this one more than <C-]> but I guess it is already sort of covered by g<C-]>.
-
-
-if has('cscope')
-    set cscopetagorder=0
-    set cscopetag
-    set cscopeverbose
-    set cscopequickfix=s-,c-,d-,i-,t-,e-
-    set cscopepathcomp=3
-
-    function! LoadCscope()
-        let db = findfile("cscope.out", ".;")
-        if (!empty(db))
-            let path = strpart(db, 0, match(db, "/cscope.out$"))
-            set nocscopeverbose " suppress 'duplicate connection' error
-            exe "cs add " . db . " " . path
-            set cscopeverbose
-        endif
-    endfunction
-    au BufEnter /* call LoadCscope()
-
-    nnoremap T :cs find c <C-R>=expand("<cword>")<CR><CR>
-    " nnoremap t <C-]>
-    nnoremap gt <C-W><C-]>
-    nnoremap gT <C-W><C-]><C-W>T
-    nnoremap <silent> <leader>z :Dispatch echo "Generating tags and cscope database..." &&
-                        \ /usr/local/bin/ctags -R --fields=+aimSl --c-kinds=+lpx --c++-kinds=+lpx --exclude=.svn 
-                        \ --exclude=.git && find . -iname '*.c' -o 
-                        \ -iname '*.cpp' -o -iname '*.h' -o -iname '*.hpp' 
-                        \ > cscope.files && cscope -b -i cscope.files -f cscope.out &&
-                        \ echo "Done." <cr><cr>
-
-    cnoreabbrev csa cs add
-    cnoreabbrev csf cs find
-    cnoreabbrev csk cs kill
-    cnoreabbrev csr cs reset
-    " cnoreabbrev css cs show
-    cnoreabbrev csh cs help
-    cnoreabbrev csc Cscope
-    command! Cscope :call LoadCscope()
-endif
-
-" TODO 171029: put this in the right place
 
 
 " INFO {{{
@@ -2371,6 +2388,8 @@ set isfname+=32	" <space> is part of filename
 
 " open header:
 nnoremap <leader>h :e %:r.h<cr>
+
+" XXX 180116: Doesn't work anymore. Doesn't work on vimrc from 2017.9.
 " "bubble" move the lines (will have weird things on edge of the buffer)
 " nnoremap <A-k> ddkP
 " nnoremap <A-j> ddp
@@ -2379,10 +2398,10 @@ nnoremap <leader>h :e %:r.h<cr>
 inoremap <A-S-k> <C-o>dd<C-o>k<C-o>P
 inoremap <A-S-j> <C-o>dd<C-o>p
 " bubble move the lines with unimpared plugin
-nmap <A-S-k> [e
-nmap <A-S-j> ]e
-vmap <A-S-k> [egv
-vmap <A-S-j> ]egv
+" nmap <A-S-k> [e
+" nmap <A-S-j> ]e
+" vmap <A-S-k> [egv
+" vmap <A-S-j> ]egv
 " " manually create that dirs:
 " inoremap <A-k> <C-o>[e
 " inoremap <A-j> <C-o>]e

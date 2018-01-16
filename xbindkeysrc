@@ -4,7 +4,7 @@
 
 # Example: F7 and F8 for volume control
 # "mixer vol -5"
-# 	F7
+	# F7
 # "mixer vol +5"
 # 	F8
 
@@ -19,6 +19,11 @@
 # Ctrl + [ = F16
 "xdotool key --clearmodifiers F16"
     control + bracketleft + Release
+
+# TODO 180116: Map CapsLock key release (in my case same as mod4/win) to Fx
+# in Vim map that key to <esc>
+# "mixer vol -5"
+# 	mod4 + Release
 
 # Ctrl + ; = Ctrl + v
 # "xvkbd -xsendevent -text "\Cv""

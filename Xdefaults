@@ -41,7 +41,11 @@ xterm*scrollBar:	false
 !XTerm*faceSize:		9
 !*XTerm*deleteIsDEL:              true	
 *XTerm*deleteIsDEL:			false
-xterm*saveLines:             10000
+! xterm*saveLines:             10000
+! INFO 180115: maybe tmux vim will be faster, xterm is not used very much standalone
+! 100 non-visible lines (in "scroll history") + about 46 visible (current screen)
+! XTerm*saveLines:             100
+xterm*saveLines:             1000
 xterm*jumpScroll:            true
 ! use this insted bold letters:
 ! xterm*colorBD:               red
