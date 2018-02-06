@@ -1,5 +1,5 @@
 # Created 17.08.13. 21:09 by Johnny Sorocil.
-# copied from somewhere where I have changed it to my style
+# vim: set ft=snippets ts=4 sw=4 tw=0 fdm=syntax noet :
 
 # Functions
 # snippet fn "Function definition"
@@ -12,19 +12,23 @@
 # 	{
 # 		${0}
 # 	}
-# snippet pfn "Function definition"
-# 	pub fn ${1:function_name}(${2})${3}
-# 	{
-# 		${0}
-# 	}
+
+snippet pfn "pub fn"
+	pub fn ${1:function_name}(${2})${3}
+	{
+		${0}
+	}
+endsnippet
+
 # snippet test "Unit test function"
 # 	#[test]
 # 	fn ${1:test_function_name}()
 # 	{
 # 		${0}
 # 	}
-# snippet main "Main function"
-# 	pub fn main()
-# 	{
-# 		${0}
-# 	}
+snippet main "Main function2"
+	fn main()
+	{
+		${0}
+	}
+endsnippet

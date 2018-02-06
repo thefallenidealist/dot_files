@@ -5,6 +5,7 @@
 " vim: set ft=vim ts=4 sw=4 tw=78 fdm=marker et :
 
 " TODO 2017-09-02 Windows libclang
+let s:work_pc = 0
 
 "				Generic Vim settings 										{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -73,11 +74,21 @@ set shortmess+=c    " don't give ins-completion-menu messages
 set encoding=utf-8	" otherwise gVim will complain about listchars and showbreak
 "		<tab> and wrapping			{{{
 """""""""""""""""""""""""""""""""""""""
-set tabstop=4		" tab size
-set shiftwidth=4 	" when indenting with '>'
-" 180114: I surrender, spaces as tab:
-set expandtab		" convert tab to spaces
-set softtabstop=4	" smart <BS> - delete 4 chars"
+if (s:work_pc == 1)
+    " let s:tab_size = 3
+    " you can't use variables on the rhs in the .vimrc.
+    " execute "set tabstop=".tab_size
+    set tabstop=3		" tab size
+    set shiftwidth=3 	" when indenting with '>'
+    set expandtab		" convert tab to spaces
+    set softtabstop=3	" smart <BS> - delete 4 chars"
+else
+    set tabstop=4		" tab size
+    set shiftwidth=4 	" when indenting with '>'
+    " 180114: I surrender, spaces as tab:
+    set expandtab		" convert tab to spaces
+    set softtabstop=4	" smart <BS> - delete 4 chars"
+endif
 
 " soft wrap
 set wrap			" soft break when line is wider than Vim window (not tw)
@@ -156,6 +167,7 @@ if has('nvim')
 endif
 
 set formatoptions+=j	" pretty formating when joining lines (key J)
+set nrformats+=alpha  " Ctrl-A/X will also work on single chars
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		OS specific															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -176,9 +188,14 @@ if has('unix')
 	elseif s:uname == "Linux"
 	endif " uname
 elseif has('windows')
-	let g:ctags_exe='c:\bin\ctags.exe'
-	let g:python3_host_prog='c:\Python3\python.exe'
-	" let g:python_host_prog='c:\python27\python.exe'
+    " INFO 17xxxx: nvim clipboard: Install win32yank.exe and put in $PATH. That's it
+    " place where Python (x64, as vim.exe) is installed
+    let $PATH.=';C:\python35_x64'
+    let g:ctags_exe='c:\bin\ctags.exe'
+    let g:python3_host_prog='c:\python35_x64\python.exe'
+    " let g:python_host_prog='c:\python27\python.exe'
+
+    let g:session_autosave = 'no'
 endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		build/programming			{{{
@@ -501,10 +518,14 @@ if has('nvim')
 	nnoremap <A-l> <C-w>l
 
 	" because they are close to hjkl
-	inoremap <A-u> <C-o>:tabprev<cr>
-	inoremap <A-i> <C-o>:tabnext<cr>
-	inoremap <A-n> <C-o>:tabprev<cr>
-	inoremap <A-m> <C-o>:tabnext<cr>
+	" inoremap <A-u> <C-o>:tabprev<cr>
+	" inoremap <A-i> <C-o>:tabnext<cr>
+	" inoremap <A-n> <C-o>:tabprev<cr>
+	" inoremap <A-m> <C-o>:tabnext<cr>
+    " nnoremap <A-u> <C-o>:tabprev<cr>
+    " nnoremap <A-i> <C-o>:tabnext<cr>
+    " nnoremap <A-n> <C-o>:tabprev<cr>
+    " nnoremap <A-m> <C-o>:tabnext<cr>
 	tnoremap <A-u> <C-\><C-N>:tabprev<cr>
 	tnoremap <A-i> <C-\><C-N>:tabnext<cr>
 	tnoremap <A-n> <C-\><C-N>:tabprev<cr>
@@ -1077,8 +1098,11 @@ Plug 'huawenyu/neogdb.vim'
 Plug 'tpope/vim-dispatch'	" async make, needed for cscope code snippet below
 
 Plug 'tpope/vim-unimpaired'	" easier movements around, like [q, ]q (quickfick)
+" Plug 'triglav/vim-visual-increment' " Ctrl-A/X for columns
+" Plug 'vim-scripts/VisIncr'
+" Vim 8: visual select and Ctrl-A
 
-Plug 'w0rp/ale'				" Linter
+" Plug 'w0rp/ale'				" Linter
 Plug 'SirVer/ultisnips'		" snippet engine
 Plug 'honza/vim-snippets'	" snippet collection
 " Auto generate incremetal tags
@@ -1135,7 +1159,7 @@ Plug 'ronakg/quickr-preview.vim'	" preview files in quickfix without spoiling bu
 Plug 'tomasr/molokai'		" color scheme
 Plug 'powerman/vim-plugin-AnsiEsc'	" Show shell ANSI colors as colors
 
-" Plug 'brookhong/cscope.vim'		" cscope
+Plug 'brookhong/cscope.vim'		" cscope
 Plug 'idanarye/vim-vebugger'
 " needed for vebugger
 Plug 'Shougo/vimproc.vim', {'do' : 'make'}
@@ -1354,9 +1378,13 @@ nnoremap <leader>m :FZFMru<CR>
 nnoremap <leader>b :Buffers<CR>
 nnoremap <leader>w :Windows<CR>
 nnoremap to :tabnew<cr>:Files<CR>
+nnoremap tO :-tabnew<cr>:Files<CR>
 nnoremap tm :tabnew<cr>:FZFMru<CR>
+nnoremap tM :-tabnew<cr>:FZFMru<CR>
 nnoremap tb :tabnew<cr>:Buffers<cr>
+nnoremap tB :-tabnew<cr>:Buffers<cr>
 nnoremap tt :tabnew<cr>:Tags<cr>
+nnoremap tT :-tabnew<cr>:Tags<cr>
 nnoremap ; :Buffers<CR>
 
 imap <c-x><c-l> <plug>(fzf-complete-line)
@@ -1400,9 +1428,9 @@ let g:NERDTreeMapActivateNode = "<space>"
 " - shows +-m in sign column
 " - shortcuts: [c ]c
 
-let g:gitgutter_sign_added = '+'
-let g:gitgutter_sign_modified = '~'
-let g:gitgutter_sign_removed = '-'
+let g:gitgutter_sign_added            = '+'
+let g:gitgutter_sign_modified         = '~'
+let g:gitgutter_sign_removed          = '-'
 let g:gitgutter_sign_modified_removed = '-~'
 highlight GitGutterAdd				ctermbg=234 ctermfg=10 guifg=green
 highlight GitGutterDelete			ctermbg=234 ctermfg=9  guifg=red
@@ -1422,7 +1450,6 @@ let g:gitgutter_max_signs=5000	" default was 500
 
 " TODO 170813: goto first line of the preview window
 nmap <Leader>gv <Plug>GitGutterPreviewHunk :wincmd P<CR> :1<CR>
-" nmap <Leader>gp <Plug>GitGutterPreviewHunk
 nmap <Leader>ga <Plug>GitGutterStageHunk
 nmap <Leader>gr <Plug>GitGutterUndoHunk
 nmap <Leader>gu <Plug>GitGutterUndoHunk
@@ -1433,6 +1460,12 @@ call SetupCommandAlias("gitt","GitGutterToggle")
 " let g:gitgutter_eager = 0
 
 " Fugitive
+" use 'q' to exit Gdiff:
+" if (bufname('%') !~ '^fugitive:')
+if (bufname('%') == '^fugitive:')
+    " echom "diff mode"
+    nnoremap <buffer> q :wincmd c<cr>
+endif
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " searching																	{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1558,26 +1591,26 @@ let g:tagbar_width = 50		" default: 40
 "let g:tagbar_autoclose = 1	" default: 0
 let g:tagbar_autofocus = 1	" auto jump to the Tagbar	default: 0
 let g:tagbar_sort = 0		" default: 1
-let g:tagbar_show_linenumbers = 2	" show relative
+let g:tagbar_show_linenumbers = 0   " 2 - show relative
 "let g:tagbar_singleclick = 1
 let g:tagbar_iconchars = ['►', '▼']		" changed first symbol because powerline font
 let g:tagbar_previewwin_pos = "aboveleft"
 let g:tagbar_autopreview = 0
 
 nnoremap <leader>t :TagbarToggle<CR>
-let g:tagbar_type_rust = {
-			\ 'ctagstype' : 'rust',
-			\ 'kinds' : [
-			\'T:types,type definitions',
-			\'f:functions,function definitions',
-			\'g:enum,enumeration names',
-			\'s:structure names',
-			\'m:modules,module names',
-			\'c:consts,static constants',
-			\'t:traits,traits',
-			\'i:impls,trait implementations',
-			\]
-			\}
+" let g:tagbar_type_rust = {
+"             \ 'ctagstype' : 'rust',
+"             \ 'kinds' : [
+"             \'T:types,type definitions',
+"             \'f:functions,function definitions',
+"             \'g:enum,enumeration names',
+"             \'s:structure names',
+"             \'m:modules,module names',
+"             \'c:consts,static constants',
+"             \'t:traits',
+"             \'i:impls,trait implementations',
+"             \]
+"             \}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 " C/C++ highlighter															{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1797,6 +1830,7 @@ let g:AutoPairsMapCR = 0    " otherwise NCM expansion with <CR> won't work
 
 " disable <A-b> it's used as Emacs type A-b
 let g:AutoPairsShortcutBackInsert = '<nop>'
+let g:AutoPairsShortcutJump = '<nop>'
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 
 " {{{
@@ -1877,34 +1911,38 @@ highlight HighlightedyankRegion cterm=reverse gui=reverse
 
 "" cscope																	{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"if has('cscope')
+
+if has('cscope')
+    " unimpared mapping: ]q [q
+
+    " regenerate DB from vim: :!cscope -Rbq :cs reset
 "	set cscopetag cscopeverbose
 
 "	if has('quickfix')
 "		set cscopequickfix=s-,c-,d-,i-,t-,e-
 "	endif
 
-"	" a: Find assignments to this symbol
-
-"	" s: Find this C symbol
-"	nmap <C-\>s :cs find s <C-R>=expand("<cword>")<CR><CR>
-"	" g: Find this definition
-"	nmap <C-\>g :cs find g <C-R>=expand("<cword>")<CR><CR>
-"	" c: Find functions calling this function
-"	nmap <C-\>c :cs find c <C-R>=expand("<cword>")<CR><CR>
-"	" t: Find this text string
-"	nmap <C-\>t :cs find t <C-R>=expand("<cword>")<CR><CR>
-"	" e: Find this egrep pattern
-"	nmap <C-\>e :cs find e <C-R>=expand("<cword>")<CR><CR>
-"	" f: Find this file
-"	nmap <C-\>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
-"	" i: Find files #including this file
-"	nmap <C-\>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
-"	" d: Find functions called by this function
-"	nmap <C-\>d :cs find d <C-R>=expand("<cword>")<CR><CR>
+    " a: Find assignments to this symbol
+    nmap <C-\>a :cs find s <C-R>=expand("<cword>")<CR><CR>
+    " s: Find this C symbol
+    nmap <C-\>s :cs find s <C-R>=expand("<cword>")<CR><CR>
+    " g: Find this definition
+    nmap <C-\>g :cs find g <C-R>=expand("<cword>")<CR><CR>
+    " c: Find functions calling this function
+    nmap <C-\>c :cs find c <C-R>=expand("<cword>")<CR><CR>
+    " t: Find this text string
+    nmap <C-\>t :cs find t <C-R>=expand("<cword>")<CR><CR>
+    " e: Find this egrep pattern
+    nmap <C-\>e :cs find e <C-R>=expand("<cword>")<CR><CR>
+    " f: Find this file
+    nmap <C-\>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
+    " i: Find files #including this file
+    nmap <C-\>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
+    " d: Find functions called by this function
+    nmap <C-\>d :cs find d <C-R>=expand("<cword>")<CR><CR>
 
 "	" command -nargs=0 Cscope cs add $VIMSRC/src/cscope.out $VIMSRC/src
-"endif
+endif
 
 
 " if has('cscope')
@@ -1945,6 +1983,33 @@ highlight HighlightedyankRegion cterm=reverse gui=reverse
 "     cnoreabbrev csc Cscope
 "     command! Cscope :call LoadCscope()
 " endif
+
+" generate db:
+" 1 cscope -bcqR .
+" 2) find . -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" > cscope.files
+"    cscope -q -R -b -i cscope.files
+"    - c: don't compress the data
+
+nnoremap <leader>fa :call CscopeFindInteractive(expand('<cword>'))<CR>
+nnoremap <leader>l :call ToggleLocationList()<CR>
+" Some optional key mappings to search directly.
+" s: Find this C symbol
+nnoremap  <leader>fs :call CscopeFind('s', expand('<cword>'))<CR>
+" g: Find this definition
+nnoremap  <leader>fg :call CscopeFind('g', expand('<cword>'))<CR>
+" d: Find functions called by this function
+nnoremap  <leader>fd :call CscopeFind('d', expand('<cword>'))<CR>
+" c: Find functions calling this function
+nnoremap  <leader>fc :call CscopeFind('c', expand('<cword>'))<CR>
+" t: Find this text string
+nnoremap  <leader>ft :call CscopeFind('t', expand('<cword>'))<CR>
+" e: Find this egrep pattern
+nnoremap  <leader>fe :call CscopeFind('e', expand('<cword>'))<CR>
+" f: Find this file
+nnoremap  <leader>ff :call CscopeFind('f', expand('<cword>'))<CR>
+" i: Find files #including this file
+nnoremap  <leader>fi :call CscopeFind('i', expand('<cword>'))<CR>
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " TODO 170812: <leader>sX for searching with ripgrep
 
@@ -1991,8 +2056,8 @@ nmap <leader>hw :%!xxd -r<CR> :set binary<CR> :set filetype=<CR> :set fileencodi
 " 					colors and TERM setup									{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " highlight Normal		ctermbg=233	" XXX change in theme file
-highlight Normal guibg=#121212 " ctermbg=233
 " ~/.vim/plugged/molokai/colors/molokai.vim
+highlight Normal guibg=#121212
 
 highlight Todo			ctermfg=196 ctermbg=232 guifg=#ff0000 guibg=#080808
 highlight Debug			ctermfg=226 ctermbg=234 guifg=#ffff00 guibg=#1c1c1c
@@ -2060,7 +2125,7 @@ highlight Comment		ctermfg=101
 " highlight Comment		ctermfg=114 guifg=#80a0ff
 
 " highlight ExtraWhitespace	ctermbg=162
-highlight ExtraWhitespace ctermbg=202
+highlight ExtraWhitespace ctermbg=202 guibg=Red
 
 " highlight Error			ctermfg=15 ctermbg=9 guifg=White guibg=Red
 " highlight WarningMsg	ctermfg=210 guifg=Red
@@ -2376,7 +2441,6 @@ set isfname+=32	" <space> is part of filename
 " set nocursorline
 
 " posao 170725
-" set expandtab
 " set shiftwidth=3
 " set tabstop=3
 " ignore whitespace changes and also newlines (^M)
@@ -2388,6 +2452,7 @@ set isfname+=32	" <space> is part of filename
 
 " open header:
 nnoremap <leader>h :e %:r.h<cr>
+" TODO 180206: Open .c file if header is currently opened
 
 " XXX 180116: Doesn't work anymore. Doesn't work on vimrc from 2017.9.
 " "bubble" move the lines (will have weird things on edge of the buffer)

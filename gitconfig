@@ -30,6 +30,8 @@
 	c = commit --allow-empty-message -m	# TODO posao
 	ca = commit --amend
     cA = commit --amend --no-edit
+    rc = rebase --continue
+    rq = rebase --quit
 	; am = commit --amend --no-edit
 	ls = diff --name-only	# only show filenames of changed files between commits
 	ls2 = ls-files		# list tracked files

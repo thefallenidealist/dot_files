@@ -1,5 +1,6 @@
 # Created 17.08.13. 21:03 by Johnny Sorocil.
 # INFO: $0 - last stop
+# vim:ft=snippets:
 
 snippet test
 /*
@@ -18,6 +19,10 @@ snippet date "yymmdd"
 `!v strftime("%y")``!v strftime("%m")``!v strftime("%d")`
 endsnippet
 
+snippet created "created yymmdd"
+Created `!v strftime("%y")``!v strftime("%m")``!v strftime("%d")`
+endsnippet
+
 snippet datetime "yymmdd" w
 `!v strftime("%y")`.`!v strftime("%m")`.`!v strftime("%d")`. `!v strftime("%H")`:`!v strftime("%M")` 
 endsnippet
@@ -30,6 +35,10 @@ snippet date3 "dd.mm.yyyy" w
 `!v strftime("%d")`.`!v strftime("%m")`.`!v strftime("%Y")`. 
 endsnippet
 
+snippet date4S "yymmdd." w
+`!v strftime("%y%m%d")`
+endsnippet
+
 snippet time "hh:mm" w
 `!v strftime("%H")`:`!v strftime("%M")` 
 endsnippet
@@ -38,15 +47,31 @@ snippet todo "TODO YYMMDD:<space>"
 TODO `!v strftime("%y%m%d")`: 
 endsnippet
 
+snippet TODO "TODO YYMMDD:<space>"
+TODO `!v strftime("%y%m%d")`: 
+endsnippet
+
 snippet todo2 "TODO YYMMDD"
 TODO `!v strftime("%y%m%d")`
 endsnippet
 
-snippet xxx
+snippet TODO2 "TODO YYMMDD"
+TODO `!v strftime("%y%m%d")`
+endsnippet
+
+snippet xxx "with semicolon"
+XXX `!v strftime("%y%m%d")`: 
+endsnippet
+
+snippet XXX "with semicolon"
 XXX `!v strftime("%y%m%d")`: 
 endsnippet
 
 snippet xxx2
+XXX `!v strftime("%y%m%d")`
+endsnippet
+
+snippet XXX2
 XXX `!v strftime("%y%m%d")`
 endsnippet
 
@@ -56,6 +81,10 @@ endsnippet
 
 snippet zajeb
 ZAJEB `!v strftime("%y%m%d")`: 
+endsnippet
+
+snippet idea "IDEA YYMMDD:<space>"
+IDEA `!v strftime("%y%m%d")`: 
 endsnippet
 
 snippet intro
@@ -75,4 +104,37 @@ ${3:`!v g:snips_author`}
 ${0}
 endsnippet
 
+################################################################################
+# sh part
+################################################################################
+# here because shell script sometimes won't have '.sh' extension
+
+# Snippets for shell
+# Created 2018.01.16. 00:57 by Johnny Sorocil.
 # vim:ft=snippets:
+
+# _skel: auto inserted when creating new file
+snippet _skel "/bin/sh"
+#!/bin/sh
+${0}
+endsnippet
+
+snippet binsh "/bin/sh"
+#!/bin/sh
+${0}
+endsnippet
+
+snippet shsh "/bin/sh"
+#!/bin/sh
+${0}
+endsnippet
+
+snippet bash "/usr/bin/env bash"
+#!/usr/bin/env bash
+${0}
+endsnippet
+
+snippet binbash "/usr/bin/env bash"
+#!/usr/bin/env bash
+${0}
+endsnippet
