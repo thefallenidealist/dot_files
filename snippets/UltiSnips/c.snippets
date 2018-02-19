@@ -8,7 +8,7 @@ while (${1})
 }
 endsnippet
 
-snippet inculude "io int"
+snippet include "io int"
 #include <stdio.h>
 #include <stdint.h>${0}
 endsnippet
@@ -17,6 +17,16 @@ snippet imain "int main(void)"
 int main(void)
 {
 	${0}
+}
+endsnippet
+
+snippet main_app "int main(int argc, const char *argv[])"
+int main(int argc, const char *argv[])
+{
+	${0}
+
+	printf("main() END\n");
+	return 0;
 }
 endsnippet
 
@@ -34,28 +44,119 @@ void ${1}(${2})
 }
 endsnippet
 
-snippet u8 "expand u8 uint8_t" b
-uint8_t 
+snippet nocxx
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+${0}
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 endsnippet
 
-snippet u16 "expand u16 uint16_t"
-uint16_t 
-endsnippet
+# snippet u8 "expand u8 uint8_t" b
+# uint8_t 
+# endsnippet
 
-snippet u32 "expand u32 uint32_t"
-uint32_t 
-endsnippet
+# snippet u16 "expand u16 uint16_t"
+# uint16_t 
+# endsnippet
 
-snippet i8 "expand i8 int8_t"
-int8_t 
-endsnippet
+# snippet u32 "expand u32 uint32_t"
+# uint32_t 
+# endsnippet
 
-snippet i16 "expand i16 int16_t"
-int16_t 
-endsnippet
+# snippet i8 "expand i8 int8_t"
+# int8_t 
+# endsnippet
+
+# snippet i16 "expand i16 int16_t"
+# int16_t 
+# endsnippet
 
 snippet i32 "expand i32 int32_t"
 int32_t 
+endsnippet
+
+snippet ifdef "#ifdef #endif"
+#ifdef ${1}
+${0}
+#endif
+endsnippet
+
+snippet for "for (i = 0)"
+for (uint8_t i = 0; i < ${1}; i++)
+{
+	${0}
+}
+endsnippet
+
+
+snippet if "if()"
+if (${1:true})
+{
+	${0:${VISUAL}}
+}
+endsnippet
+
+snippet ife "if() else"
+if (${1:true})
+{
+	${2:${VISUAL}}
+}
+else
+{
+	${0}
+}
+endsnippet
+
+snippet el "else"
+else
+{
+	${0:${VISUAL}}
+}
+endsnippet
+
+snippet elif "else if"
+else if (${1:true})
+{
+	${0:${VISUAL}}
+}
+endsnippet
+
+# ternary
+snippet ternary "short oneline if"
+${1:/* condition */} ? ${2:a} : ${3:b}
+endsnippet
+
+# switch
+snippet switch "switch-case"
+switch (${1:/* variable */})
+{
+	case ${2:/* variable case */}:
+		${3}
+		${4:break;}${5}
+	default:
+		${6}
+}
+endsnippet
+
+# switch without default
+snippet switchndef "switch-case without default case"
+switch (${1:/* variable */})
+{
+	case ${2:/* variable case */}:
+		${3}
+		${4:break;}${5}
+}
+endsnippet
+
+snippet case "case"
+case ${1:/* variable case */}:
+	${2}
+	${3:break;}
 endsnippet
 
 # vim:ft=snippets:

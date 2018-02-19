@@ -167,7 +167,8 @@ if has('nvim')
 endif
 
 set formatoptions+=j	" pretty formating when joining lines (key J)
-set nrformats+=alpha  " Ctrl-A/X will also work on single chars
+" set nrformats+=alpha  " Ctrl-A/X will also work on single chars
+"
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		OS specific															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -190,10 +191,11 @@ if has('unix')
 elseif has('windows')
     " INFO 17xxxx: nvim clipboard: Install win32yank.exe and put in $PATH. That's it
     " place where Python (x64, as vim.exe) is installed
-    let $PATH.=';C:\python35_x64'
+    let $PATH.=';C:\bin'
+    let $PATH.=';C:\python35_x64'   " posao
+    let $PATH.=';C:\python36'       " Win10 VM
     let g:ctags_exe='c:\bin\ctags.exe'
-    let g:python3_host_prog='c:\python35_x64\python.exe'
-    " let g:python_host_prog='c:\python27\python.exe'
+    let g:python3_host_prog='python.exe'
 
     let g:session_autosave = 'no'
 endif
@@ -403,6 +405,7 @@ cabbrev css :mksession!
 cabbrev csl :source Session.vim
 
 cabbrev ccc call ToggleColorColumn()
+call SetupCommandAlias("qc", "ccl") " quickfix close (alignmend with :pc[lose])
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		generic mappings													{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -558,6 +561,16 @@ nnoremap <leader>0 :tablast<cr>
 nnoremap tH :tabmove -1<cr>
 nnoremap tL :tabmove +1<cr>
 
+nnoremap T1 :tabmove 0<cr>:echo "current tab moved to position 1"<cr>
+nnoremap T2 :tabmove 1<cr>:echo "current tab moved to position 2"<cr>
+nnoremap T3 :tabmove 2<cr>:echo "current tab moved to position 3"<cr>
+nnoremap T4 :tabmove 3<cr>:echo "current tab moved to position 4"<cr>
+nnoremap T5 :tabmove 4<cr>:echo "current tab moved to position 5"<cr>
+nnoremap T6 :tabmove 5<cr>:echo "current tab moved to position 6"<cr>
+nnoremap T7 :tabmove 6<cr>:echo "current tab moved to position 7"<cr>
+nnoremap T8 :tabmove 7<cr>:echo "current tab moved to position 8"<cr>
+nnoremap T9 :tabmove 8<cr>:echo "current tab moved to position 9"<cr>
+
 " holy fucking gods of Vim, browse only buffers for current tab
 " nnoremap tj :CtrlSpaceGoDown<cr>
 " nnoremap tk :CtrlSpaceGoUp<cr>
@@ -686,7 +699,7 @@ nmap , <leader>
 nnoremap <leader>H :noh<cr>
 " TODO make this to toggle highlight, probably will not be possible
 
-nnoremap <leader>S :setlocal spell!<cr>
+nnoremap <leader>z :setlocal spell!<cr>
 " toggle showing invisible chars
 nnoremap <leader>l :set list!<cr>:set list?<CR>
 nnoremap <leader>n :set relativenumber!<cr>
@@ -801,16 +814,16 @@ vnoremap <leader>Y8 "Iy :echo "added to the register 8(i)"<cr>
 vnoremap <leader>Y9 "Oy :echo "added to the register 9(o)"<cr>
 vnoremap <leader>Y0 "Py :echo "added to the register 0(p)"<cr>
 " paste
-nnoremap <leader>p1 "q]p :echo "paste from the register 1(q)"<cr>
-nnoremap <leader>p2 "w]p :echo "paste from the register 2(w)"<cr>
-nnoremap <leader>p3 "e]p :echo "paste from the register 3(e)"<cr>
-nnoremap <leader>p4 "r]p :echo "paste from the register 4(r)"<cr>
-nnoremap <leader>p5 "t]p :echo "paste from the register 5(t)"<cr>
-nnoremap <leader>p6 "y]p :echo "paste from the register 6()"<cr>
-nnoremap <leader>p7 "u]p :echo "paste from the register 7()"<cr>
-nnoremap <leader>p8 "i]p :echo "paste from the register 8()"<cr>
-nnoremap <leader>p9 "o]p :echo "paste from the register 9()"<cr>
-nnoremap <leader>p0 "p]p :echo "paste from the register 0()"<cr>
+nnoremap <leader>p1 "qp :echo "paste from the register 1(q)"<cr>
+nnoremap <leader>p2 "wp :echo "paste from the register 2(w)"<cr>
+nnoremap <leader>p3 "ep :echo "paste from the register 3(e)"<cr>
+nnoremap <leader>p4 "rp :echo "paste from the register 4(r)"<cr>
+nnoremap <leader>p5 "tp :echo "paste from the register 5(t)"<cr>
+nnoremap <leader>p6 "yp :echo "paste from the register 6()"<cr>
+nnoremap <leader>p7 "up :echo "paste from the register 7()"<cr>
+nnoremap <leader>p8 "ip :echo "paste from the register 8()"<cr>
+nnoremap <leader>p9 "op :echo "paste from the register 9()"<cr>
+nnoremap <leader>p0 "pp :echo "paste from the register 0()"<cr>
 " paste in insert mode
 inoremap <C-r>1 <C-o>"q]p<C-o>:echo "paste from the register 1(q)"<cr>
 inoremap <C-r>2 <C-o>"w]p<C-o>:echo "paste from the register 2(w)"<cr>
@@ -1073,6 +1086,33 @@ function! RemoveBrackets()                                                " {{{
     let @/ = substitute(@/, "\\\\\>", "", "")
 endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+function! HeaderToggle()                                                   " {{{
+" bang for overwrite when saving vimrc
+" from https://stackoverflow.com/questions/17170902/in-vim-how-to-switch-quickly-between-h-and-cpp-files-with-the-same-name
+let file_path = expand("%")
+let file_name = expand("%<")
+let extension = split(file_path, '\.')[-1] " '\.' is how you really split on dot
+let err_msg = "There is no file "
+
+if extension == "c"
+    let next_file = join([file_name, ".h"], "")
+
+    if filereadable(next_file)
+    :e %<.h
+    else
+        echo join([err_msg, next_file], "")
+    endif
+elseif extension == "h"
+    let next_file = join([file_name, ".c"], "")
+
+    if filereadable(next_file)
+        :e %<.c
+    else
+        echo join([err_msg, next_file], "")
+    endif
+endif
+endfunction
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 " Plugins																	{{{
@@ -1114,6 +1154,7 @@ Plug 'majutsushi/tagbar'	" show tags (func, vars) in window right
 Plug 'octol/vim-cpp-enhanced-highlight'	" simpler works out-of-the books, but not as good as TagHighlight
 " Plug 'jeaye/color_coded'	" semantic highlighter INFO 170818: doesn't work in nvim
 
+Plug 'chrisbra/NrrwRgn' " narrow region
 
 " ******************** files
 " CtrlP look-a-like
@@ -1140,6 +1181,7 @@ Plug 'osyo-manga/vim-anzu'			" show search matches in statusline
 									" (second from the right)
 Plug 'jiangmiao/auto-pairs'			" auto close quotes, brackets, ...
 Plug 'tpope/vim-surround'			" replace quotes, brackets,...
+Plug 'tpope/vim-repeat'             " repeat with . previous plugin
 Plug 'tpope/vim-commentary'
 Plug 'troydm/zoomwintab.vim'		" <C-w>o wil zoom/unzoom windows/split
 Plug 'AndrewRadev/undoquit.vim'
@@ -1149,7 +1191,7 @@ Plug 'ntpeters/vim-better-whitespace'	" show red block when there is a trailing 
 " Plug 'ervandew/supertab'
 
 
-Plug 'mileszs/ack.vim'		" wrapper around vimgrep or external grep
+" Plug 'mileszs/ack.vim'		" wrapper around vimgrep or external grep
 Plug 'jremmen/vim-ripgrep'	" fast external grep
 Plug 'mhinz/vim-grepper'	" search buffers and populate quickfix
 " search buffers and populate quickfix, lazy loading the plugin:
@@ -1159,7 +1201,7 @@ Plug 'ronakg/quickr-preview.vim'	" preview files in quickfix without spoiling bu
 Plug 'tomasr/molokai'		" color scheme
 Plug 'powerman/vim-plugin-AnsiEsc'	" Show shell ANSI colors as colors
 
-Plug 'brookhong/cscope.vim'		" cscope
+" Plug 'brookhong/cscope.vim'		" XXX 180217: on clean Win10
 Plug 'idanarye/vim-vebugger'
 " needed for vebugger
 Plug 'Shougo/vimproc.vim', {'do' : 'make'}
@@ -1182,8 +1224,8 @@ Plug 'godlygeek/tabular'	" Tabularize/align
 " Plug 'timonv/vim-cargo'		" simple plugin, cmds: Cargo{Build, Run, Test, Bench}
 Plug 'qpkorr/vim-bufkill'			" kill buffer without killing split :BD :BW
 Plug 'easymotion/vim-easymotion'	" leader leader and magic begins
+" Plug 'justinmk/vim-sneak'       " lightweight easymotion
 Plug 'myusuf3/numbers.vim'		" disable relative numbers in insert mode and non-active windows
-" Plug 'tpope/vim-repeat'
 " Plug 'hyiltiz/vim-plugins-profile'
 " Plug 'junegunn/vim-easy-align'
 " Plug 'matze/vim-move'
@@ -1226,7 +1268,9 @@ imap <expr> <Plug>(expand_or_nl) (cm#completed_is_snippet() ? "\<C-u>":"\<CR>")
 inoremap <C-space> <C-o><Plug>(cm_force_refresh)
 
 let g:cm_matcher = {'module': 'cm_matchers.fuzzy_matcher', 'case': 'smartcase'}
+" let g:cm_matcher = {'module': 'cm_matchers.abbrev_matcher', 'case': 'smartcase'}
 "cm_matchers.abbrev_matcher"`	" not really fuzzy
+" let g:cm_refresh_length=2
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " clang_complete															{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1330,12 +1374,16 @@ let g:airline#extensions#obsession#indicator_text = 'Ses' " default: '$'
 
 " snippets																	{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:UltiSnipsExpandTrigger        = '<C-u>'   " expand snippet
+" let g:UltiSnipsExpandTrigger        = '<C-u>'   " expand snippet
+" 180218 NCM:
+let g:UltiSnipsExpandTrigger		= "<Plug>(ultisnips_expand)"
 " INFO 180115: <C-o> works but it will break Vim's <C-o> (exit insert mode for
 " one command)
 let g:UltiSnipsJumpForwardTrigger   = "<tab>"   " jump between $1, $2, ...
 let g:UltiSnipsJumpBackwardTrigger  = "<s-tab>"
 let g:UltiSnipsListSnippets         = '<C-l>'
+" 180218 NCM optional:
+inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ultisnips_expand)")<cr>
 
 let g:UltiSnipsRemoveSelectModeMappings = 0
 let g:UltiSnipsEnableSnipMate       = 0 " no need to look for SnipMate snippets
@@ -1419,6 +1467,10 @@ end
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nnoremap <leader>f :NERDTreeToggle<cr>
 nnoremap <leader>F :NERDTreeFind<cr>
+" TODO 180218: <leader>F 
+
+nnoremap <C-w>f :NERDTreeFocus<cr>
+nnoremap <C-w>F :NERDTreeClose<cr>
 " TODO <space> to expand folder
 let g:NERDTreeMapActivateNode = "<space>"
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
@@ -1469,82 +1521,32 @@ endif
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " searching																	{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Ack - search files with extern program (ack, rg, ...)
-" Rg - fast external grep
-" ripgrep																	{{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" fast grep
-" :Rg :RgRoot
+" 180217 Grepper
+let g:grepper = {}            " initialize g:grepper with empty dictionary
+runtime plugin/grepper.vim    " initialize g:grepper with default values
+let g:grepper.highlight = 1
+let g:grepper.rg.grepprg .= ' --smart-case'
 
-" let g:rg_command="rg --vimgrep"	" default
-" let g:rg_command="rg --vimgrep -g '!.*.tags' -g '!.*tags' -g '!tags' -g '!.*.src'"
+" - -query must be the last flag
+
 if has('windows')
-	" Windows 171030:
-	let g:rg_command="rg --vimgrep"
+    " 180218: This doesn't work under my Win10 VM for some reason
+    nnoremap <leader>a :Rg <C-r><C-w><CR>
 else
-	" let g:rg_command="rg --vimgrep -g '!tags' -g '!.*.src'"
-	let g:rg_command="rg --vimgrep -g '!tags' -g '!*.src'"
+    nnoremap <leader>a :Grepper -tool rg -query <C-r><C-w><CR>
 endif
-let g:rg_command="rg --vimgrep -g '!*tags'"
-" don't show column (%c):
-let g:rg_format="%f:%l:%m"
-let g:rg_highlight=1						" 1 if you want matches highlighted
+nnoremap <leader>A :Grepper<cr>
+nnoremap <leader>s :Grepper -tool rg -buffers -query <C-r><c-w><cr>
+nnoremap <leader>S :Grepper -tool rg -buffers <cr>
 
-" INFO 171210: Don't use it directly, use it with Ack plugin
-" nnoremap <leader>a :tab split<cr>:Rg <C-r><C-w><CR>
-" nnoremap <leader>A :tab split<cr>:Rg ""<left>
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
-
-
-if executable("rg")
-	" ne radi na Windowsima:
-	" set grepprg='rg --vimgrep --no-heading'
-	set grepformat=%f:%l:%c:%m,%f:%l:%m
-else
-	echoe "ag executable not found"
-endif
-
-if executable('rg')
-	let g:ackprg = g:rg_command
-endif
-
-" search current dir for word under cursor or enter the word manually
-nnoremap <leader>a :tab split<cr>:Ack <C-r><C-w><CR>
-nnoremap <leader>A :tab split<cr>:Ack ""<left>
-" search current buffer (only the currently open buffer):
-nnoremap <leader>s :tab split<cr>:Ack %<C-r><C-w><CR>
-" nnoremap <leader>S :tab split<cr>:Ack "" %<left><left><left>
-
-nnoremap <leader>s :tab split<cr>:bufdo vimgrepadd <C-r><C-w> %<cr>:copen <cr>
-" nnoremap <leader>S :tab split<cr>:Ack "" %<left><left><left>
-
-" :AckWindow will search in visible buffers (windows in current tab).
-
-
-" https://vi.stackexchange.com/questions/2904/how-to-show-search-results-for-all-open-buffers
-function! BuffersList()
-	let all = range(0, bufnr('$'))
-	let res = []
-	for b in all
-		if buflisted(b)
-			call add(res, bufname(b))
-		endif
-	endfor
-	return res
-endfunction
-
-function! GrepBuffers (expression)
-	" clear QF list
-	call setqflist([])
-	tab split
-	exec 'vimgrep/'.a:expression.'/ '.join(BuffersList())
-	copen " open QF list
-endfunction
-
-command! -nargs=+ GrepBufs call GrepBuffers(<q-args>)
+call SetupCommandAlias("Gbuf",  "Grepper -tool rg -buffer -query")
+call SetupCommandAlias("Gbufs", "Grepper -tool rg -buffers -query")
+call SetupCommandAlias("G",     "Grepper -tool rg -query")
+" call SetupCommandAlias("Gadd",  "Grepper -tool rg -append -query") " XXX 180218
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " easymotion																{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" easymotion original {{{
 " press <leader><leader>X where X is char for modes (it can be f,w,...)
 " <Leader>f{char} to move to {char}
 map  <leader><leader>f <Plug>(easymotion-bd-f)
@@ -1564,6 +1566,17 @@ nmap <leader><leader>l <Plug>(easymotion-overwin-line)
 " Move to word
 map  <Leader>w <Plug>(easymotion-bd-w)
 nmap <Leader>w <Plug>(easymotion-overwin-w)
+" }}}
+
+" 180218 vim-sneak
+" label-mode for a minimalist alternative to EasyMotion:
+" let g:sneak#label = 1
+" nmap \\ <Plug>SneakLabel_s
+" INFO 180218: complicated to me, not working as expected, remaps <tab> and s
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+" narrow region                                                              {{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" select and :NR or <leader>nr
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 
 
@@ -1786,34 +1799,6 @@ let g:SignatureMap = {
 " \ 'GotoNextLineByPos'  :  "]'",
 " \ 'GotoPrevLineByPos'  :  "['",
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
-" grepper                                                                    {{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" plugin for async search (ag/ack/rg) which will populate quickfix/locatelist
-" location list is local to window, quickfix is one for all windows
-" location 
-
-runtime plugin/grepper.vim    " initialize g:grepper with default values
-
-let g:grepper.highlight = 1
-" let g:grepper.quickfix = 0	" 0 - use location list
-" let g:grepper.switch = 0	" When the quickfix/location window opens, switch to it.
-let g:grepper.prompt_quote = 1
-" let g:grepper.repo = ['.git'] " ['.git', '.hg', '.svn']
-" tab in Grepper prompt to switch grep tools
-
-" search word under the cursor
-nnoremap <leader>* :Grepper -tool rg -cword -switch -noprompt<cr>
-nnoremap <leader>* :Grepper -tool rg -cword -side<cr>
-" search current dir:
-nnoremap <leader>s :Grepper -tool rg<cr>
-" search open buffers
-nnoremap <leader>S :Grepper -tool rg -buffers<cr>
-
-command! Todo :Grepper
-      \ -noprompt
-      \ -tool git
-      \ -grepprg git grep -nIi '\(TODO\|FIXME\)'
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " quickfix preview                                                           {{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " quickr-preview.vim lets you preview the result in detail without spoiling the buffer list. Everything is automatically clened up once quickfix window is closed.
@@ -1833,6 +1818,15 @@ let g:AutoPairsShortcutBackInsert = '<nop>'
 let g:AutoPairsShortcutJump = '<nop>'
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 
+" unimpared                                                                  {{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" plugin with usefull shortcuts
+
+" options:
+" [oX to disable something
+" ]oX to enable something
+" \oX to toggle something:
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " {{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
@@ -2451,8 +2445,9 @@ set isfname+=32	" <space> is part of filename
 
 
 " open header:
-nnoremap <leader>h :e %:r.h<cr>
+" nnoremap <leader>h :e %:r.h<cr>
 " TODO 180206: Open .c file if header is currently opened
+nnoremap <Leader>h :call HeaderToggle()<CR>
 
 " XXX 180116: Doesn't work anymore. Doesn't work on vimrc from 2017.9.
 " "bubble" move the lines (will have weird things on edge of the buffer)
@@ -2471,8 +2466,6 @@ inoremap <A-S-j> <C-o>dd<C-o>p
 " inoremap <A-k> <C-o>[e
 " inoremap <A-j> <C-o>]e
 
-nnoremap T1 :tabmove 0<cr>:echo "current tab moved to position 1"<cr>
-
 " TODO 171224: explain this
 " nnoremap [c zk
 
@@ -2483,10 +2476,6 @@ let g:vebugger_path_gdb='arm-none-eabi-gdb --data-directory=~/.local/share/gdb-a
 let g:startify_fortune_use_unicode = 1
 " Sort sessions by modification time rather than alphabetically.
 let g:startify_session_sort = 0
-" 171127
-" TODO 171224: <C-w>f -> goto nerdtree window
-nnoremap <C-w>f :NERDTreeFocus<cr>
-nnoremap <C-w>F :NERDTreeClose<cr>
 
 cmap w!! w !sudo tee %
 
@@ -2496,3 +2485,7 @@ cmap w!! w !sudo tee %
 " 180106 - useful when reading man pages
 nnoremap <Home> gg
 nnoremap <End> G
+
+" INFO 180218: multiple file search and replace:
+" - search and populate quick list: Greeper or <leader>a
+" - :cdo s/old/new/ge | update
