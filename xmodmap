@@ -1,0 +1,176 @@
+! created 160417
+! based on a file created probably in 2008
+! INFO 160819: just differences between setxkbdmap us
+
+! Key Shift+Key mode_switch+Key mode_switch+Shift+Key AltGr+Key AltGr+Shift+Key
+!------------------------------------------------------------------------------
+! Modifers																	{{{
+!------------------------------------------------------------------------------
+! ensure that you are not in CAPS on mode
+clear lock
+! CapsLock as Super (Win) key
+keycode  66 = Super_L
+
+! INFO 180617: Shift+BS will be recognized in xev, but won't work as Delete
+keycode  22 = BackSpace Delete
+! the real Escape
+keycode   9 = Escape Escape Escape Escape
+! the key left of "1"
+keycode  49 = Escape asciitilde grave grave
+! Disable NumLock and ScrollLock
+keycode  77 =
+keycode  78 =
+
+! INFO Mode switch is modern ISO_Level3_Shift
+! 113 was Alt_R
+keycode 113 = Mode_switch Mode_switch
+! 117 was Menu (mouse right click) key
+keycode 117 = Super_R Super_R
+
+! defaults ---------------------------------------------------------------------
+!! default keys on us layout
+!keycode  37 = Control_L NoSymbol Control_L
+!keycode 109 = Control_R NoSymbol Control_R
+!keycode  64 = Alt_L Meta_L Alt_L Meta_L
+!keycode 113 = Alt_R Meta_R Alt_R Meta_R
+!keycode  50 = Shift_L NoSymbol Shift_L
+!keycode  62 = Shift_R NoSymbol Shift_R
+!keycode 115 = Super_L NoSymbol Super_L
+!keycode 116 = Super_R NoSymbol Super_R
+!! key between Alt_R and Ctrl_R
+!keycode 117 = Menu NoSymbol Menu
+
+! on phy croatian keyboard: key right of Shift_L
+!keycode  94 = less greater less greater bar brokenbar bar
+!keycode  94 = Shift_L
+! hr layout (AltGr):
+!keycode 113 = ISO_Level3_Shift ISO_Level3_Shift
+!---------------------------------------------------------------------------}}}
+!	ints + chars															{{{
+!------------------------------------------------------------------------------
+!										~								 `
+keycode  10 = 1 exclam 					asciitilde asciitilde
+keycode  11 = 2 at
+keycode  12 = 3 numbersign
+!										€		 £
+keycode  13 = 4 dollar					EuroSign sterling
+!				%						°
+keycode  14 = 5 percent 				degree degree
+!				^			 			`
+keycode  15 = 6 asciicircum 			grave grave
+!				&						`
+keycode  16 = 7 ampersand 				grave grave
+keycode  17 = 8 asterisk
+keycode  18 = 9 parenleft
+keycode  19 = 0 parenright
+keycode  20 = minus underscore			plusminus plusminus
+keycode  21 = equal plus				plusminus plusminus
+!										õ	   Õ
+keycode  24 = q Q						otilde Otilde
+! ruotsalinen o							å     Å
+keycode  25 = w W						aring Aring
+keycode  26 = e E						EuroSign EuroSign
+keycode  27 = r R						registered registered
+keycode  28 = t T						trademark trademark
+keycode  29 = y Y
+! U with an umlaut						ü		   Ü
+keycode  30 = u U						udiaeresis Udiaeresis
+! fi symbol								ø      Ø
+keycode  31 = i I						oslash Oslash
+! O with an umlaut						ö		   Ö
+keycode  32 = o O						odiaeresis Odiaeresis
+keycode  33 = p P
+!			  [			  {				š		Š
+keycode  34 = bracketleft braceleft		scaron Scaron
+!			  ]			   }			đ		Đ
+keycode  35 = bracketright braceright	dstroke Dstroke
+keycode  36 = Return NoSymbol
+! keycode  36 = Return  F13
+! A with an umlaut						ä		   Ä
+keycode  38 = a A						adiaeresis Adiaeresis
+! soft š 								ś		Ś
+keycode  39 = s S						sacute Sacute
+keycode  40 = d D
+!										£		 £
+keycode  41 = f F						sterling sterling
+keycode  42 = g G
+keycode  43 = h H						Left 	leftarrow
+keycode  44 = j J						Down	downarrow
+keycode  45 = k K						Up 		uparrow
+keycode  46 = l L						Right 	rightarrow
+!										č		Č
+keycode  47 = semicolon colon			ccaron Ccaron
+!										ć		Ć
+keycode  48 = apostrophe quotedbl		cacute Cacute
+!			  \			|				ž		Ž
+keycode  51 = backslash bar				zcaron Zcaron
+! soft ž								ź		Ź
+keycode  52 = z Z						zacute Zacute
+keycode  53 = x X
+keycode  54 = c C						copyright cent
+keycode  55 = v V
+keycode  56 = b B
+keycode  57 = n N
+! micro									µ  º
+keycode  58 = m M						mu masculine
+!										«
+keycode  59 = comma less				guillemotleft
+!										»
+keycode  60 = period greater			guillemotright
+keycode  61 = slash question 			questiondown questiondown
+keycode  65 = space NoSymbol space
+!---------------------------------------------------------------------------}}}
+! cursor, delete cluster													{{{
+!------------------------------------------------------------------------------
+! cursor keys -----------------------------------------------------------------
+keycode  98 = Up NoSymbol uparrow
+keycode 100 = Left NoSymbol leftarrow
+keycode 102 = Right NoSymbol rightarrow
+keycode 104 = Down NoSymbol downarrow
+! delete/home/end cluster	---------------------------------------------------
+!keycode 107 = Delete BackSpace Delete
+!keycode  97 = Home NoSymbol Home
+!keycode 103 = End NoSymbol End
+! PageUp
+!keycode  99 = Prior NoSymbol Prior
+! PageDown
+!keycode 105 = Next NoSymbol Next
+!keycode 106 = Insert NoSymbol Insert
+!---------------------------------------------------------------------------}}}
+! ThinkPad keys																{{{
+!------------------------------------------------------------------------------
+! mute speaker
+keycode 140 = XF86AudioMute NoSymbol XF86AudioMute
+! Fn key, can't work as normal key nor as modifier
+keycode 150 = NoSymbol NoSymbol
+keycode 150 = F15 F15 F15
+
+! This is already default
+!! Fn + Left
+!keycode 144 = XF86AudioPrev NoSymbol XF86AudioPrev
+!! Fn + Right
+!keycode 153 = XF86AudioNext NoSymbol XF86AudioNext
+!! lower volume
+!keycode 174 = XF86AudioLowerVolume NoSymbol XF86AudioLowerVolume
+!! raise volume
+!keycode 176 = XF86AudioRaiseVolume NoSymbol XF86AudioRaiseVolume
+!
+!keycode 162 = XF86AudioPlay XF86AudioPause XF86AudioPlay XF86AudioPause XF86AudioPlay XF86AudioPause
+!keycode 164 = XF86AudioStop XF86Eject XF86AudioStop XF86Eject XF86AudioStop XF86Eject
+
+! ThinkPad keys
+keycode 233 = F22
+keycode 234 = F21
+!---------------------------------------------------------------------------}}}
+!-------------------------------------------------------------------------------
+!agrave		 à
+!aacute		 á
+!acircumflex â
+!atilde		 ã
+!adiaeresis	 ä
+!aring		 å
+
+! Changing shift+enter will change Pidgin behaviour also (Shift-Enter will not
+! work as expected)
+!keycode  36 = Return F13 F14 F15
+!  vim: set ts=4 sw=4 tw=78 noet foldmethod=marker:
