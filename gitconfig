@@ -27,12 +27,12 @@
 	# up = rebase	# SVN muscle memory
 	last = log -1 HEAD
 	l = log --decorate
-	c = commit --allow-empty-message -m	# TODO posao
+    c = commit
+    cm = commit --allow-empty-message -m
 	ca = commit --amend
-    cA = commit --amend --no-edit
+    caa = commit --amend --no-edit  # git aliases are not case sensitive (cA will not work here)
     rc = rebase --continue
     rq = rebase --quit
-	; am = commit --amend --no-edit
 	ls = diff --name-only	# only show filenames of changed files between commits
 	ls2 = ls-files		# list tracked files
 	st = stash
@@ -49,10 +49,15 @@
 	dt = difftool
 	lol = log --graph --branches --remotes --pretty=oneline --abbrev-commit
 	lsh = log --graph --branches --remotes --pretty=short --abbrev-commit
-	ll = log --pretty=format:"%C(green)%h\\ %C(yellow)[%ad]%Cred%d\\ %Creset%s%C('blue bold')\\ [%cn]" --decorate --date=relative
+	ll  = log --pretty=format:"%C(green)%h\\ %C(yellow)[%ad]%Cred%d\\ %Creset%s%C('blue bold')\\ [%cn]" --decorate --date=relative
+    ll  = log --pretty=format:"%C(green)%h\\ %C(yellow)[%ad]%C(red)%d\\ %C(reset)%s%C('blue bold')\\ [%cn]" --decorate --date=relative
+    ; ll2 = log --pretty=format:"%C(green)%h\\ %C(yellow)[%ad]%Cred%d\\ %Creset%s%C('blue bold')\\ [%cn] %Cred%d\\ %creset" --decorate --date=relative
 	ap = apply --ignore-space-change --ignore-whitespace
 	ap2 = apply --reject --whitespace=fix
 	app = apply --reject --whitespace=fix
+
+    brc = git rev-parse --abbrev-ref HEAD   # show only current branch
+    ; pusho = push --set-upstream origin $(git rev-parse --abbrev-ref HEAD) # TODO
 
 [log]
 	decorate = full
@@ -79,3 +84,12 @@
 	# autocrlf = false	# s posla
 [apply]
     whitespace = nowarn
+
+# examples
+# change remote:
+# git remote set-url origin https://github.com/user/project
+#
+# resync fork
+# git remote add upstream https://github.com/user/project
+# git fetch upstream
+# git pull upstream master

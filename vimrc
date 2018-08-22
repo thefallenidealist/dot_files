@@ -82,6 +82,8 @@ if (s:work_pc == 1)
     set shiftwidth=3 	" when indenting with '>'
     set expandtab		" convert tab to spaces
     set softtabstop=3	" smart <BS> - delete 4 chars"
+    set textwidth=120
+    set diffopt+=iwhite " ignore whitespace changes and also newlines (^M)
 else
     set tabstop=4		" tab size
     set shiftwidth=4 	" when indenting with '>'
@@ -168,7 +170,8 @@ endif
 
 set formatoptions+=j	" pretty formating when joining lines (key J)
 " set nrformats+=alpha  " Ctrl-A/X will also work on single chars
-"
+
+set diffopt+=vertical   " vertical split
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		OS specific															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -178,8 +181,6 @@ if has('unix')
 	if s:uname == "FreeBSD"
 		let g:clang_library_path='/usr/local/llvm50/lib'
 
-		" Exuberant Ctags
-		" let g:ctags_exe='/usr/local/bin/exctags'
 		" Universal Ctags - Exuberant Ctags fork
 		let g:ctags_exe='/usr/local/bin/uctags'
 
@@ -196,6 +197,9 @@ elseif has('windows')
     let $PATH.=';C:\python36'       " Win10 VM
     let g:ctags_exe='c:\bin\ctags.exe'
     let g:python3_host_prog='python.exe'
+    if substitute(system('is_sverige'), '\n','','g') == "1"
+        let g:python3_host_prog='C:\python35_x64\python.exe'
+    endif
 
     let g:session_autosave = 'no'
 endif
@@ -231,9 +235,10 @@ function! Compile()
 		make
 	elseif expand('%:e') == "rs"
 		echo "building Rust"
-		" setlocal makeprg=rustc\ %
-		make
-		" !./%:r
+        setlocal makeprg=cargo\ build\ $*
+        make
+        " TODO 180805: check if Makefile exists then just call make instead of cargo
+        " places to check: . src/ src/rust
 	else
 		echoerr "Don't know how to build :["
 	endif
@@ -241,6 +246,12 @@ endfunction
 
 nnoremap <F5> :call Compile()<cr>
 nnoremap <leader>rr :call Compile()<cr>
+inoremap <F5> :call Compile()<cr>
+inoremap <leader>rr :call Compile()<cr>
+if has('nvim')
+    inoremap <A-r> <C-o>:call Compile()<cr>
+    nnoremap <A-r> :call Compile()<cr>
+endif
 
 " za gF komandu koja otvori fajl pod kursorom
 let &path.="src/include,/usr/include/AL,"
@@ -288,11 +299,18 @@ augroup my_group_with_a_very_uniq_name
 	" autocmd VimEnter * if @% == "[Command Line]" | echo "QQQQQQ" | else | "AAAAAA" | endif
 
 	autocmd Filetype xdefaults set commentstring=!%s
-	autocmd FileType pf,dnsmasq setlocal commentstring=#\ %s
+	autocmd FileType pf,dnsmasq,fstab,cfg setlocal commentstring=#\ %s
 
 	" Warn if file in current buffer is changed outside of Vim
 	" - default: just warning when trying to write to the file
 	autocmd BufEnter,FocusGained * checktime %
+
+    autocmd BufRead,BufNewFile SConstruct,SConscript set filetype=python
+
+    autocmd Filetype verilog call SetupVerilogEnvironment()
+
+    " close preview windows if it is last
+    au WinEnter * if winnr('$') == 1 && getbufvar(winbufnr(winnr()), "&buftype") == "quickfix"|q|endif
 augroup END
 
 " setup when in diff mode:
@@ -305,6 +323,9 @@ if &diff
 	map <leader>1 :diffget LOCAL<CR>
 	map <leader>2 :diffget BASE<CR>
 	map <leader>3 :diffget REMOTE<CR>
+
+    call SetupCommandAlias("dg",  "diffget")
+    call SetupCommandAlias("dp",  "diffput")
 endif
 
 " setup for preview window
@@ -359,6 +380,7 @@ call SetupCommandAlias("Bd", "bd")
 
 command! WE write | edit
 cabbrev we WE
+cabbrev We WE
 
 command! PU PlugUpdate | PlugUpgrade
 command! PI so $MYVIMRC | PlugInstall
@@ -463,6 +485,7 @@ nnoremap <M-x> ga
 " only in insert mode, muscle memory. Doesn't work in 100% of cases
 inoremap <F14> <Tab>
 
+nnoremap <F4> :set paste!<cr>
 " don't 'insert char above cursor, it's confusing'
 " inoremap <C-y> <nop> " XXX 180115: will break snippets and NCM
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
@@ -592,9 +615,6 @@ nnoremap <C-n> :tag<cr>:echo "Tag jump +1"<cr>
 " INFO 180114 <C-[> is rempapped to <F16> with xbindkeys
 nnoremap <F16> :pop<cr>:echo "Taglist jump -1"<cr>
 
-" IDEA
-" <leader>n 	for switching buffers
-" Alt-shift-N 	for switching tabs
 if has('nvim')
 	" INFO Alt-N is used for tmux
 	" INFO shift in shortcuts won't work, but this will:
@@ -841,6 +861,8 @@ if has('clipboard')	" not really needed for all options under this
 	" copy filepath to X11 clipboard
 	nnoremap <leader>FP  :let @* = expand("%")<cr>:echo		"relative path of the file copied to the X11 1st clipboard"<CR>
 	nnoremap <leader>fp  :let @+ = expand("%")<cr>:echo		"relative path of the file copied to the X11 2nd clipboard"<CR>
+   nnoremap <leader>FD  :let @* = expand("%:h")<cr>:echo		"relative path of the dir copied to the X11 1st clipboard"<CR>
+   nnoremap <leader>fd  :let @+ = expand("%:h")<cr>:echo		"relative path of the dir copied to the X11 2nd clipboard"<CR>
 	nnoremap <leader>FFP :let @* = expand("%:p")<cr>:echo		"full path of the file copied to the X11 1st clipboard"<CR>
 	nnoremap <leader>ffp :let @+ = expand("%:p")<cr>:echo		"full path of the file copied to the X11 2nd clipboard"<CR>
 
@@ -882,7 +904,8 @@ if has('clipboard')	" not really needed for all options under this
 	" X11 secondary buffer		"+
 	" TODO TODO set paste mode before pasting
 	vnoremap <leader>y "+y:echo  "copied to the X11 2nd clipboard"<cr>
-	nnoremap <leader>y "+yy:echo "copied to the X11 2nd clipboard"<cr>
+	nnoremap <leader>yy "+yy:echo "copied to the X11 2nd clipboard"<cr>
+    nnoremap <leader>y "+yiw:echo "copied to the X11 2nd clipboard"<cr>
 	nnoremap <leader>p "+p:echo  "pasted from the X11 2nd clipboard"<cr>
 	vnoremap <leader>p "+p:echo  "pasted from the X11 2nd clipboard"<cr>
 
@@ -1113,6 +1136,13 @@ elseif extension == "h"
 endif
 endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+function! SetupVerilogEnvironment()                                        " {{{
+    " https://github.com/albertxie/iverilog-tutorial
+    " TODO 180617: Incorporate this into <F5> mapping for C/C++/Rust
+    " (depending on filetype)
+    map <F5> :! iverilog -o %:r.vvp %:r.v %:r_tb.v && vvp %:r.vvp && gtkwave %:r.vcd <ENTER>
+endfunction
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 " Plugins																	{{{
@@ -1152,6 +1182,7 @@ Plug 'majutsushi/tagbar'	" show tags (func, vars) in window right
 " Plug 'vim-scripts/TagHighlight'	" color typedefs as variables, needs
 " :UpdateTypesFile
 Plug 'octol/vim-cpp-enhanced-highlight'	" simpler works out-of-the books, but not as good as TagHighlight
+                                        " INFO 180525: This line must be here, otherwise C functions won't be highlighted
 " Plug 'jeaye/color_coded'	" semantic highlighter INFO 170818: doesn't work in nvim
 
 Plug 'chrisbra/NrrwRgn' " narrow region
@@ -1167,9 +1198,6 @@ Plug 'dietsche/vim-lastplace'		" Open file at last edit position
 Plug 'bogado/file-line'				" open file.txt:123
 Plug 'scrooloose/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
-" Plug 'vim-nerdtree-tabs'		" Not maintained, one NERDtree for all buffers
-
-
 
 Plug 'vim-airline/vim-airline'
 Plug 'gcmt/taboo.vim'				" Rename tabs
@@ -1183,6 +1211,7 @@ Plug 'jiangmiao/auto-pairs'			" auto close quotes, brackets, ...
 Plug 'tpope/vim-surround'			" replace quotes, brackets,...
 Plug 'tpope/vim-repeat'             " repeat with . previous plugin
 Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-abolish'            " better search and replace and abbrev :Subvert
 Plug 'troydm/zoomwintab.vim'		" <C-w>o wil zoom/unzoom windows/split
 Plug 'AndrewRadev/undoquit.vim'
 Plug 'ntpeters/vim-better-whitespace'	" show red block when there is a trailing whitespace
@@ -1199,6 +1228,7 @@ Plug 'mhinz/vim-grepper'	" search buffers and populate quickfix
 Plug 'ronakg/quickr-preview.vim'	" preview files in quickfix without spoiling buffer list
 
 Plug 'tomasr/molokai'		" color scheme
+Plug 'tomasiser/vim-code-dark'  " VisualStudio inspired theme
 Plug 'powerman/vim-plugin-AnsiEsc'	" Show shell ANSI colors as colors
 
 " Plug 'brookhong/cscope.vim'		" XXX 180217: on clean Win10
@@ -1240,6 +1270,7 @@ Plug 'Carpetsmoker/auto_autoread.vim'
 Plug 'wesQ3/vim-windowswap'		" Easier window swap: <leader>ww
 
 Plug 'machakann/vim-highlightedyank'	" temporary highlight yanked text/selection
+" Plug 'luochen1990/rainbow'             " colored brackets
 
 " igranje:
 
@@ -1271,6 +1302,8 @@ let g:cm_matcher = {'module': 'cm_matchers.fuzzy_matcher', 'case': 'smartcase'}
 " let g:cm_matcher = {'module': 'cm_matchers.abbrev_matcher', 'case': 'smartcase'}
 "cm_matchers.abbrev_matcher"`	" not really fuzzy
 " let g:cm_refresh_length=2
+" let g:cm_refresh_length=[[1,4],[7,3]]   " default
+let g:cm_refresh_length=[[1,4],[7,1]]
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " clang_complete															{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1336,11 +1369,8 @@ let g:ale_linters = {'rust': ['rustc']}
 let g:rust_recommended_style = 0
 let g:ftplugin_rust_source_path = $HOME.'~/src/rust-src/rust'
 
-if has('nvim')
-	inoremap <A-r> <C-o>:RustRun<cr>
-	nnoremap <A-r> :RustRun<cr>
-endif
-" nnoremap <F5> :RustRun<cr>
+" 180805 RustFmt:
+" TODO 180805
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " Airline																	{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1489,15 +1519,6 @@ highlight GitGutterDelete			ctermbg=234 ctermfg=9  guifg=red
 highlight GitGutterChange			ctermbg=234 ctermfg=3  guifg=yellow
 highlight link GitGutterChangeDelete GitGutterChange
 
-" unmap all keys (<leader>hX are not useful to me)
-" let g:gitgutter_map_keys = 0
-" default keybindings:
-" nmap ]c <Plug>GitGutterNextHunk
-" nmap [c <Plug>GitGutterPrevHunk
-" omap ic <Plug>GitGutterTextObjectInnerPending
-" omap ac <Plug>GitGutterTextObjectOuterPending
-" xmap ic <Plug>GitGutterTextObjectInnerVisual
-" xmap ac <Plug>GitGutterTextObjectOuterVisual
 let g:gitgutter_max_signs=5000	" default was 500
 
 " TODO 170813: goto first line of the preview window
@@ -1507,15 +1528,14 @@ nmap <Leader>gr <Plug>GitGutterUndoHunk
 nmap <Leader>gu <Plug>GitGutterUndoHunk
 
 call SetupCommandAlias("gitt","GitGutterToggle")
+call SetupCommandAlias("Gca","Gcommit --amend")
+call SetupCommandAlias("GcA","Gcommit --amend --reuse-message=HEAD")
 
 " let g:gitgutter_realtime = 0
 " let g:gitgutter_eager = 0
 
-" Fugitive
-" use 'q' to exit Gdiff:
-" if (bufname('%') !~ '^fugitive:')
+" Fugitive - use 'q' to exit Gdiff:
 if (bufname('%') == '^fugitive:')
-    " echom "diff mode"
     nnoremap <buffer> q :wincmd c<cr>
 endif
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
@@ -1525,7 +1545,7 @@ endif
 let g:grepper = {}            " initialize g:grepper with empty dictionary
 runtime plugin/grepper.vim    " initialize g:grepper with default values
 let g:grepper.highlight = 1
-let g:grepper.rg.grepprg .= ' --smart-case'
+" let g:grepper.rg.grepprg .= ' --smart-case'
 
 " - -query must be the last flag
 
@@ -1679,7 +1699,7 @@ nnoremap <C-w>c :call undoquit#SaveWindowQuitHistory()<cr><C-w>c
 " INFO rename tabs XXX don't work with CtrlSpace (which manages Airline tabline)
 
 " remember tab names after restore
-set sessionoptions+=tabpages,globals
+set sessionoptions+=tabpages,globals,buffers,curdir,folds,resize
 
 let g:taboo_tabline = 0		" AirLine is OK for this purpose
 let g:airline#extensions#taboo#enabled = 1
@@ -1746,8 +1766,6 @@ call SetupCommandAlias("css", ":Obsession .")	" muscle memory
 " :ViewSession
 
 " g:session_directory = '~/.vim/sessions' "" or ~\vimfiles\sessions (on Windows).
-" Don't save hidden and unloaded buffers in sessions.
-set sessionoptions-=buffers
 
 " let g:session_autosave = 'no'	" Don't ask when exiting Vim
 let g:session_autosave_periodic = '1'	" Auto save every N minutes
@@ -1985,7 +2003,6 @@ endif
 "    - c: don't compress the data
 
 nnoremap <leader>fa :call CscopeFindInteractive(expand('<cword>'))<CR>
-nnoremap <leader>l :call ToggleLocationList()<CR>
 " Some optional key mappings to search directly.
 " s: Find this C symbol
 nnoremap  <leader>fs :call CscopeFind('s', expand('<cword>'))<CR>
@@ -2433,12 +2450,6 @@ set isfname+=32	" <space> is part of filename
 " vsplit
 " vertical resize 24
 " set nocursorline
-
-" posao 170725
-" set shiftwidth=3
-" set tabstop=3
-" ignore whitespace changes and also newlines (^M)
-" set diffopt+=iwhite
 
 " TODO 171210: :bd when quickfix is open: delete current buffer, but do not close window (it will fuck up quickfix window height)
 
