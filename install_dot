@@ -1,0 +1,158 @@
+#!/bin/sh
+# vim: set ft=sh ts=4 sw=4 tw=0 fdm=marker noet :
+# Created 180922
+# INFO installs user dot files and links it with SRC
+
+# TODO 181020 check if installed: python pip
+#				vim snippets
+
+PIP="pip-3.6"
+PROGRAMS="zsh tmux nvim xrdb xmodmap git"
+
+# set dir (basedir/pwd)														{{{
+# -----------------------------------------------------------------------------
+set_dir()
+{
+	# BASEDIR is used instead of PWD so script can be run from other dirs
+	BASEDIR=$(dirname "$0")
+	if [ "$BASEDIR" == "." ] ; then
+		BASEDIR=$PWD	# case when script is run from cwd with ./
+	fi
+}
+# ------------------------------------------------------------------------- }}}
+# print debug informations													{{{
+# -----------------------------------------------------------------------------
+print_debug()
+{
+	echo "BASEDIR $BASEDIR"
+	echo "PWD: $PWD"
+	echo "CWD: $CWD"
+} #------------------------------------------------------------------------ }}}
+# usage																		{{{
+# -----------------------------------------------------------------------------
+usage()
+{
+	echo "Script for installing dot files for fresh user"
+	echo "Usage: $progname"
+	echo "  -h --help"
+	echo "  -r --remove | remove old files before installing new"
+	echo "  -t          | check if all needed programs are installed"
+} #------------------------------------------------------------------------ }}}
+# remove files																{{{
+# -----------------------------------------------------------------------------
+remove_files()
+{
+	rm -rf \
+		$HOME/.zshrc \
+		$HOME/.tmux.conf \
+		$HOME/.Xdefaults \
+		$HOME/.vim \
+		$HOME/.config/nvim \
+		$HOME/.xmodmap
+	# rm -rf $HOME/.local
+}
+# ------------------------------------------------------------------------- }}}
+# install vim																{{{
+# -----------------------------------------------------------------------------
+install_vim()
+{
+	mkdir -p $HOME/.vim/autoload
+	mkdir -p $HOME/.vim/backup
+	mkdir -p $HOME/.config/nvim
+	ln -sf $HOME/.vim/autoload	$HOME/.config/nvim/
+	ln -sf $HOME/.vim/vimrc		$HOME/.vimrc			# .vimrc -> .vim/vimrc
+
+	ln -sf $BASEDIR/vimrc		$HOME/.vim/vimrc
+	ln -sf $BASEDIR/vimrc		$HOME/.config/nvim/init.vim
+	ln -sf $BASEDIR/snippets	$HOME/.vim
+	$PIP install --user neovim
+	nvim +PlugInstall +qall
+}
+# ------------------------------------------------------------------------- }}}
+# install dot files															{{{
+# -----------------------------------------------------------------------------
+install_dot()
+{
+	ln -sf $BASEDIR/tmux.conf	$HOME/.tmux.conf
+	ln -sf $BASEDIR/zshrc		$HOME/.zshrc
+	ln -sf $BASEDIR/gitconfig	$HOME/.gitconfig
+}
+# ------------------------------------------------------------------------- }}}
+# GUI config                                                                {{{
+# -----------------------------------------------------------------------------
+install_gui()
+{
+	# $UID doesn't work in /bin/sh
+	UID=$(id -u)
+
+	# for non-root users only:
+	if [ "$UID" != "0" ]; then
+		ln -sf $BASEDIR/Xdefaults	$HOME/.Xdefaults
+		ln -sf $BASEDIR/xmodmap		$HOME/.xmodmap
+		ln -sf $BASEDIR/xbindkeysrc	$HOME/.xbindkeysrc
+		xrdb	$HOME/.Xdefaults
+		xmodmap	$HOME/.xmodmap
+
+		# XXX tmp fix for T430s with fuck-up keyboard layout:
+		xmodmap -e "keycode 111 = Super_R"
+	else
+		echo "This is root, no X11 conf needed"
+	fi
+} # ----------------------------------------------------------------------- }}}
+# check programs															{{{
+# -----------------------------------------------------------------------------
+check_programs()
+{
+	echo "Checking if these programs are available: $PROGRAMS"
+
+	for i in $PROGRAMS ; do
+		command -v $i > /dev/null;
+		ret=$?
+		if [ "$ret" == "0" ]; then
+			echo "Command \"$i\" found"
+		else
+			echo "Command \"$i\" not found!"
+		fi
+	done
+}
+# ------------------------------------------------------------------------- }}}
+
+main()
+{
+	while [ "$1" != "" ]; do
+		PARAM=$1
+		case $PARAM in
+			-h | --help)
+				usage
+				exit
+				;;
+			-r | --remove)
+				REMOVE="y"
+				;;
+			-t)
+				check_programs
+				exit
+				;;
+			*)
+				echo "ERROR: unknown parameter \"$PARAM\""
+				usage
+				exit 1
+				;;
+		esac
+		shift
+	done
+
+	if [ "$REMOVE" == "y" ] ; then
+		echo "Removing files"
+		remove_files
+	fi
+
+	set_dir
+	# print_debug
+	install_vim
+	install_dot
+	install_gui
+	check_programs
+}
+
+main "${@}"
