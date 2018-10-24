@@ -188,6 +188,7 @@ if has('unix')
 		let g:tagbar_ctags_bin=g:ctags_exe
 
 	elseif s:uname == "Linux"
+		let g:ctags_exe='/usr/bin/uctags'
 	endif " uname
 elseif has('windows')
     " INFO 17xxxx: nvim clipboard: Install win32yank.exe and put in $PATH. That's it
@@ -1147,6 +1148,12 @@ endfunction
 
 " Plugins																	{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+if empty(glob('~/.vim/autoload/plug.vim'))
+	silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+				\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+	autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
 call plug#begin('~/.vim/plugged')
 " AutoComplete
 Plug 'roxma/nvim-completion-manager'
@@ -1767,7 +1774,7 @@ call SetupCommandAlias("css", ":Obsession .")	" muscle memory
 
 " g:session_directory = '~/.vim/sessions' "" or ~\vimfiles\sessions (on Windows).
 
-" let g:session_autosave = 'no'	" Don't ask when exiting Vim
+let g:session_autosave = 'no'	" Don't ask when exiting Vim
 let g:session_autosave_periodic = '1'	" Auto save every N minutes
 
 " Disable all session locking - I know what I'm doing :-).

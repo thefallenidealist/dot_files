@@ -13,6 +13,13 @@ setopt histignorespace			# and with trailing spaces
 
 zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}'
 
+# [ -f .zshrc_local] && source .zsh_local	# include per-host configuration
+if [ -e ~/.zshrc_local ]; then
+	source ~/.zshrc_local
+else
+	print "~/.zshrc_local not found."
+fi
+
 #PATH=/bin:/usr/bin:/opt/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin:~/.opt:~/.opt/bin:~/.opt/sbin:/opt/scripts
 export LD_LIBRARY_PATH=$HOME/.opt/lib:$LD_LIBRARY_PATH
 # TOOLCHAIN_ARM=`find /usr/local -maxdepth 1 -type d -name "gcc-arm*"`/bin # find arm-none-eabi- tools
@@ -32,9 +39,6 @@ case $(whoami) in
 		# hostname in black on red
 		PS1="$(print '%{\e[0;30;41m%}%M%#%{\e[0m%}') "
 		unset MANPATH	# root doesn't need to read man pages from ~/rust
-		;;
-	*)
-		PS1="$(print '%{\e[0;34m%}%M%{\e[0m%}%{\e[0;31m%}%#%{\e[0m%}') "
 		;;
 esac
 PS2="$(print '%{\e[0;31m%}>%{\e[0m%}') "

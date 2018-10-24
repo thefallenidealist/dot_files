@@ -6,8 +6,16 @@
 # TODO 181020 check if installed: python pip
 #				vim snippets
 
-PIP="pip-3.6"
+OS=$(uname)
+if [ "$OS" == "FreeBSD" ] ; then
+	PIP="pip-3.6"
+	FILE_ZSH_LOCAL=zshrc_bsd
+elif [ "$OS" == "Linux" ] ; then
+	PIP="pip"
+	FILE_ZSH_LOCAL=zshrc_linux
+fi
 PROGRAMS="zsh tmux nvim xrdb xmodmap git"
+# Linux: apt-get install curl fonts-powerline
 
 # set dir (basedir/pwd)														{{{
 # -----------------------------------------------------------------------------
@@ -75,6 +83,7 @@ install_dot()
 {
 	ln -sf $BASEDIR/tmux.conf	$HOME/.tmux.conf
 	ln -sf $BASEDIR/zshrc		$HOME/.zshrc
+	ln -sf $BASEDIR/$FILE_ZSH_LOCAL		$HOME/.zshrc_local
 	ln -sf $BASEDIR/gitconfig	$HOME/.gitconfig
 }
 # ------------------------------------------------------------------------- }}}
@@ -83,10 +92,11 @@ install_dot()
 install_gui()
 {
 	# $UID doesn't work in /bin/sh
-	UID=$(id -u)
+	# $UID won't work in bash (because Linux /bin/sh)
+	USER_ID=$(id -u)
 
 	# for non-root users only:
-	if [ "$UID" != "0" ]; then
+	if [ "$USER_ID" != "0" ]; then
 		ln -sf $BASEDIR/Xdefaults	$HOME/.Xdefaults
 		ln -sf $BASEDIR/xmodmap		$HOME/.xmodmap
 		ln -sf $BASEDIR/xbindkeysrc	$HOME/.xbindkeysrc
