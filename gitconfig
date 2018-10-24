@@ -1,21 +1,12 @@
-; INFO to view options: git config --list (or -l)
-;  vim: set ft=gitconfig ts=4 sw=4 tw=0 fdm=manual et :
-[user]
-	email = propaliidealist@gmail.com
-	name = Johnny Sorocil
-[github]
-	user = propaliidealist@gmail.com
-[merge]
-	tool = vimdiff
-[credential]
-	# 1440s = 1 day
-	helper = cache --timeout=1440
-	username = thefallenidealist
+# INFO to view options: git config --list (or -l)
+# vim: set ft=gitconfig ts=4 sw=4 tw=0 fdm=manual noet :
+[include]
+	path = ~/.gitconfig_local
 
 [alias]
 	s = status
 	sn = status -uno
-	; ! means pass the whole line to the shell
+	# ! means pass the whole line to the shell
 	; s = !git remote get-url origin && git status	# TODO posao
 	co = checkout
 	com = checkout master
@@ -27,42 +18,45 @@
 	# up = rebase	# SVN muscle memory
 	last = log -1 HEAD
 	l = log --decorate
-    c = commit
-    cm = commit --allow-empty-message -m
-	ca = commit --amend
-    caa = commit --amend --no-edit  # git aliases are not case sensitive (cA will not work here)
-    rc = rebase --continue
-    rq = rebase --quit
-	ls = diff --name-only	# only show filenames of changed files between commits
-	ls2 = ls-files		# list tracked files
+	c = commit
+	cm = commit --allow-empty-message -m
+	cc = commit						# same as vim fugitive plugin
+	ca = commit --amend				# same as vim fugitive plugin
+	ce = commit --amend --no-edita	# same as vim fugitive plugin
+	rc = rebase --continue
+	ra = rebase --abort
+	cp  = cherry-pick
+	cpc = cherry-pick --continue
+	cpa = cherry-pick --abort
+	ls = diff --name-only			# only show filenames of changed files between commits
+	ls2 = ls-files					# list tracked files
 	st = stash
 	sh = stash
 	sp = stash pop
 	ss = stash show
-	# some aliases for lazy shits like me
 	d = diff
 	dc = diff --cached
 	dd = diff --submodule
+    dhh = diff HEAD^ HEAD
 	dd0 = foreach --recursive git diff
 	dd1 = foreach --recursive git diff --name-status
-
 	dt = difftool
 	lol = log --graph --branches --remotes --pretty=oneline --abbrev-commit
 	lsh = log --graph --branches --remotes --pretty=short --abbrev-commit
 	ll  = log --pretty=format:"%C(green)%h\\ %C(yellow)[%ad]%Cred%d\\ %Creset%s%C('blue bold')\\ [%cn]" --decorate --date=relative
-    ll  = log --pretty=format:"%C(green)%h\\ %C(yellow)[%ad]%C(red)%d\\ %C(reset)%s%C('blue bold')\\ [%cn]" --decorate --date=relative
-    ; ll2 = log --pretty=format:"%C(green)%h\\ %C(yellow)[%ad]%Cred%d\\ %Creset%s%C('blue bold')\\ [%cn] %Cred%d\\ %creset" --decorate --date=relative
+	ll  = log --pretty=format:"%C(green)%h\\ %C(yellow)[%ad]%C(red)%d\\ %C(reset)%s%C('blue bold')\\ [%cn]" --decorate --date=relative
+	# ll2 = log --pretty=format:"%C(green)%h\\ %C(yellow)[%ad]%Cred%d\\ %Creset%s%C('blue bold')\\ [%cn] %Cred%d\\ %creset" --decorate --date=relative
 	ap = apply --ignore-space-change --ignore-whitespace
 	ap2 = apply --reject --whitespace=fix
 	app = apply --reject --whitespace=fix
 
-    brc = git rev-parse --abbrev-ref HEAD   # show only current branch
-    ; pusho = push --set-upstream origin $(git rev-parse --abbrev-ref HEAD) # TODO
+	brc = git rev-parse --abbrev-ref HEAD   # show only current branch
+	# pusho = push --set-upstream origin $(git rev-parse --abbrev-ref HEAD) # TODO
 
 [log]
 	decorate = full
 	# decorate with branch pointers
-	; decorate = short
+	# decorate = short
 [color]
 	ui = auto
 [color "branch"]
@@ -83,7 +77,7 @@
 	pager = less -F -X
 	# autocrlf = false	# s posla
 [apply]
-    whitespace = nowarn
+	whitespace = nowarn
 
 # examples
 # change remote:

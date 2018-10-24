@@ -2,7 +2,7 @@
 " 1.0 - created 160729, again
 " 0.1 - 160512 - vim as IDE at work
 " 0.0 - 2006. probably
-" vim: set ft=vim ts=4 sw=4 tw=78 fdm=marker et :
+" vim: set ft=vim ts=4 sw=4 tw=78 fdm=marker noet :
 
 " TODO 2017-09-02 Windows libclang
 let s:work_pc = 0
@@ -72,18 +72,17 @@ set showmatch
 set shortmess+=c    " don't give ins-completion-menu messages
 
 set encoding=utf-8	" otherwise gVim will complain about listchars and showbreak
+set diffopt+=vertical
 "		<tab> and wrapping			{{{
 """""""""""""""""""""""""""""""""""""""
 if (s:work_pc == 1)
-    " let s:tab_size = 3
-    " you can't use variables on the rhs in the .vimrc.
-    " execute "set tabstop=".tab_size
+    " let s:tab_size = 3 XXX - you can't use variables on the rhs in the .vimrc.
     set tabstop=3		" tab size
     set shiftwidth=3 	" when indenting with '>'
     set expandtab		" convert tab to spaces
     set softtabstop=3	" smart <BS> - delete 4 chars"
     set textwidth=120
-    set diffopt+=iwhite " ignore whitespace changes and also newlines (^M)
+    set diffopt+=iwhite	" ignore whitespace changes and also newlines (^M)
 else
     set tabstop=4		" tab size
     set shiftwidth=4 	" when indenting with '>'
@@ -170,8 +169,7 @@ endif
 
 set formatoptions+=j	" pretty formating when joining lines (key J)
 " set nrformats+=alpha  " Ctrl-A/X will also work on single chars
-
-set diffopt+=vertical   " vertical split
+set sessionoptions+=buffers,curdir,folds,resize
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		OS specific															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -188,20 +186,16 @@ if has('unix')
 		let g:tagbar_ctags_bin=g:ctags_exe
 
 	elseif s:uname == "Linux"
+		let g:ctags_exe='/usr/bin/uctags'
 	endif " uname
 elseif has('windows')
-    " INFO 17xxxx: nvim clipboard: Install win32yank.exe and put in $PATH. That's it
-    " place where Python (x64, as vim.exe) is installed
-    let $PATH.=';C:\bin'
-    let $PATH.=';C:\python35_x64'   " posao
-    let $PATH.=';C:\python36'       " Win10 VM
-    let g:ctags_exe='c:\bin\ctags.exe'
-    let g:python3_host_prog='python.exe'
-    if substitute(system('is_sverige'), '\n','','g') == "1"
-        let g:python3_host_prog='C:\python35_x64\python.exe'
-    endif
-
-    let g:session_autosave = 'no'
+	let $PATH.=';C:\bin'			" place where win32yank is
+	let $PATH.=';C:\python35_x64'	" work PC
+	let g:ctags_exe='c:\bin\ctags.exe'
+	let g:python3_host_prog='python.exe'
+	if substitute(system('is_sverige'), '\n','','g') == "1"
+		let g:python3_host_prog='C:\python35_x64\python.exe'
+	endif
 endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		build/programming			{{{
@@ -299,7 +293,7 @@ augroup my_group_with_a_very_uniq_name
 	" autocmd VimEnter * if @% == "[Command Line]" | echo "QQQQQQ" | else | "AAAAAA" | endif
 
 	autocmd Filetype xdefaults set commentstring=!%s
-	autocmd FileType pf,dnsmasq,fstab,cfg setlocal commentstring=#\ %s
+	autocmd FileType pf,dnsmasq,fstab,cfg,gitconfig setlocal commentstring=#\ %s
 
 	" Warn if file in current buffer is changed outside of Vim
 	" - default: just warning when trying to write to the file
@@ -323,9 +317,6 @@ if &diff
 	map <leader>1 :diffget LOCAL<CR>
 	map <leader>2 :diffget BASE<CR>
 	map <leader>3 :diffget REMOTE<CR>
-
-    call SetupCommandAlias("dg",  "diffget")
-    call SetupCommandAlias("dp",  "diffput")
 endif
 
 " setup for preview window
@@ -334,6 +325,12 @@ if &previewwindow
 	" echoe "Preview Window here!"
 	" nnoremap q :q!<cr>
 endif
+
+" close preview windows if it is last
+aug QFClose
+	au!
+	au WinEnter * if winnr('$') == 1 && getbufvar(winbufnr(winnr()), "&buftype") == "quickfix"|q|endif
+aug END
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		cmd aliases															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -428,6 +425,10 @@ cabbrev csl :source Session.vim
 
 cabbrev ccc call ToggleColorColumn()
 call SetupCommandAlias("qc", "ccl") " quickfix close (alignmend with :pc[lose])
+call SetupCommandAlias("dt", "diffthis")
+call SetupCommandAlias("do", "diffoff")
+" call SetupCommandAlias("dg", "diffget")
+" call SetupCommandAlias("dp", "diffput")
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		generic mappings													{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -905,7 +906,7 @@ if has('clipboard')	" not really needed for all options under this
 	" TODO TODO set paste mode before pasting
 	vnoremap <leader>y "+y:echo  "copied to the X11 2nd clipboard"<cr>
 	nnoremap <leader>yy "+yy:echo "copied to the X11 2nd clipboard"<cr>
-    nnoremap <leader>y "+yiw:echo "copied to the X11 2nd clipboard"<cr>
+	nnoremap <leader>y "+yiw:echo "copied to the X11 2nd clipboard"<cr>
 	nnoremap <leader>p "+p:echo  "pasted from the X11 2nd clipboard"<cr>
 	vnoremap <leader>p "+p:echo  "pasted from the X11 2nd clipboard"<cr>
 
@@ -1147,7 +1148,17 @@ endfunction
 
 " Plugins																	{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Auto install plug.vim doesn't exists                                      {{{
+" -----------------------------------------------------------------------------
+if empty(glob('~/.vim/autoload/plug.vim'))
+    silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+                \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+" -----------------------------------------------------------------------------
+" ------------------------------------------------------------------------- }}}
 call plug#begin('~/.vim/plugged')
+
 " AutoComplete
 Plug 'roxma/nvim-completion-manager'
 " NCM fork without Python dependency
@@ -1164,8 +1175,8 @@ Plug 'racer-rust/vim-racer' " Rust autocompleter
 Plug 'roxma/nvim-cm-racer'  " Rust enginge for NCM
 
 Plug 'roxma/ncm-github'
-Plug 'huawenyu/neogdb.vim'
-Plug 'tpope/vim-dispatch'	" async make, needed for cscope code snippet below
+" Plug 'huawenyu/neogdb.vim'
+" Plug 'tpope/vim-dispatch'	" async make, needed for cscope code snippet below
 
 Plug 'tpope/vim-unimpaired'	" easier movements around, like [q, ]q (quickfick)
 " Plug 'triglav/vim-visual-increment' " Ctrl-A/X for columns
@@ -1228,13 +1239,14 @@ Plug 'mhinz/vim-grepper'	" search buffers and populate quickfix
 Plug 'ronakg/quickr-preview.vim'	" preview files in quickfix without spoiling buffer list
 
 Plug 'tomasr/molokai'		" color scheme
+Plug 'altercation/vim-colors-solarized'
 Plug 'tomasiser/vim-code-dark'  " VisualStudio inspired theme
 Plug 'powerman/vim-plugin-AnsiEsc'	" Show shell ANSI colors as colors
 
 " Plug 'brookhong/cscope.vim'		" XXX 180217: on clean Win10
-Plug 'idanarye/vim-vebugger'
+" Plug 'idanarye/vim-vebugger'
 " needed for vebugger
-Plug 'Shougo/vimproc.vim', {'do' : 'make'}
+" Plug 'Shougo/vimproc.vim', {'do' : 'make'}
 
 
 Plug 'kshenoy/vim-signature'	" marks in sign column and with easier shortcuts
@@ -1271,8 +1283,6 @@ Plug 'wesQ3/vim-windowswap'		" Easier window swap: <leader>ww
 
 Plug 'machakann/vim-highlightedyank'	" temporary highlight yanked text/selection
 " Plug 'luochen1990/rainbow'             " colored brackets
-
-" igranje:
 
 " Initialize plugin system
 call plug#end()
@@ -1528,8 +1538,9 @@ nmap <Leader>gr <Plug>GitGutterUndoHunk
 nmap <Leader>gu <Plug>GitGutterUndoHunk
 
 call SetupCommandAlias("gitt","GitGutterToggle")
+call SetupCommandAlias("Gcc","Gcommit -m")
 call SetupCommandAlias("Gca","Gcommit --amend")
-call SetupCommandAlias("GcA","Gcommit --amend --reuse-message=HEAD")
+call SetupCommandAlias("Gce","Gcommit --amend --no-edit")
 
 " let g:gitgutter_realtime = 0
 " let g:gitgutter_eager = 0
@@ -1699,7 +1710,7 @@ nnoremap <C-w>c :call undoquit#SaveWindowQuitHistory()<cr><C-w>c
 " INFO rename tabs XXX don't work with CtrlSpace (which manages Airline tabline)
 
 " remember tab names after restore
-set sessionoptions+=tabpages,globals,buffers,curdir,folds,resize
+set sessionoptions+=tabpages,globals
 
 let g:taboo_tabline = 0		" AirLine is OK for this purpose
 let g:airline#extensions#taboo#enabled = 1
@@ -1767,7 +1778,7 @@ call SetupCommandAlias("css", ":Obsession .")	" muscle memory
 
 " g:session_directory = '~/.vim/sessions' "" or ~\vimfiles\sessions (on Windows).
 
-" let g:session_autosave = 'no'	" Don't ask when exiting Vim
+let g:session_autosave = 'no'	" Don't ask when exiting Vim
 let g:session_autosave_periodic = '1'	" Auto save every N minutes
 
 " Disable all session locking - I know what I'm doing :-).
@@ -2500,3 +2511,8 @@ nnoremap <End> G
 " INFO 180218: multiple file search and replace:
 " - search and populate quick list: Greeper or <leader>a
 " - :cdo s/old/new/ge | update
+
+" TODO 181026:check this (on Windows specially)
+" g:session_directory = '~/.vim/sessions' "" or ~\vimfiles\sessions (on Windows).
+" Don't save hidden and unloaded buffers in sessions.
+" set sessionoptions-=buffers

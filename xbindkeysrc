@@ -1,30 +1,104 @@
 # created 180113
-# to reload: xbindkey -p  (it will reload ~/.xbindkeysrc)
-# to identify key: xbindkey -k
-
-# Example: F7 and F8 for volume control
-# "mixer vol -5"
-	# F7
-# "mixer vol +5"
-# 	F8
+#  vim: set ft=conf ts=4 sw=4 tw=0 fdm=marker noet :
+# generate default rc:  xbindkeys -d
+# reload:               xbindkey -p  (it will reload ~/.xbindkeysrc)
+# identify key:         xbindkey -k /-mk (multikey)
+# show/print:           xbindkey -s
+# Even when you laptop screen is locked you will be able to use xbinded keys (to turn the volume down or up).
 
 # Ctrl + i will generate F14 key
 # Release - if not present, then not every keypress will be registered
-"xdotool key --clearmodifiers F14"
-    control + i + Release
+# "xdotool key --clearmodifiers Control + Prior"
+# 	Mod4 + bracketleft + Release
 
-# "xdotool key --clearmodifiers F15"
-#     control + o + Release
+"gmrun"
+	alt + F2
 
-# Ctrl + [ = F16
-"xdotool key --clearmodifiers F16"
-    control + bracketleft + Release
+# Mod4 = Super
 
-# TODO 180116: Map CapsLock key release (in my case same as mod4/win) to Fx
-# in Vim map that key to <esc>
-# "mixer vol -5"
-# 	mod4 + Release
+# xterm combos																{{{
+# -----------------------------------------------------------------------------
+# xterm -title Xterm
+"xterm"
+	mod4 + x
 
-# Ctrl + ; = Ctrl + v
-# "xvkbd -xsendevent -text "\Cv""
-# 	control + semicolon
+# "xterm -title XScreen -e 'tmux'"
+"xterm -e tmux"
+	mod4 + z
+
+"xterm -e htop"
+	mod4 + shift + h
+# ------------------------------------------------------------------------- }}}
+# programs																	{{{
+# -----------------------------------------------------------------------------
+"firefox"
+	mod4 + shift + e
+
+"pidgin"
+	mod4 + shift + r
+
+"VirtualBox"
+	mod4 + shift + t
+
+"kicad"
+	mod4 + shift + y
+
+"kicad"
+	mod4 + shift + y
+
+"galculator"
+	mod4 + shift + g
+"galculator"
+	mod4 + shift + c
+
+"mtpaint"
+	mod4 + shift + u
+
+"xkill"
+	mod4 + shift + p
+
+"xterm -e nvim"
+	mod4 + shift + v
+
+# TODO 181020
+# <keybind key="Print">	<action name="Execute"> <command>scrot '%y.%m.%d-%H:%M:%S.png' -e 'mv $f ~/ss'	</command> </action> </keybind>
+# <keybind key="C-Print">	<action name="Execute"> <command>scrot '%y.%m.%d-%H:%M:%S.png' -se 'mv $f ~/ss'	</command> </action> </keybind>
+# ------------------------------------------------------------------------- }}}
+# volume control															{{{
+# -----------------------------------------------------------------------------
+# TODO 181020: use pcm or vol?
+"mixer vol -5"
+	mod4 + shift + comma
+
+"mixer vol 0"	# TODO 181020: vol toggle
+	mod4 + shift + period
+
+"mixer vol +5"
+	mod4 + shift + slash
+
+"mixer vol -5"
+	XF86AudioLowerVolume
+
+"mixer vol +5"
+	XF86AudioRaiseVolume
+# ------------------------------------------------------------------------- }}}
+
+# test combo
+# "xterm -e htop"
+# "xdotool mousemove 90 80 click 3" # radi
+"xdotool key Next"
+ 	mod4 + n
+
+# "xdotool key ctrl+Prior"
+	# Release + KP_End
+
+# "xdotool key Control_L + Prior"	# key combo is OK: works from gmrun
+"xdotool getactivewindow key Control_L + Prior"	# key combo is OK: works from gmrun
+	mod4 + bracketleft
+
+# "xdotool keydown Control_L key Prior"
+	# mod4 + bracketleft
+
+# "xdotool key ctrl + Next"
+	# Release + mod4 + bracketright
+	# Release + mod4 + bracketright

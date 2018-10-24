@@ -1,5 +1,5 @@
 # Created probably in 2006
-#  vim: set ft=zsh ts=4 sw=4 tw=0 fdm=marker et :
+#  vim: set ft=zsh ts=4 sw=4 tw=0 fdm=marker noet :
 HISTFILE=~/.history.zsh
 HISTSIZE=1000
 SAVEHIST=1000
@@ -13,14 +13,23 @@ setopt histignorespace			# and with trailing spaces
 
 zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}'
 
-#PATH=/bin:/usr/bin:/opt/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin:~/.opt:~/.opt/bin:~/.opt/sbin:/opt/scripts
+# include per-host configuration
+if [ -e ~/.zshrc_local ]; then
+	source ~/.zshrc_local
+else
+	print "~/.zshrc_local not found."
+fi
+
 export LD_LIBRARY_PATH=$HOME/.opt/lib:$LD_LIBRARY_PATH
 # TOOLCHAIN_ARM=`find /usr/local -maxdepth 1 -type d -name "gcc-arm*"`/bin # find arm-none-eabi- tools
 TOOLCHAIN_ARM=/usr/local/gcc-arm-embedded-7-2017-q4-major/bin	# faster sh startup, needs manual update
-TOOLCHAIN_FPGA=$HOME/.opt/fpga/bin
-export PATH=~/.opt/scripts:~/.opt:~/.opt/bin:~/.opt/sbin:/opt/scripts:/opt/bin:$HOME/.cargo/bin:$HOME/.local/bin:$PATH:$TOOLCHAIN_ARM:$TOOLCHAIN_FPGA
+# TOOLCHAIN_FPGA=$HOME/.opt/fpga/bin
+export PATH="$HOME/.opt:$HOME/.opt/bin:$HOME/.opt/sbin:$HOME/.opt/scripts:\
+	/opt/scripts:/opt/bin:\
+	$HOME/.cargo/bin:$HOME/.local/bin:\
+	$TOOLCHAIN_ARM:$TOOLCHAIN_FPGA\
+	$PATH"
 # Thumb toolchain (and GDB -python)
-# /usr/local/bin is here (and arm-none-eabi-gdb +python)
 
 export MANPATH="$HOME/.opt/share/man:
 	$HOME/toolchains/nightly-x86_64-unknown-freebsd:
@@ -32,9 +41,6 @@ case $(whoami) in
 		# hostname in black on red
 		PS1="$(print '%{\e[0;30;41m%}%M%#%{\e[0m%}') "
 		unset MANPATH	# root doesn't need to read man pages from ~/rust
-		;;
-	*)
-		PS1="$(print '%{\e[0;34m%}%M%{\e[0m%}%{\e[0;31m%}%#%{\e[0m%}') "
 		;;
 esac
 PS2="$(print '%{\e[0;31m%}>%{\e[0m%}') "
@@ -143,6 +149,8 @@ alias sw2='sw0; sw1'
 
 alias zsnap_used="zfs get -o name,value used |grep @"
 alias zsnap_destroy_all="zfs list -H -o name -t snapshot | xargs -n1 zfs destroy"
+alias beadm=bectl	# 12.0 has beadm tool in base system as bectl
+alias zdf="zpool list -o name,size,allocated,capacity"
 
 # ------------------ 3rd party system utils --------------------------------
 alias freec='freecolor -mt'
@@ -152,7 +160,8 @@ alias ip="w3m www.whatismyip.com | grep 'Your IP Address Is:' | cut -d ':' -f 2 
 alias pstree='pstree -g 2'
 # -------------------------------------------------------------------------- }}}
 # ------------------ alias - unix tools ------------------------------------ {{{
-alias ls='ls -IGh'
+# INFO 181024: add GNU specific flag until this is separated into per OS configs:
+alias ls='ls -IGh --color'
 alias l='ls'
 alias ll='ls -l'
 alias llt='ls -lt'
@@ -188,6 +197,7 @@ alias msg="grc cat /var/log/messages | grep -v 'wpa_supplicant\|dhclient\|wlan0:
 alias lsof='fstat | grep -i '
 alias u='(date && uname -a && uptime)'
 alias uu='(date && uname -a && uptime) > `uname -r | cut -b 1-3`.`/bin/date +'%y%m%d'`'
+alias xxd="hexdump -C"		# xxd is part of vim package
 # -------------------------------------------------------------------------- }}}
 # ------------------ alias - archivers ------------------------------------- {{{
 alias untar='tar xvf'
@@ -214,7 +224,7 @@ alias pkga='pkg info -a'	# all installed packages
 #alias bup0='portaudit -Faq'
 alias bup0='pkg audit -Fq'
 alias bup1o='portsnap fetch update'
-alias bup1='cd /usr/ports ; git pull ; cd -'
+alias bup1='cd /usr/ports ; git pull ; make fetchindex ; cd -'
 alias bup2="pkg version -v | grep -v '='"
 alias bup3='portmaster -dHa'
 alias bup3f='portmaster -Fa'
@@ -242,6 +252,7 @@ alias w='wget --no-check-certificate'
 # -------------------------------------------------------------------------- }}}
 # ------------------ alias - user programs --------------------------------- {{{
 alias vi=nvim
+alias vimdiff="nvim -d"
 #alias s='screen -U'
 alias s='tmux'
 alias history='history -Ef'	# pretty history with European dates"
