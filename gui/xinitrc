@@ -1,0 +1,20 @@
+# 180921 - ThinkPad T430s
+export LC_ALL=en_US.UTF-8
+
+#xterm&
+xsetroot -solid black&
+xmodmap .xmodmap&
+xbindkeys&
+tint2&
+
+# fix for T430s with fuck-up keyboard layout:
+xmodmap -e "keycode 111 = Super_R"  # "PrtSc" key between Alt and Ctrl
+
+# unclutter --timeout 1&		# hide mouse pointer - no problem when hiding cursor on mpv
+hhpc -i 1&		# unclutter alterntive, works also on hw accelated videos
+
+# sh ~/.opt/conky.sh&
+# pcmanfm -n /mnt/local/video/music &
+
+xterm -title tp.root -e 'echo tp root && su -l'&				# tp root
+exec openbox
