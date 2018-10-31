@@ -67,10 +67,14 @@ remove_files()
 		$HOME/.zshrc \
 		$HOME/.zshrc_local \
 		$HOME/.tmux.conf \
-		$HOME/.Xdefaults \
 		$HOME/.vim \
+		$HOME/.fzf* \
+		$HOME/.Xdefaults \
 		$HOME/.config/nvim \
-		$HOME/.xmodmap
+		$HOME/.xmodmap \
+		$HOME/.xinitrc \
+		$HOME/.config/openbox \
+		$HOME/.config/tint2
 	# rm -rf $HOME/.local
 }
 # ------------------------------------------------------------------------- }}}
@@ -116,7 +120,12 @@ install_gui()
 	if [ "$USER_ID" != "0" ]; then
 		ln -sf $BASEDIR/Xdefaults	$HOME/.Xdefaults
 		ln -sf $BASEDIR/xmodmap		$HOME/.xmodmap
+		ln -sf $BASEDIR/gui/xinitrc	$HOME/.xinitrc
 		ln -sf $BASEDIR/xbindkeysrc	$HOME/.xbindkeysrc
+		mkdir -p $HOME/.config
+		ln -sf $BASEDIR/gui/openbox	$HOME/.config
+		ln -sf $BASEDIR/gui/tint2	$HOME/.config
+
 		xrdb	$HOME/.Xdefaults
 		xmodmap	$HOME/.xmodmap
 	else
