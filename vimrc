@@ -76,19 +76,19 @@ set diffopt+=vertical
 "		<tab> and wrapping			{{{
 """""""""""""""""""""""""""""""""""""""
 if (s:work_pc == 1)
-    " let s:tab_size = 3 XXX - you can't use variables on the rhs in the .vimrc.
-    set tabstop=3		" tab size
-    set shiftwidth=3 	" when indenting with '>'
-    set expandtab		" convert tab to spaces
-    set softtabstop=3	" smart <BS> - delete 4 chars"
-    set textwidth=120
-    set diffopt+=iwhite	" ignore whitespace changes and also newlines (^M)
+	" let s:tab_size = 3 XXX - you can't use variables on the rhs in the .vimrc.
+	set tabstop=3		" tab size
+	set shiftwidth=3 	" when indenting with '>'
+	set expandtab		" convert tab to spaces
+	set softtabstop=3	" smart <BS> - delete 4 chars"
+	set textwidth=120
+	set diffopt+=iwhite	" ignore whitespace changes and also newlines (^M)
 else
-    set tabstop=4		" tab size
-    set shiftwidth=4 	" when indenting with '>'
-    " 180114: I surrender, spaces as tab:
-    set expandtab		" convert tab to spaces
-    set softtabstop=4	" smart <BS> - delete 4 chars"
+	set tabstop=4		" tab size
+	set shiftwidth=4 	" when indenting with '>'
+	" 180114: I surrender, spaces as tab:
+	" set expandtab		" convert tab to spaces
+	set softtabstop=4	" smart <BS> - delete 4 chars"
 endif
 
 " soft wrap
@@ -229,10 +229,10 @@ function! Compile()
 		make
 	elseif expand('%:e') == "rs"
 		echo "building Rust"
-        setlocal makeprg=cargo\ build\ $*
-        make
-        " TODO 180805: check if Makefile exists then just call make instead of cargo
-        " places to check: . src/ src/rust
+		setlocal makeprg=cargo\ build\ $*
+		make
+		" TODO 180805: check if Makefile exists then just call make instead of cargo
+		" places to check: . src/ src/rust
 	else
 		echoerr "Don't know how to build :["
 	endif
@@ -243,8 +243,8 @@ nnoremap <leader>rr :call Compile()<cr>
 inoremap <F5> :call Compile()<cr>
 inoremap <leader>rr :call Compile()<cr>
 if has('nvim')
-    inoremap <A-r> <C-o>:call Compile()<cr>
-    nnoremap <A-r> :call Compile()<cr>
+	inoremap <A-r> <C-o>:call Compile()<cr>
+	nnoremap <A-r> :call Compile()<cr>
 endif
 
 " za gF komandu koja otvori fajl pod kursorom
@@ -299,12 +299,12 @@ augroup my_group_with_a_very_uniq_name
 	" - default: just warning when trying to write to the file
 	autocmd BufEnter,FocusGained * checktime %
 
-    autocmd BufRead,BufNewFile SConstruct,SConscript set filetype=python
+	autocmd BufRead,BufNewFile SConstruct,SConscript set filetype=python
 
-    autocmd Filetype verilog call SetupVerilogEnvironment()
+	autocmd Filetype verilog call SetupVerilogEnvironment()
 
-    " close preview windows if it is last
-    au WinEnter * if winnr('$') == 1 && getbufvar(winbufnr(winnr()), "&buftype") == "quickfix"|q|endif
+	" close preview windows if it is last
+	au WinEnter * if winnr('$') == 1 && getbufvar(winbufnr(winnr()), "&buftype") == "quickfix"|q|endif
 augroup END
 
 " setup when in diff mode:
@@ -489,6 +489,10 @@ inoremap <F14> <Tab>
 nnoremap <F4> :set paste!<cr>
 " don't 'insert char above cursor, it's confusing'
 " inoremap <C-y> <nop> " XXX 180115: will break snippets and NCM
+
+" jump to next misspell (<leader>z and z= are already used for spelling)
+nnoremap ]z ]s
+nnoremap [z [s
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		buffers/windows/tabs keymaps										{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -549,10 +553,10 @@ if has('nvim')
 	" inoremap <A-i> <C-o>:tabnext<cr>
 	" inoremap <A-n> <C-o>:tabprev<cr>
 	" inoremap <A-m> <C-o>:tabnext<cr>
-    " nnoremap <A-u> <C-o>:tabprev<cr>
-    " nnoremap <A-i> <C-o>:tabnext<cr>
-    " nnoremap <A-n> <C-o>:tabprev<cr>
-    " nnoremap <A-m> <C-o>:tabnext<cr>
+	" nnoremap <A-u> <C-o>:tabprev<cr>
+	" nnoremap <A-i> <C-o>:tabnext<cr>
+	" nnoremap <A-n> <C-o>:tabprev<cr>
+	" nnoremap <A-m> <C-o>:tabnext<cr>
 	tnoremap <A-u> <C-\><C-N>:tabprev<cr>
 	tnoremap <A-i> <C-\><C-N>:tabnext<cr>
 	tnoremap <A-n> <C-\><C-N>:tabprev<cr>
@@ -862,8 +866,8 @@ if has('clipboard')	" not really needed for all options under this
 	" copy filepath to X11 clipboard
 	nnoremap <leader>FP  :let @* = expand("%")<cr>:echo		"relative path of the file copied to the X11 1st clipboard"<CR>
 	nnoremap <leader>fp  :let @+ = expand("%")<cr>:echo		"relative path of the file copied to the X11 2nd clipboard"<CR>
-   nnoremap <leader>FD  :let @* = expand("%:h")<cr>:echo		"relative path of the dir copied to the X11 1st clipboard"<CR>
-   nnoremap <leader>fd  :let @+ = expand("%:h")<cr>:echo		"relative path of the dir copied to the X11 2nd clipboard"<CR>
+	nnoremap <leader>FD  :let @* = expand("%:h")<cr>:echo		"relative path of the dir copied to the X11 1st clipboard"<CR>
+	nnoremap <leader>fd  :let @+ = expand("%:h")<cr>:echo		"relative path of the dir copied to the X11 2nd clipboard"<CR>
 	nnoremap <leader>FFP :let @* = expand("%:p")<cr>:echo		"full path of the file copied to the X11 1st clipboard"<CR>
 	nnoremap <leader>ffp :let @+ = expand("%:p")<cr>:echo		"full path of the file copied to the X11 2nd clipboard"<CR>
 
@@ -895,7 +899,7 @@ if has('clipboard')	" not really needed for all options under this
 	vnoremap <leader>yt :w! /tmp/vim_buffer<cr>:echo "vselection copied to /tmp/vim_buffer"<cr>
 
 	nnoremap yiW "+yiw:echo "yank inner word to the X11 2nd clipboard"<cr>
-    vnoremap Y "+y:echo "yank selection to the X11 2nd clipboard"<cr>
+	vnoremap Y "+y:echo "yank selection to the X11 2nd clipboard"<cr>
 
 	" X11 primary buffer		"*
 	vnoremap <leader>Y "*y:echo "copied to the X11 1st clipboard"<cr>
@@ -922,8 +926,8 @@ if has('clipboard')	" not really needed for all options under this
 
 	" Windows compat:
 	inoremap <S-Insert> <C-r>*
-    " ThinkPad keyboard compat:
-    inoremap <S-Delete> <C-r>*
+	" ThinkPad keyboard compat:
+	inoremap <S-Delete> <C-r>*
 endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 " Easier copy/paste to the named registers
@@ -1104,44 +1108,44 @@ nnoremap <silent> <Plug>HelpTagPrevious :call <SID>HelpTag(1)<CR>
 nnoremap <silent> <Plug>HelpTagNext     :call <SID>HelpTag(0)<CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 function! RemoveBrackets()                                                " {{{
-    " removes '\<' and '\>' in '/' register
-    " INFO created 171022, used for <C-R>/ after */#
-    let @/ = substitute(@/, "\\\\\<", "", "")
-    let @/ = substitute(@/, "\\\\\>", "", "")
+	" removes '\<' and '\>' in '/' register
+	" INFO created 171022, used for <C-R>/ after */#
+	let @/ = substitute(@/, "\\\\\<", "", "")
+	let @/ = substitute(@/, "\\\\\>", "", "")
 endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 function! HeaderToggle()                                                   " {{{
-" bang for overwrite when saving vimrc
-" from https://stackoverflow.com/questions/17170902/in-vim-how-to-switch-quickly-between-h-and-cpp-files-with-the-same-name
-let file_path = expand("%")
-let file_name = expand("%<")
-let extension = split(file_path, '\.')[-1] " '\.' is how you really split on dot
-let err_msg = "There is no file "
+	" bang for overwrite when saving vimrc
+	" from https://stackoverflow.com/questions/17170902/in-vim-how-to-switch-quickly-between-h-and-cpp-files-with-the-same-name
+	let file_path = expand("%")
+	let file_name = expand("%<")
+	let extension = split(file_path, '\.')[-1] " '\.' is how you really split on dot
+	let err_msg = "There is no file "
 
-if extension == "c"
-    let next_file = join([file_name, ".h"], "")
+	if extension == "c"
+		let next_file = join([file_name, ".h"], "")
 
-    if filereadable(next_file)
-    :e %<.h
-    else
-        echo join([err_msg, next_file], "")
-    endif
-elseif extension == "h"
-    let next_file = join([file_name, ".c"], "")
+		if filereadable(next_file)
+			:e %<.h
+		else
+			echo join([err_msg, next_file], "")
+		endif
+	elseif extension == "h"
+		let next_file = join([file_name, ".c"], "")
 
-    if filereadable(next_file)
-        :e %<.c
-    else
-        echo join([err_msg, next_file], "")
-    endif
-endif
+		if filereadable(next_file)
+			:e %<.c
+		else
+			echo join([err_msg, next_file], "")
+		endif
+	endif
 endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 function! SetupVerilogEnvironment()                                        " {{{
-    " https://github.com/albertxie/iverilog-tutorial
-    " TODO 180617: Incorporate this into <F5> mapping for C/C++/Rust
-    " (depending on filetype)
-    map <F5> :! iverilog -o %:r.vvp %:r.v %:r_tb.v && vvp %:r.vvp && gtkwave %:r.vcd <ENTER>
+	" https://github.com/albertxie/iverilog-tutorial
+	" TODO 180617: Incorporate this into <F5> mapping for C/C++/Rust
+	" (depending on filetype)
+	map <F5> :! iverilog -o %:r.vvp %:r.v %:r_tb.v && vvp %:r.vvp && gtkwave %:r.vcd <ENTER>
 endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
@@ -1151,9 +1155,9 @@ endfunction
 " Auto install plug.vim doesn't exists                                      {{{
 " -----------------------------------------------------------------------------
 if empty(glob('~/.vim/autoload/plug.vim'))
-    silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
-                \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+	silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+				\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+	autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 " -----------------------------------------------------------------------------
 " ------------------------------------------------------------------------- }}}
@@ -1193,7 +1197,7 @@ Plug 'majutsushi/tagbar'	" show tags (func, vars) in window right
 " Plug 'vim-scripts/TagHighlight'	" color typedefs as variables, needs
 " :UpdateTypesFile
 Plug 'octol/vim-cpp-enhanced-highlight'	" simpler works out-of-the books, but not as good as TagHighlight
-                                        " INFO 180525: This line must be here, otherwise C functions won't be highlighted
+										" INFO 180525: This line must be here, otherwise C functions won't be highlighted
 " Plug 'jeaye/color_coded'	" semantic highlighter INFO 170818: doesn't work in nvim
 
 Plug 'chrisbra/NrrwRgn' " narrow region
@@ -1240,7 +1244,7 @@ Plug 'ronakg/quickr-preview.vim'	" preview files in quickfix without spoiling bu
 
 Plug 'tomasr/molokai'		" color scheme
 Plug 'altercation/vim-colors-solarized'
-Plug 'tomasiser/vim-code-dark'  " VisualStudio inspired theme
+Plug 'tomasiser/vim-code-dark'		" VisualStudio inspired theme
 Plug 'powerman/vim-plugin-AnsiEsc'	" Show shell ANSI colors as colors
 
 " Plug 'brookhong/cscope.vim'		" XXX 180217: on clean Win10
@@ -1435,8 +1439,8 @@ let g:snips_mail=substitute(strtrans(system('git config user.email')), '\^@','',
 let g:UltiSnipsEditSplit="vertical"
 call SetupCommandAlias("snipe", "UltiSnipsEdit")
 
-	" don't search for directory, use only tihs:
-	" let g:UltiSnipsSnippetDirectories=$HOME.'/.vim/UltiSnips'
+" don't search for directory, use only tihs:
+" let g:UltiSnipsSnippetDirectories=$HOME.'/.vim/UltiSnips'
 " set runtimepath+=~/.vim/my-snippets/	" radi, ali unutar tog foldera mora bit subfolder "snippets" ili "UltiSnips""
 " let g:UltiSnipsSnippetsDir = "~/.vim/my-snippets/UltiSnips"	" CP s neta, njima radi, meni ne
 "
@@ -1496,11 +1500,12 @@ let g:fzf_buffers_jump = 0
 " let g:fzf_commits_log_options = '--graph --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr"'
 
 " 171205 close FZF windows with <esc> (insted of <C-W>c)
+" TODO 181105: Check this under Windows
 if has('nvim')
-aug fzf_setup
-    au!
-    au TermOpen term://*FZF tnoremap <silent> <buffer><nowait> <esc> <c-c>
-aug END
+	aug fzf_setup
+		au!
+		au TermOpen term://*FZF tnoremap <silent> <buffer><nowait> <esc> <c-c>
+	aug END
 end
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " File managers                                                              {{{
@@ -1547,7 +1552,7 @@ call SetupCommandAlias("Gce","Gcommit --amend --no-edit")
 
 " Fugitive - use 'q' to exit Gdiff:
 if (bufname('%') == '^fugitive:')
-    nnoremap <buffer> q :wincmd c<cr>
+	nnoremap <buffer> q :wincmd c<cr>
 endif
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " searching																	{{{
@@ -1561,10 +1566,10 @@ let g:grepper.highlight = 1
 " - -query must be the last flag
 
 if has('windows')
-    " 180218: This doesn't work under my Win10 VM for some reason
-    nnoremap <leader>a :Rg <C-r><C-w><CR>
+	" 180218: This doesn't work under my Win10 VM for some reason
+	nnoremap <leader>a :Rg <C-r><C-w><CR>
 else
-    nnoremap <leader>a :Grepper -tool rg -query <C-r><C-w><CR>
+	nnoremap <leader>a :Grepper -tool rg -query <C-r><C-w><CR>
 endif
 nnoremap <leader>A :Grepper<cr>
 nnoremap <leader>s :Grepper -tool rg -buffers -query <C-r><c-w><cr>
@@ -1936,35 +1941,35 @@ highlight HighlightedyankRegion cterm=reverse gui=reverse
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 if has('cscope')
-    " unimpared mapping: ]q [q
+	" unimpared mapping: ]q [q
 
-    " regenerate DB from vim: :!cscope -Rbq :cs reset
-"	set cscopetag cscopeverbose
+	" regenerate DB from vim: :!cscope -Rbq :cs reset
+	"	set cscopetag cscopeverbose
 
-"	if has('quickfix')
-"		set cscopequickfix=s-,c-,d-,i-,t-,e-
-"	endif
+	"	if has('quickfix')
+	"		set cscopequickfix=s-,c-,d-,i-,t-,e-
+	"	endif
 
-    " a: Find assignments to this symbol
-    nmap <C-\>a :cs find s <C-R>=expand("<cword>")<CR><CR>
-    " s: Find this C symbol
-    nmap <C-\>s :cs find s <C-R>=expand("<cword>")<CR><CR>
-    " g: Find this definition
-    nmap <C-\>g :cs find g <C-R>=expand("<cword>")<CR><CR>
-    " c: Find functions calling this function
-    nmap <C-\>c :cs find c <C-R>=expand("<cword>")<CR><CR>
-    " t: Find this text string
-    nmap <C-\>t :cs find t <C-R>=expand("<cword>")<CR><CR>
-    " e: Find this egrep pattern
-    nmap <C-\>e :cs find e <C-R>=expand("<cword>")<CR><CR>
-    " f: Find this file
-    nmap <C-\>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
-    " i: Find files #including this file
-    nmap <C-\>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
-    " d: Find functions called by this function
-    nmap <C-\>d :cs find d <C-R>=expand("<cword>")<CR><CR>
+	" a: Find assignments to this symbol
+	nmap <C-\>a :cs find s <C-R>=expand("<cword>")<CR><CR>
+	" s: Find this C symbol
+	nmap <C-\>s :cs find s <C-R>=expand("<cword>")<CR><CR>
+	" g: Find this definition
+	nmap <C-\>g :cs find g <C-R>=expand("<cword>")<CR><CR>
+	" c: Find functions calling this function
+	nmap <C-\>c :cs find c <C-R>=expand("<cword>")<CR><CR>
+	" t: Find this text string
+	nmap <C-\>t :cs find t <C-R>=expand("<cword>")<CR><CR>
+	" e: Find this egrep pattern
+	nmap <C-\>e :cs find e <C-R>=expand("<cword>")<CR><CR>
+	" f: Find this file
+	nmap <C-\>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
+	" i: Find files #including this file
+	nmap <C-\>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
+	" d: Find functions called by this function
+	nmap <C-\>d :cs find d <C-R>=expand("<cword>")<CR><CR>
 
-"	" command -nargs=0 Cscope cs add $VIMSRC/src/cscope.out $VIMSRC/src
+	" command -nargs=0 Cscope cs add $VIMSRC/src/cscope.out $VIMSRC/src
 endif
 
 
@@ -2312,9 +2317,9 @@ set isfname+=32	" <space> is part of filename
 " for tag search (like * uses): echo expand('<cword'>)
 " if not tag, check if declaration: gd, then gD
 " check if www link
-		" map <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
-		" map <A-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
-		" execute("e ".mycurf) opens the file saved in mycurf
+" map <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
+" map <A-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
+" execute("e ".mycurf) opens the file saved in mycurf
 
 
 "  vib		select inner block (eg inside {})
@@ -2356,12 +2361,12 @@ set isfname+=32	" <space> is part of filename
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " db	delete word backwars
 " profiling: http://stackoverflow.com/questions/12213597/how-to-see-which-plugins-are-making-vim-slow
-	" :profile start profile.log
-	" :profile func *
-	" :profile file *
-	" " At this point do slow actions
-	" :profile pause
-	" :noautocmd qall!
+" :profile start profile.log
+" :profile func *
+" :profile file *
+" " At this point do slow actions
+" :profile pause
+" :noautocmd qall!
 
 " TODO jednom sredit:
 " plugin tslime		:vnoremap <buffer> \t <Plug>SendSelectionToTmux			" puts selected text to neighbors pane
@@ -2387,10 +2392,10 @@ set isfname+=32	" <space> is part of filename
 " :r! read output of command
 " :so source/execute commands from file<Paste>
 " redirect to file (in this example kbd map):
-	":redir! > vim_maps.txt
-	" :map
-	" :map!
-	" :redir END
+":redir! > vim_maps.txt
+" :map
+" :map!
+" :redir END
 
 " R in normal mode: write throught (Replace)-(without need to delete)
 " U/u/~ in visual mode to upper/lower/toggle case
@@ -2400,17 +2405,17 @@ set isfname+=32	" <space> is part of filename
 " load file without loading it :bad file.txt
 
 " argdo {{{
-    " :arg => list files in arglist
-    " :argdelete * => clean arglist
-    " :argadd **/*.rb => add files to arglist
-    " :argdo %s/foo/bar/gc => replace foo by bar in arglist
-    " :argdo update => save changes to arglist
-    " :argdo undo => undo changes to arglist
+" :arg => list files in arglist
+" :argdelete * => clean arglist
+" :argadd **/*.rb => add files to arglist
+" :argdo %s/foo/bar/gc => replace foo by bar in arglist
+" :argdo update => save changes to arglist
+" :argdo undo => undo changes to arglist
 " Navigation in arglist
-    " [a => go to the previous file in arglist
-    " ]a => go to the next file in arglist
-    " [A => go to the first file in arglist
-    " ]A => go to the last file in arglist
+" [a => go to the previous file in arglist
+" ]a => go to the next file in arglist
+" [A => go to the first file in arglist
+" ]A => go to the last file in arglist
 " }}}
 "##########################################################################}}}
 " vimL misc							{{{
@@ -2515,4 +2520,4 @@ nnoremap <End> G
 " TODO 181026:check this (on Windows specially)
 " g:session_directory = '~/.vim/sessions' "" or ~\vimfiles\sessions (on Windows).
 " Don't save hidden and unloaded buffers in sessions.
-" set sessionoptions-=buffers
+" set sessionoptions-=buftabers

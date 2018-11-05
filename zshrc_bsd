@@ -2,3 +2,4 @@
 # per OS specific config (linked to right ~/.zshrc_local via install_dot script)
 
 PS1="$(print '%{\e[0;34m%}%M%{\e[0m%}%{\e[0;31m%}%#%{\e[0m%}') "
+alias ls='ls -IGh'

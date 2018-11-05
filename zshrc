@@ -23,12 +23,11 @@ fi
 export LD_LIBRARY_PATH=$HOME/.opt/lib:$LD_LIBRARY_PATH
 # TOOLCHAIN_ARM=`find /usr/local -maxdepth 1 -type d -name "gcc-arm*"`/bin # find arm-none-eabi- tools
 TOOLCHAIN_ARM=/usr/local/gcc-arm-embedded-7-2017-q4-major/bin	# faster sh startup, needs manual update
-# TOOLCHAIN_FPGA=$HOME/.opt/fpga/bin
-export PATH="$HOME/.opt:$HOME/.opt/bin:$HOME/.opt/sbin:$HOME/.opt/scripts:\
-	/opt/scripts:/opt/bin:\
-	$HOME/.cargo/bin:$HOME/.local/bin:\
-	$TOOLCHAIN_ARM:$TOOLCHAIN_FPGA\
-	$PATH"
+export PATH="$PATH:$HOME/.opt:$HOME/.opt/bin:$HOME/.opt/sbin:$HOME/.opt/scripts"
+export PATH="$PATH:/opt/scripts:/opt/bin"
+export PATH="$PATH:$HOME/.cargo/bin:$HOME/.local/bin"
+# export PATH="$PATH:$HOME/.cargo/bin:$HOME/.local/bin:$HOME/.fzf/bin"
+export PATH="$PATH:$TOOLCHAIN_ARM"
 # Thumb toolchain (and GDB -python)
 
 export MANPATH="$HOME/.opt/share/man:
@@ -140,7 +139,7 @@ alias mem='top -b -o res'
 
 alias s2r='sync; acpiconf -s 3'
 alias s2d='sync; acpiconf -s 4'	# Neb reka da bas radi, bit ce da mu treba pravi swap
-alias reboot='sudo shutdown -r now'
+alias reboot='shutdown -r now'
 alias su='su -l'
 
 alias sw0="swapoff /dev/gpt/swap"
@@ -160,8 +159,6 @@ alias ip="w3m www.whatismyip.com | grep 'Your IP Address Is:' | cut -d ':' -f 2 
 alias pstree='pstree -g 2'
 # -------------------------------------------------------------------------- }}}
 # ------------------ alias - unix tools ------------------------------------ {{{
-# INFO 181024: add GNU specific flag until this is separated into per OS configs:
-alias ls='ls -IGh --color'
 alias l='ls'
 alias ll='ls -l'
 alias llt='ls -lt'
@@ -293,8 +290,6 @@ alias md="grip --norefresh"	# GitHub readme preview, don't auto refresh because 
 #echo "obase=16; 10"|bc
 alias gg='gmake clean && gmake'
 alias ggu='gmake clean && gmake -j4 && gmake upload'
-
-alias firefox=waterfox  # muscle memory
 # -------------------------------------------------------------------------- }}}
 
 # ------------------ custom fuction - zsnap -------------------------------- {{{
