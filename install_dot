@@ -18,9 +18,6 @@ elif [ "$OS" == "Linux" ] ; then
 fi
 PROGRAMS="zsh tmux nvim xrdb xmodmap git"
 # Linux: apt-get install curl fonts-powerline
-# TODO 181023: xinitrc
-
-LS="ls -lGh"
 
 IS_WORK_PC=$(is_work_pc 2>/dev/null)
 

@@ -86,19 +86,20 @@
 # test combo
 # "xterm -e htop"
 # "xdotool mousemove 90 80 click 3" # radi
-"xdotool key Next"
- 	mod4 + n
+# "xdotool key Next"
+ 	# mod4 + n
 
 # "xdotool key ctrl+Prior"
 	# Release + KP_End
 
 # "xdotool key Control_L + Prior"	# key combo is OK: works from gmrun
-"xdotool getactivewindow key Control_L + Prior"	# key combo is OK: works from gmrun
-	mod4 + bracketleft
+# "xdotool getactivewindow key Control_L + Prior"	# key combo is OK: works from gmrun
+	# mod4 + bracketleft
 
 # "xdotool keydown Control_L key Prior"
 	# mod4 + bracketleft
 
 # "xdotool key ctrl + Next"
+"gmrun"
 	# Release + mod4 + bracketright
-	# Release + mod4 + bracketright
+	mod4 + bracketleft

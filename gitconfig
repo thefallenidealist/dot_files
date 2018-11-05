@@ -37,7 +37,7 @@
 	d = diff
 	dc = diff --cached
 	dd = diff --submodule
-    dhh = diff HEAD^ HEAD
+	dhh = diff HEAD^ HEAD
 	dd0 = foreach --recursive git diff
 	dd1 = foreach --recursive git diff --name-status
 	dt = difftool

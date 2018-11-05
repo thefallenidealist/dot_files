@@ -12,7 +12,8 @@ clear lock
 keycode  66 = Super_L
 
 ! INFO 180617: Shift+BS will be recognized in xev, but won't work as Delete
-keycode  22 = BackSpace Delete
+! keycode  22 = BackSpace Delete BackSpace BackSpace NoSymbol NoSymbol Terminate_Server
+keycode  22 = BackSpace BackSpace BackSpace BackSpace NoSymbol NoSymbol Terminate_Server
 ! the real Escape
 keycode   9 = Escape Escape Escape Escape
 ! the key left of "1"
