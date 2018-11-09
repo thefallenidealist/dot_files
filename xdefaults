@@ -31,7 +31,7 @@ XTerm*allowBoldFonts: true
 !ali fluxbox slijedi volju bozju pa ne radi na racionalan nacin
 !ovo overridea onu od .fluxboxa
 !xterm*geometry:		118x49+3+23
-xterm*geometry:		145x49+1+23
+! xterm*geometry:		145x49+1+23
 xterm*cursorBlink:	false
 xterm*utf8:			true
 xterm*wideChars:	true

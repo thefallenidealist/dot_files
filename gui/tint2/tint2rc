@@ -181,11 +181,10 @@ launcher_icon_theme_override = 0
 startup_notifications = 1
 launcher_tooltip = 1
 
-launcher_item_app = /usr/share/applications/tint2conf.desktop
-launcher_item_app = /usr/share/applications/rxvt-unicode.desktop 
+launcher_item_app = /usr/share/applications/debian-uxterm.desktop
 launcher_item_app = /usr/share/applications/firefox.desktop
-launcher_item_app = /usr/share/applications/thunderbird.desktop 
-# launcher_item_app = /usr/share/applications/thunar.desktop 
+launcher_item_app = /usr/share/applications/thunderbird.desktop
+launcher_item_app = /usr/share/applications/skypeforlinux.desktop
 
 #-------------------------------------
 # System tray (notification area)
