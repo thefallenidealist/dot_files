@@ -24,7 +24,7 @@ keycode  78 =
 
 ! INFO Mode switch is modern ISO_Level3_Shift
 ! 113 was Alt_R
-keycode 113 = Mode_switch Mode_switch
+! keycode 113 = Mode_switch Mode_switch
 ! 117 was Menu (mouse right click) key
 keycode 117 = Super_R Super_R
 
@@ -175,3 +175,6 @@ keycode 234 = F21
 ! work as expected)
 !keycode  36 = Return F13 F14 F15
 !  vim: set ts=4 sw=4 tw=78 noet foldmethod=marker:
+keycode 100 = Left NoSymbol leftarrow
+keycode  64 = Alt_L Meta_L Alt_L Meta_L
+keycode  23 = Tab ISO_Left_Tab Tab ISO_Left_Tab

@@ -1,0 +1,25 @@
+! created 160417
+!  vim: set ts=4 sw=4 tw=78 noet foldmethod=marker:
+! 181109: Linux specific, minimal because there are problem with Left and
+! Alt-Tab
+
+!------------------------------------------------------------------------------
+! Modifers																	{{{
+!------------------------------------------------------------------------------
+! ensure that you are not in CAPS on mode
+clear lock
+! CapsLock as Super (Win) key
+keycode  66 = Super_L
+
+! INFO 180617: Shift+BS will be recognized in xev, but won't work as Delete
+! keycode  22 = BackSpace Delete BackSpace BackSpace NoSymbol NoSymbol Terminate_Server
+keycode  22 = BackSpace BackSpace BackSpace BackSpace NoSymbol NoSymbol Terminate_Server
+! the real Escape
+keycode   9 = Escape Escape Escape Escape
+! the key left of "1"
+keycode  49 = Escape asciitilde grave grave
+
+!---------------------------------------------------------------------------}}}
+! keycode 100 = Left NoSymbol leftarrow
+! keycode  64 = Alt_L Meta_L Alt_L Meta_L
+! keycode  23 = Tab ISO_Left_Tab Tab ISO_Left_Tab

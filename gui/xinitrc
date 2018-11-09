@@ -5,23 +5,25 @@ export RESOLUTION_Y=$(xdpyinfo | awk '/dimensions:/ { print $2; exit }' | cut -d
 
 #xterm&
 xsetroot -solid black&
-xmodmap .xmodmap&
+# xmodmap .xmodmap&
+xmodmap ~/dot_files/xmodmap_linux&
 xrdb .xdefaults&
 xbindkeys&
 tint2&
 
 # fix for T430s with fuck-up keyboard layout:
-xmodmap -e "keycode 111 = Super_R"  # "PrtSc" key between Alt and Ctrl
+# xmodmap -e "keycode 111 = Super_R"  # "PrtSc" key between Alt and Ctrl
 
 # unclutter --timeout 1&		# hide mouse pointer - no problem when hiding cursor on mpv
-hhpc -i 1&		# unclutter alterntive, works also on hw accelated videos
 # osdmixer 300 100 d d&
 osdmixer $((RESOLUTION_X/4)) 100 d d&
+# hhpc -i 1&		# unclutter alterntive, works also on hw accelated videos
 
 # sh ~/.opt/conky.sh&
 # pcmanfm -n /mnt/local/video/music &
 
-xterm -title tp.root -e 'echo tp root && su -l'&				# tp root
+# xterm -title tp.root -e 'echo tp root && su -l'&				# tp root
 # exec openbox
 # 181107:
+# exec openbsd-cwm
 exec cwm
