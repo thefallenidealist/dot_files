@@ -1,0 +1,74 @@
+# Created 181108
+
+gap 30 0 0 0
+
+# bind CM-r       reload
+bind-key 4M-r		reload
+bind-key 4-r		reload
+bind-key 4-Return	xterm
+
+bind-key M-F3		window-hide
+bind-key M-F4		window-delete
+bind-key M-F5		window-maximize
+bind-key M-F6		window-hmaximize
+bind-key M-F7		window-vmaximize
+# bind-key 4-Return	window-fullscreen
+bind-key 4-f		window-fullscreen
+
+bind-key	M-Left	window-snap-left
+bind-key	M-Right window-snap-right
+bind-key	M-Up	window-snap-up
+bind-key	M-Down	window-snap-down
+
+# virtual desktop actions													{{{
+# -----------------------------------------------------------------------------
+bind-key	4-1		group-only-1
+bind-key	4-2		group-only-2
+bind-key	4-3		group-only-3
+bind-key	4-4		group-only-4
+bind-key	4-5		group-only-5
+bind-key	4-6		group-only-6
+bind-key	4-7		group-only-7
+bind-key	4-8		group-only-8
+bind-key	4S-1	window-movetogroup-1
+bind-key	4S-2	window-movetogroup-2
+bind-key	4S-3	window-movetogroup-3
+bind-key	4S-4	window-movetogroup-4
+bind-key	4S-5	window-movetogroup-5
+bind-key	4S-6	window-movetogroup-6
+bind-key	4S-7	window-movetogroup-7
+bind-key	4S-8	window-movetogroup-8
+# -------------------------------------------------------------------------- }}}
+
+
+unbind-mouse all
+bind-mouse	4S-1	window-group
+bind-mouse	4-1		window-move
+bind-mouse	4S-1	window-resize
+bind-mouse	4-3		window-resize
+# bind-mouse	4-2		window-lower
+bind-mouse	4S-3	window-hide
+
+bind-key 4-a group-toggle-all
+bind-key 4-g window-group
+
+unbind-key	M-comma
+unbind-key	M-period
+
+
+autogroup 3     "Navigator,Firefox"
+
+# inherit current selected group
+sticky yes
+
+color    activeborder   "#444444"
+color    inactiveborder "#111111"
+fontname fixed-13
+snapdist 20
+sticky   yes
+
+# Any entry here is shown in the application menu
+command firefox         firefox
+command xmms            xmms
+command top             "xterm -e top"
+

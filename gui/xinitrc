@@ -1,9 +1,12 @@
 # 180921 - ThinkPad T430s
 export LC_ALL=en_US.UTF-8
+export RESOLUTION_X=$(xdpyinfo | awk '/dimensions:/ { print $2; exit }' | cut -d 'x' -f 1)
+export RESOLUTION_Y=$(xdpyinfo | awk '/dimensions:/ { print $2; exit }' | cut -d 'x' -f 2)
 
 #xterm&
 xsetroot -solid black&
 xmodmap .xmodmap&
+xrdb .xdefaults&
 xbindkeys&
 tint2&
 
@@ -12,9 +15,13 @@ xmodmap -e "keycode 111 = Super_R"  # "PrtSc" key between Alt and Ctrl
 
 # unclutter --timeout 1&		# hide mouse pointer - no problem when hiding cursor on mpv
 hhpc -i 1&		# unclutter alterntive, works also on hw accelated videos
+# osdmixer 300 100 d d&
+osdmixer $((RESOLUTION_X/4)) 100 d d&
 
 # sh ~/.opt/conky.sh&
 # pcmanfm -n /mnt/local/video/music &
 
 xterm -title tp.root -e 'echo tp root && su -l'&				# tp root
-exec openbox
+# exec openbox
+# 181107:
+exec cwm
