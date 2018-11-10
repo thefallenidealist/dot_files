@@ -1,27 +1,30 @@
-#  vim: set ft=conf ts=4 sw=4 tw=0 fdm=marker et :
+# vim: set ft=conf ts=4 sw=4 tw=0 fdm=marker noet :
+# 181110 major update
 
+# Backgrounds																{{{
+# -----------------------------------------------------------------------------
+# Gradients
+# Gradient 1
+gradient = vertical
+start_color = #2d2d2d 80
+end_color = #000000 80
+color_stop = 70.000000 #1c1c1c 80
 
-
-
-
-
-#-------------------------------------
-# Backgrounds
-
+# -----------------------------------------------------------------------------
 # Background 1: Taskbar
 rounded = 4
 border_width = 1
 border_sides = TBLR
-background_color =         #ffffff 50
-border_color =             #444444 30
+background_color = #101010 100
+border_color =     #0000ff 100
 
 # Background 2: Default task
 rounded = 2
 border_width = 2
 border_sides = B
-background_color =         #bbdefb 0   # blue100
-border_color =             #1976d2 100 # blue700
-background_color_hover =   #64b5f6 30  # blue300
+background_color =         #202020 100
+border_color =             #3366ff 100
+background_color_hover =   #64b5f6 50  # blue300
 border_color_hover =       #2196f3 100 # blue500
 background_color_pressed = #2196f3 60  # blue500
 border_color_pressed =     #0d47a1 100 # blue900
@@ -30,10 +33,10 @@ border_color_pressed =     #0d47a1 100 # blue900
 rounded = 2
 border_width = 2
 border_sides = B
-background_color =         #ffffff 0  # white
-border_color =             #ffeb3b 100 # yellow500
+background_color =         #404040 100
+border_color =             #ffff00 100
 background_color_hover =   #fff176 45  # yellow300
-border_color_hover =       #fbc02d 100 # yellow700
+border_color_hover =       #fbc03d 100 # yellow700
 background_color_pressed = #ffeb3b 60  # yellow500
 border_color_pressed =     #f57f17 100 # yellow900
 
@@ -59,7 +62,7 @@ border_color_hover =       #616161 100 # grey700
 background_color_pressed = #9e9e9e 60  # grey500
 border_color_pressed =     #212121 100 # grey900
 
-# Background 7: Tooltip
+# Background 6: Tooltip
 rounded = 2
 border_width = 1
 background_color =         #64b5f6 100 # blue300
@@ -76,24 +79,77 @@ border_color_hover =       #ffffff 30  # white
 background_color_pressed = #d32f2f 50  # red700
 border_color_pressed =     #ffffff 30  # white
 
-#-------------------------------------
-# Panel
-# panel_items = CLTS
-panel_items = TLSBC
-panel_size = 100% 30
+# Background 8: Battery
+rounded = 2
+border_width = 2
+border_sides = TBLR
+background_color = #000000 100
+border_color =     #ff0000 100
+
+# Background 9: Clock
+rounded = 2
+border_width = 1
+border_sides = TBLR
+# background_color = #101010 100
+background_color = #000000 100
+border_color =     #ff8000 100
+
+# Background 10: Desktop name
+rounded = 2
+border_width = 2
+border_sides = TBLR
+background_color = #000000 100
+border_color =     #ff8000 100
+
+# Background 11: Launcher
+rounded = 2
+border_width = 2
+border_sides = BTLR
+background_color = #202020 100	# grayish
+border_color =     #993300 100	# brownish
+
+# Background 12: Whole panel TODO 181110: id: 1
+# rounded = 4
+# border_width = 0
+# border_sides = TBLR
+# gradient_id = 1
+# background_color = #101010 100
+# border_color =     #00ff00 100
+rounded = 0
+border_width = 1
+border_sides = T
+border_content_tint_weight = 0
+background_content_tint_weight = 0
+background_color = #000000 80
+border_color = #333333 80
+gradient_id = 1
+background_color_hover = #000000 80
+border_color_hover = #555555 80
+background_color_pressed = #000000 80
+border_color_pressed = #555555 80
+# ------------------------------------------------------------------------- }}}
+# Panel																		{{{
+# -----------------------------------------------------------------------------
+# T - taskbar
+# B - battery
+# L - launcher
+# S - system tray
+# E - executor
+# C - clock
+# : - separator
+panel_items = T:L:E:B:S:C
+# panel_size = 100% 24
+# panel_size = 100% 37
+panel_size = 100% 4%
 panel_margin = 0 0
-panel_padding = 2 0 2
-panel_background_id = 0
+# panel_padding = 2 0 2
+panel_background_id = 12
 wm_menu = 1
 panel_dock = 0
 panel_position = top center horizontal
+# panel_layer = top
 panel_layer = top
 panel_monitor = all
-primary_monitor_first = 0
-autohide = 0
-autohide_show_timeout = 0
-autohide_hide_timeout = 0.5
-autohide_height = 2
 strut_policy = follow_size
 panel_window_name = tint2
 disable_transparency = 1
@@ -101,79 +157,102 @@ mouse_effects = 1
 font_shadow = 0
 mouse_hover_icon_asb = 100 0 10
 mouse_pressed_icon_asb = 100 0 0
-
-#-------------------------------------
-# Taskbar
+# ------------------------------------------------------------------------- }}}
+# battery																	{{{
+# -----------------------------------------------------------------------------
+# panel_items+=B
+battery = 1				# enable
+battery_hide = never	# never hide
+# bat1_format = %p %t		# INFO 181110: same as default, but not in two line
+# bat1_format = %p
+# bat2_format = %t
+battery_low_status = 10
+# battery_low_cmd = notify-send "battery low" # TODO 181110
+bat1_font = sans 8
+bat2_font = sans 12
+battery_font_color = #cccccc 100
+battery_padding = 2 0	# horizontal vertical
+battery_background_id = 8
+# ------------------------------------------------------------------------- }}}
+# Taskbar																	{{{
+# -----------------------------------------------------------------------------
 taskbar_mode = single_desktop
-# taskbar_padding = 8 2 8
-taskbar_padding = 1 2 2
 taskbar_background_id = 1
-taskbar_active_background_id = 1
-taskbar_name = 1
-# taskbar_hide_inactive_tasks = 0
-taskbar_hide_different_monitor = 0
-taskbar_always_show_all_desktop_tasks = 0
-taskbar_name_padding = 4 2
-taskbar_name_background_id = 0
-taskbar_name_active_background_id = 7
-taskbar_name_font_color = #444444 100
-taskbar_name_active_font_color = #222222 100
-taskbar_name_active_font_color = #ffffff 100
-taskbar_distribute_size = 0
-taskbar_sort_order = none
-task_align = left
+taskbar_background_id = 0
+taskbar_padding = 1 2 2 # H V spacing
+taskbar_sort_order = application	# group by application XXX 181110
 
-#-------------------------------------
-# Task
-task_text = 1
+taskbar_name = 1	# show virtual desktop names
+taskbar_name_padding = 6 2
+taskbar_name_background_id = 3	# XXX TODO 181110
+taskbar_name_active_font_color = #B0B0B0 100
+taskbar_name_active_background_id = 10
+
+
+# taskbar_active_background_id = 1
+# # taskbar_hide_inactive_tasks = 0
+# taskbar_hide_different_monitor = 0
+# taskbar_always_show_all_desktop_tasks = 0
+# taskbar_distribute_size = 0
+# taskbar_sort_order = none
+# task_align = left
+#
+# ------------------------------------------------------------------------- }}}
+# Task																		{{{
+# -----------------------------------------------------------------------------
 task_icon = 1
-task_font = Monospace 8
+task_text = 1
 task_centered = 1
-urgent_nb_of_blink = 100000
-# task_maximum_size = 40 40
-task_maximum_size = 140 35
-task_padding = 2 2 4
 task_tooltip = 1
-task_font_color = #222222 100
+task_thumbnail = 1
+task_maximum_size = 200
+
+
+# task_font = Monospace 8
+# urgent_nb_of_blink = 100000
+# task_padding = 2 2 4
+# task_font_color = #ffffff 100
 task_background_id = 2
 task_active_background_id = 3
 task_urgent_background_id = 4
 task_iconified_background_id = 5
+
 mouse_left = toggle_iconify
 mouse_middle = close
 mouse_right = none
-mouse_scroll_up = toggle
-mouse_scroll_down = iconify
-
-#-------------------------------------
-# Tooltip
+mouse_scroll_up = none
+mouse_scroll_down = none
+# ------------------------------------------------------------------------- }}}
+# Tooltip																	{{{
+# -----------------------------------------------------------------------------
 tooltip_show_timeout = 0.5
 tooltip_hide_timeout = 0.1
 tooltip_padding = 2 2
 tooltip_background_id = 6
 tooltip_font_color = #222222 100
-
-#-------------------------------------
-# Clock
-time1_format = %H:%M
-time2_format = %A %d %B
-time1_timezone = 
-time2_timezone = 
-clock_font_color = #222222 100
-clock_padding = 2 0
-clock_background_id = 1
-clock_tooltip = 
-clock_tooltip_timezone = 
+# ------------------------------------------------------------------------- }}}
+# Clock																		{{{
+# -----------------------------------------------------------------------------
+time1_format = %a %d.%m.%Y. %H:%M
+# time1_format = %a %H:%M
+# time2_format = %d.%m.%Y
+time1_font = sans 12
+# clock_font_color = #888880 100
+clock_font_color = #ffffff 100
+clock_padding = 5 0
+clock_background_id = 9
+clock_tooltip = %A, %d. %B %Y. %H:%M:%S
+# clock_tooltip = %H:%M %a %d.%m.%Y.
 clock_lclick_command = 
 clock_rclick_command = orage
 clock_mclick_command = 
 clock_uwheel_command = 
 clock_dwheel_command = 
-
-#-------------------------------------
-# Launcher
+# ------------------------------------------------------------------------- }}}
+# Launcher																	{{{
+# -----------------------------------------------------------------------------
 launcher_padding = 2 4 2
-launcher_background_id = 4
+launcher_background_id = 11
 launcher_icon_background_id = 0
 launcher_icon_size = 24
 launcher_icon_asb = 100 0 0
@@ -181,16 +260,43 @@ launcher_icon_theme_override = 0
 startup_notifications = 1
 launcher_tooltip = 1
 
-launcher_item_app = /usr/share/applications/debian-uxterm.desktop
-launcher_item_app = /usr/share/applications/firefox.desktop
-launcher_item_app = /usr/share/applications/thunderbird.desktop
-launcher_item_app = /usr/share/applications/skypeforlinux.desktop
-
-#-------------------------------------
-# System tray (notification area)
+# launcher_item_app = /usr/share/applications/debian-uxterm.desktop
+launcher_item_app = /usr/local/share/applications/xterm.desktop
+launcher_item_app = /usr/local/share/applications/pcmanfm.desktop
+launcher_item_app = /usr/local/share/applications/firefox.desktop
+# launcher_item_app = /usr/share/applications/skypeforlinux.desktop
+# ------------------------------------------------------------------------- }}}
+# System tray (notification area)											{{{
+# -----------------------------------------------------------------------------
 systray_padding = 0 4 2
 systray_background_id = 4
 systray_sort = ascending
 systray_icon_size = 32
 systray_icon_asb = 100 0 0
 systray_monitor = 1
+# ------------------------------------------------------------------------- }}}
+# Executor																	{{{
+# -----------------------------------------------------------------------------
+# Executor samples
+# Print the hostname
+# execp = new
+# execp_command = hostname
+# execp_interval = 0
+
+
+# Desktop pager with text
+execp = new
+execp_command = xprop -root -spy | awk '/^_NET_CURRENT_DESKTOP/ { print "Workspace " ($3 + 1) ; fflush(); }'
+execp_interval = 1
+execp_continuous = 1
+
+execp_command = xprop -root -spy | awk -v home="$HOME" '/^_NET_CURRENT_DESKTOP/ { print home "/.config/myPager/" ($3 + 1) ".png\n" ; fflush(); }'
+execp_interval = 1
+execp_has_icon = 1
+execp_cache_icon = 1
+execp_continuous = 2
+
+
+execp_font = sans 9
+execp_font_color = #aaffaa 100
+# ------------------------------------------------------------------------- }}}
