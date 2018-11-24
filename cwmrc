@@ -1,10 +1,16 @@
 # Created 181108
 #  vim: set ft=conf ts=4 sw=4 tw=0 fdm=marker noet :
 
-gap 30 0 0 0    # leave 30 pixels at top of the screen
-# command lock xautolock -locknow
+# gap 24 0 0 0    # leave 30 pixels at top of the screen
 
-# default keybinding														{{{
+gap 38 0 0 0    # leave 30 pixels at top of the screen
+# INFO 181109: ThinkPad: 38 pixels because when 30 pixel is used, maximized xterm window still doesn't use extra space
+
+sticky yes		# inherit current selected group
+ignore	tint2	# don't draw borders around
+snapdist	20	# minimum distance to snap-to edge
+
+# default keybindings														{{{
 # -----------------------------------------------------------------------------
 # The default key bindings are:
 #
@@ -59,48 +65,57 @@ gap 30 0 0 0    # leave 30 pixels at top of the screen
 # 	  C-a                   List all available items.
 # 	  [Esc]                 Cancel.
 # ------------------------------------------------------------------------- }}}
+unbind-key	M-comma		# used in tmux
+unbind-key	M-period	# used in tmux
 
-# bind CM-r       reload
-bind-key	4M-r		reload	# XXX
-# bind-key 4S-r		reload
-bind-key 4-Return	terminal
+bind-key	4-Return	terminal
+bind-key	4M-r		restart
+bind-key	4-Escape	quit
+unbind-key	CMS-q
+bind-key	4-r			menu-exec		# execute programs from $PATH
+bind-key	4-space		menu-window		# search for window
+bind-key	C-space		menu-cmd		# execute program from application menu
 
+# window																	{{{
+# -----------------------------------------------------------------------------
+bind-key	M-Tab		window-cycle-ingroup
+bind-key	MS-Tab		window-rcycle-ingroup
+# bind-key	M-Tab		window-cycle
+# bind-key	MS-Tab		window-rcycle
 bind-key	M-F3		window-hide
 bind-key	M-F4		window-delete
 bind-key	M-F5		window-maximize
 bind-key	M-F6		window-hmaximize
 bind-key	M-F7		window-vmaximize
-# bind-key 4-Return	window-fullscreen
-bind-key 4-f		window-fullscreen
+bind-key	4-f			window-fullscreen
+bind-key	M-Return	window-fullscreen
 
-bind-key	4-Escape		quit
-unbind-key	CMS-q
-
-
-
-
-
-bind-key	4-m		window-maximize
-bind-key	4-n		window-hide
-bind-key	4-j		window-rcycle-ingroup
-bind-key	4-k		window-cycle-ingroup
-bind-key	4-h		group-rcycle
-bind-key	4-l		group-cycle
-
-bind-key	4-b		lock	# muscle memory
-
-
-
+bind-key	4-m			window-maximize
+# bind-key	4-n			window-hide
+bind-key	4-comma		window-hide
+bind-key	4-period	window-minimize
+bind-key	4-j			window-rcycle-ingroup
+bind-key	4-k			window-cycle-ingroup
+# bind-key	4-j			window-rcycle
+# bind-key	4-k			window-cycle
+# bind-key	4-c			window-delete	# same as Alt-F4 - too close to x (used for xterm)
+bind-key	4-1			window-delete	# same as Alt-F4
+bind-key	4-h			group-rcycle	# move to one desktop left
+bind-key	4-l			group-cycle		# move to one desktop right
+bind-key	4-u			window-hmaximize	# because it's close to hjkl, same as Alt-F6
+bind-key	4-i			window-vmaximize	# because it's close to hjkl, same as Alt-F7
+bind-key	4-a			window-stick	# show current window in all groups/desktops (but tint2 will show it only on original desktop)
+# -------------------------------------------------------------------------- }}}
+bind-key	4-g			window-group	# Toggle group membership of current window.
+bind-key	4-n		window-menu-label	# mnemonic: [n]ame
 
 bind-key	M-Left	window-snap-left
 bind-key	M-Right window-snap-right
 bind-key	M-Up	window-snap-up
 bind-key	M-Down	window-snap-down
 
-# igranje:
-bind-key	CM-u		window-htile
-bind-key	CM-u		window-vtile
-bind-key	4-a			window-stick	# Toggle stickiness of current window - show it on all desktop
+bind-key	4M-h		window-htile
+bind-key	4M-v		window-vtile
 
 # virtual desktop actions													{{{
 # -----------------------------------------------------------------------------
@@ -112,6 +127,8 @@ bind-key	4-5		group-only-5
 bind-key	4-6		group-only-6
 bind-key	4-7		group-only-7
 bind-key	4-8		group-only-8
+bind-key	4-9		group-only-9
+# bind-key	4-0		group-toggle-all
 bind-key	4S-1	window-movetogroup-1
 bind-key	4S-2	window-movetogroup-2
 bind-key	4S-3	window-movetogroup-3
@@ -120,48 +137,53 @@ bind-key	4S-5	window-movetogroup-5
 bind-key	4S-6	window-movetogroup-6
 bind-key	4S-7	window-movetogroup-7
 bind-key	4S-8	window-movetogroup-8
+bind-key	4S-9	window-movetogroup-9
 # -------------------------------------------------------------------------- }}}
-
-
+# mouse																		{{{
+# -----------------------------------------------------------------------------
 unbind-mouse all
-bind-mouse	4S-1	window-group
 bind-mouse	4-1		window-move
 bind-mouse	4S-1	window-resize
 bind-mouse	4-3		window-resize
-# bind-mouse	4-2		window-lower
-bind-mouse	4S-3	window-hide
-
-bind-key 4-a group-toggle-all
-bind-key 4-g window-group
-
-unbind-key	M-comma
-unbind-key	M-period
+# bind-mouse	4S-1	window-group
+# bind-mouse	4S-3	window-hide
+# -------------------------------------------------------------------------- }}}
 
 
-autogroup 3     "Navigator,Firefox"
 
-# inherit current selected group
-sticky yes
 
-color    activeborder   "#444444"
-color    inactiveborder "#111111"
-fontname fixed-13
-snapdist 20
-sticky   yes
 
-# Any entry here is shown in the application menu
-command firefox         firefox
-command xmms            xmms
-command top             "xterm -e top"
+# autogroup 3     "Navigator,Firefox"
 
+
+# fontname fixed-13
+# snapdist 20
+
+# menu - application														{{{
+# -----------------------------------------------------------------------------
+# entries for "menu-cmd" command
+command firefox		firefox
+command top			"xterm -e top"
+command htop		"xterm -e htop"
+command run			gmrun
+command kbd_us		"setxkbmap us"
+command kbd_hr		"setxkbmap hr"
+# command kbd_xmodmap	"xterm -e xmodmap .xmodmap"	" XXX 181109
+command file		"pcmanfm"
+command screenshot	"scrot -s '%Y-%m-%d_$wx$h.png' -e 'mv $f $HOME/ss/$f && feh $HOME/ss/$f'"
+# -------------------------------------------------------------------------- }}}
+# colors																	{{{
+# -----------------------------------------------------------------------------
 borderwidth 1
-# Border colors
-# color activeborder		'#eeeeec'
 color activeborder		red
 color inactiveborder	white
-color urgencyborder     '#48c6ff'               # Set the color of the border of a window indicating urgency
-color groupborder       '#215d9c'               # Set the color of the border while grouping a window
-color ungroupborder '#ff005b' # Set the color of the border while ungrouping a window
+color urgencyborder		yellow
+color groupborder		green
+color ungroupborder		blue
+# -------------------------------------------------------------------------- }}}
+
+# visible anywhere
+autogroup 0 conky
 
 # TODO 181109: 
 # alt esc toogle last two (even across desktops)
