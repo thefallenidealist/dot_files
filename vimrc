@@ -864,30 +864,22 @@ inoremap <C-r>0 <C-o>"p]p<C-o>:echo "paste from the register 0(p)"<cr>
 "	clipboard																{{{
 if has('clipboard')	" not really needed for all options under this
 	" copy filepath to X11 clipboard
-	nnoremap <leader>FP  :let @* = expand("%")<cr>:echo		"relative path of the file copied to the X11 1st clipboard"<CR>
-	nnoremap <leader>fp  :let @+ = expand("%")<cr>:echo		"relative path of the file copied to the X11 2nd clipboard"<CR>
-	nnoremap <leader>FD  :let @* = expand("%:h")<cr>:echo		"relative path of the dir copied to the X11 1st clipboard"<CR>
-	nnoremap <leader>fd  :let @+ = expand("%:h")<cr>:echo		"relative path of the dir copied to the X11 2nd clipboard"<CR>
-	nnoremap <leader>FFP :let @* = expand("%:p")<cr>:echo		"full path of the file copied to the X11 1st clipboard"<CR>
-	nnoremap <leader>ffp :let @+ = expand("%:p")<cr>:echo		"full path of the file copied to the X11 2nd clipboard"<CR>
+	nnoremap <leader>FP  :let @* = expand("%")<cr>:echo   "relative path of the file copied to the X11 1st clipboard"<CR>
+	nnoremap <leader>fp  :let @+ = expand("%")<cr>:echo   "relative path of the file copied to the X11 2nd clipboard"<CR>
+	nnoremap <leader>FD  :let @* = expand("%:h")<cr>:echo "relative path of the dir copied to the X11 1st clipboard"<CR>
+	nnoremap <leader>fd  :let @+ = expand("%:h")<cr>:echo "relative path of the dir copied to the X11 2nd clipboard"<CR>
+	nnoremap <leader>FFP :let @* = expand("%:p")<cr>:echo "full path of the file copied to the X11 1st clipboard"<CR>
+	nnoremap <leader>ffp :let @+ = expand("%:p")<cr>:echo "full path of the file copied to the X11 2nd clipboard"<CR>
 
 	" insert mode paste from X11 clipboard
 	inoremap <C-r>! <C-o>"*]p<C-o>:echo "paste from the X11 1st clipboard"<cr>
 	inoremap <C-r>@ <C-o>"+]p<C-o>:echo "paste from the X11 2st clipboard"<cr>
-
-	" "*	X11 primary buffer
-	" vnoremap <leader>ry "*y
-	" vnoremap <leader>rd "*d
-	" nnoremap <leader>rp "*p
-	" vnoremap <leader>rp "*p
-	" TODO r{1,2}{y,d,p}
 
 	" tmux:
 	" p - tmux buffer paste
 	" P - X11 2nd
 	" [ - X11 1st
 	" { - Vim paste
-	" INFO vim: only used X11 1st and 2nd
 
 	" TODO IDEA
 	" y - vim yank
@@ -919,7 +911,6 @@ if has('clipboard')	" not really needed for all options under this
 	vnoremap <leader>y@ "+y:echo "copied to the X11 2nd clipboard"<cr>
 	nnoremap <leader>p! "*p:echo "pasted from the X11 1st clipboard"<cr>
 	nnoremap <leader>p@ "+p:echo "pasted from the X11 2nd clipboard"<cr>
-
 
 	cnoremap <C-r>! <C-r>*
 	cnoremap <C-r>@ <C-r>+

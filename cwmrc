@@ -6,9 +6,14 @@
 gap 38 0 0 0    # leave 30 pixels at top of the screen
 # INFO 181109: ThinkPad: 38 pixels because when 30 pixel is used, maximized xterm window still doesn't use extra space
 
-sticky yes		# inherit current selected group
-ignore	tint2	# don't draw borders around
-snapdist	20	# minimum distance to snap-to edge
+sticky		yes		# inherit current selected group
+snapdist	20		# minimum distance to snap-to edge
+ignore		tint2	# don't draw borders around
+ignore		tint
+ignore		Tint2
+
+autogroup	3	Firefox
+# autogroup	4	mpv
 
 # default keybindings														{{{
 # -----------------------------------------------------------------------------
@@ -94,7 +99,7 @@ bind-key	4-m			window-maximize
 # bind-key	4-n			window-hide
 bind-key	4-comma		window-hide
 bind-key	4-period	window-minimize
-bind-key	4-j			window-rcycle-ingroup
+bind-key	4-j			window-rcycle-ingroup	# browse through activate virtual desktops
 bind-key	4-k			window-cycle-ingroup
 # bind-key	4-j			window-rcycle
 # bind-key	4-k			window-cycle
@@ -104,6 +109,7 @@ bind-key	4-h			group-rcycle	# move to one desktop left
 bind-key	4-l			group-cycle		# move to one desktop right
 bind-key	4-u			window-hmaximize	# because it's close to hjkl, same as Alt-F6
 bind-key	4-i			window-vmaximize	# because it's close to hjkl, same as Alt-F7
+						# TODO 181126: Or use 'y' and 'u' because they are below '6' and '7'
 bind-key	4-a			window-stick	# show current window in all groups/desktops (but tint2 will show it only on original desktop)
 # -------------------------------------------------------------------------- }}}
 bind-key	4-g			window-group	# Toggle group membership of current window.
@@ -147,6 +153,7 @@ bind-mouse	4S-1	window-resize
 bind-mouse	4-3		window-resize
 # bind-mouse	4S-1	window-group
 # bind-mouse	4S-3	window-hide
+# bind-mouse	"1"		window-raise
 # -------------------------------------------------------------------------- }}}
 
 

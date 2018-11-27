@@ -3,7 +3,7 @@
 HISTFILE=~/.history.zsh
 HISTSIZE=1000
 SAVEHIST=1000
-setopt no_beep		#ne bi bilo lose da doista radi
+setopt no_beep
 fpath+=~/.zfunc	# additional complete zsh_plugins
 autoload -Uz compinit
 compinit
@@ -11,7 +11,25 @@ autoload colors ; colors
 setopt histignoredups			# Ignore duplicated entries in history
 setopt histignorespace			# and with trailing spaces
 
-zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}'
+# colors																	{{{
+# -----------------------------------------------------------------------------
+LSCOLORS="exfxcxdxbxegedabagacad";	# default, 'x' means default color
+LSCOLORS="ExGxFxdxCxDxDxhbadExEx";
+# LSCOLORS="ExfxcxdxBxegedabagacad";	# dirs are bold and light blue colored
+# 1.   directory
+# 2.   symbolic link
+# 3.   socket
+# 4.   pipe
+# 5.   executable
+# 6.   block special
+# 7.   character special
+# 8.   executable with setuid bit set
+# 9.   executable with setgid bit set
+# 10.  directory writable to others, with sticky bit
+# 11.  directory writable to others, without sticky bit
+export LSCOLORS
+# TODO 181126: change color of dir after <tab>
+# ------------------------------------------------------------------------- }}}
 
 # include per-host configuration
 if [ -e ~/.zshrc_local ]; then
@@ -30,9 +48,7 @@ export PATH="$PATH:$HOME/.cargo/bin:$HOME/.local/bin"
 export PATH="$PATH:$TOOLCHAIN_ARM"
 # Thumb toolchain (and GDB -python)
 
-export MANPATH="$HOME/.opt/share/man:
-	$HOME/toolchains/nightly-x86_64-unknown-freebsd:
-	$(manpath -q)"
+export MANPATH=$HOME/.opt/share/man:$MANPATH
 
 # ------------------ prompt - PS1, PS2, RightPS ---------------------------- {{{
 case $(whoami) in
@@ -292,13 +308,14 @@ alias gg='gmake clean && gmake'
 alias ggu='gmake clean && gmake -j4 && gmake upload'
 # -------------------------------------------------------------------------- }}}
 
-# ------------------ custom fuction - zsnap -------------------------------- {{{
+# ------------------ custom function - zsnap ------------------------------- {{{
 function zsnap()
 {
 	# make recursive snapshots of specific pool or all available pools
+	TIMESTAMP="`/bin/date +%y%m%d`_`/bin/date +%H%M`"
 	if [ ! -z $1 ]; then
 		# make snapshot for one pool (given as argument to the function)
-		zfs snapshot -r $1@`/bin/date +%y%m%d`_`/bin/date +%H%M`
+		zfs snapshot -r $i@$TIMESTAMP
 	else # if called without arguments
 		# make snapshot for all pools: pool@<date>
 		TIMESTAMP="`/bin/date +%y%m%d`_`/bin/date +%H%M`"
@@ -307,7 +324,7 @@ function zsnap()
 		for i in `zpool list -Ho name,health | grep -v UNAVAIL | cut -f 1` ; do
 			echo $i
 			# zfs snapshot -r $i@`/bin/date +%y%m%d`_`/bin/date +%H%M` ;
-			zfs snapshot -r $i@$TIMESTAMP ;
+			zfs snapshot -r $i@$TIMESTAMP
 		done
 	fi
 }
@@ -349,22 +366,8 @@ man() {
 # -------------------------------------------------------------------------- }}}
 
 
-#da cron ne salje mailove
+# cron: con't sell mails:
 MAILTO=""
-
-fpath=(~/.zsh_plugins/zsh-completions/src $fpath)
-
-
-# test za tmux + vim fini font, ne radi
-LANG="en_US.UTF-8"
-LC_COLLATE="en_US.UTF-8"
-LC_CTYPE="en_US.UTF-8"
-LC_MESSAGES="en_US.UTF-8"
-LC_MONETARY="en_US.UTF-8"
-LC_NUMERIC="en_US.UTF-8"
-LC_TIME="en_US.UTF-8"
-LC_ALL="en_US.UTF-8"
-# TERM=screen-256color	# treba, inace izlazak iz vima nece obrisat ekran
 
 #To find and play audio straight from your terminal with mm "search terms" put the following function in your .bashrc:
 function mm() {
@@ -373,7 +376,7 @@ function mm() {
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# zsh korisno TODO
+# zsh TODO check one day
 # setopt append_history # Allow multiple terminal sessions to all append to one zsh command history
 # setopt extended_history # save timestamp of command and duration
 # setopt inc_append_history # Add comamnds as they are typed, don't wait until shell exit
@@ -382,7 +385,6 @@ function mm() {
 # setopt hist_reduce_blanks # Remove extra blanks from each command line being added to history
 # setopt correct # spelling correction for commands
 # setopt correctall # spelling correction for arguments
-# pogledat funkcije
-# https://zanshin.net/2013/02/02/zsh-configuration-from-the-ground-up/
+# lookup functions from here # https://zanshin.net/2013/02/02/zsh-configuration-from-the-ground-up/
 
 fpath=($HOME/.zsh-completions $fpath)
