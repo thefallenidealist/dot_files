@@ -3,6 +3,10 @@
 [include]
 	path = ~/.gitconfig_local
 
+[core]
+	pager = less -F -X
+	autocrlf = false	# 181127 work PC
+
 [alias]
 	s = status
 	sn = status -uno
@@ -11,6 +15,8 @@
 	co = checkout
 	com = checkout master
 	br = branch
+	# br = branch --sort=committerdate	# 181127 work PC
+	br2 = for-each-ref --sort=committerdate refs/heads/ --format='%(committerdate:short) %(refname:short)'
 	a = add
 	cl = clone
 	#s = show
@@ -49,16 +55,18 @@
 	ap = apply --ignore-space-change --ignore-whitespace
 	ap2 = apply --reject --whitespace=fix
 	app = apply --reject --whitespace=fix
+	blame2 = log -p -M --follow --stat --	# nicely show changests and commit messages throught whole history for selected file
 
-	brc = git rev-parse --abbrev-ref HEAD   # show only current branch
+	brc = rev-parse --abbrev-ref HEAD   # show only current branch
 	# pusho = push --set-upstream origin $(git rev-parse --abbrev-ref HEAD) # TODO
 
 [log]
 	decorate = full
 	# decorate with branch pointers
-	# decorate = short
+	# decorate = short	# 181127 posao
 [color]
 	ui = auto
+	# ui = true	# 181127 work PC
 [color "branch"]
 	current = yellow reverse
 	local = yellow
@@ -73,9 +81,7 @@
 	changed = cyan
 	#untracked = magenta
 	untracked = red
-[core]
-	pager = less -F -X
-	# autocrlf = false	# s posla
+
 [apply]
 	whitespace = nowarn
 

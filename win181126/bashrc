@@ -1,0 +1,59 @@
+# created 170308
+# PS1='\[\033]0;$TITLEPREFIX:${PWD//[^[:ascii:]]/?}\007\]\n\[\033[32m\]\h \[\033[35m\]$MSYSTEM \[\033[33m\]\w\[\033[36m\]`__git_ps1`\[\033[0m\] > '
+# MSYS2:
+# PS1='\[\033]0;$TITLEPREFIX:${PWD//[^[:ascii:]]/?}\007\]\[\033[32m\]\h \[\033[35m\]$MSYSTEM \[\033[33m\]\w\[\033[36m\]\[\033[0m\] > '
+# bez "MINGW64" ($MSYSTEM) dijela:
+PS1='\[\033]0;$TITLEPREFIX:${PWD//[^[:ascii:]]/?}\007\]\[\033[32m\]\h \[\033[33m\]\w\[\033[36m\]\[\033[0m\] > '
+
+# ignore duplicate commands, ignore commands starting with a space
+export HISTCONTROL=erasedups:ignorespace
+# keep the last 5000 entries
+export HISTSIZE=5000
+
+# right PS
+# RPS1="$(print '%{\e[0;33m%]'})" XXX bash izgleda nema out of the box right PS1
+
+alias ls='ls --color -h'
+alias l='ls --color -h'
+alias ll='ls -l'
+alias la='ls -A'
+alias df='df -h'
+alias du='du -h'
+alias rm='rm -i'
+alias cp='cp -ri'
+
+alias gvim="/c/Program\ Files\ \(x86\)/Vim/vim80/gvim.exe"
+# alias gvi=gvim
+# alias gv=gvim
+# alias vi=gvim
+alias vi="/c/Neovim/bin/nvim-qt.exe"
+# alias grep="grep --color -n"
+alias grep="grep --color=always -n"
+# | less -r/R
+alias greph="grep --include \*.h"
+alias grepc="grep --include \*.c"
+# nece ga moc pokrenit:
+# alias vim="/c/Program\ Files\ \(x86\)/Vim/vim80/vim.exe"
+
+# fix for MSYS2 bash:
+# source ~/.git-prompt.sh
+
+
+# Scons ne radi s Pitonom 3, zato je 2 prvi
+# HIL scripts rade samo s Pitonom 3, vjerojatno ce se morat rucno full path
+# export PATH=/c/Python27:$PATH:/c/Python3
+
+# export PATH=/c/Python3:$PATH
+# for AG probably
+# export PATH=/c/Python27:$PATH:/c:/c/bin:~/.bin:/c/Program\ Files/LLVM/bin
+# 180523 removed ~/.bin in hope that this will speed up git (~ is on the network)
+export PATH=/c/Python27:$PATH:/c:/c/bin:/c/Program\ Files/LLVM/bin
+
+# export TSK_LICENSE_KEY_SW160800=5c22-5ab4-4f08-9758
+
+# export PATH="$PATH:/c/Autoliv/programs\ shared/PyCan/pycan/bin/"
+set bell-style none
+# export PATH=$PATH:/c/pycan-bin:/c/pycan-bin/mpc:/c/Autoliv/DAG_MPC_MCU/tool
+alias build_all="for i in mpcevo_noaeb_B2 stereo220 stereomini mpchigh mpclight; do ./build.sh variant=$i application --no-delete; done" # treba bit unutar DAG repoa
+PATH=$PATH:/c/pycan-bin:/c/pycan-bin/mpc
+alias pip2="/c/python27/python.exe -m pip"
