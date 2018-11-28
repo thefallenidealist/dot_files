@@ -58,7 +58,7 @@
 	blame2 = log -p -M --follow --stat --	# nicely show changests and commit messages throught whole history for selected file
 
 	brc = rev-parse --abbrev-ref HEAD   # show only current branch
-	# pusho = push --set-upstream origin $(git rev-parse --abbrev-ref HEAD) # TODO
+	# pusho = push --set-upstream origin $(git rev-parse --abbrev-ref HEAD) # TODO push current branch which doesn't exists on remote
 
 [log]
 	decorate = full

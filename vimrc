@@ -76,7 +76,7 @@ set diffopt+=vertical
 "		<tab> and wrapping			{{{
 """""""""""""""""""""""""""""""""""""""
 if (s:work_pc == 1)
-	" let s:tab_size = 3 XXX - you can't use variables on the rhs in the .vimrc.
+	" you can't use variables on the rhs in the .vimrc.
 	set tabstop=3		" tab size
 	set shiftwidth=3 	" when indenting with '>'
 	set expandtab		" convert tab to spaces
@@ -169,7 +169,7 @@ endif
 
 set formatoptions+=j	" pretty formating when joining lines (key J)
 " set nrformats+=alpha  " Ctrl-A/X will also work on single chars
-set sessionoptions+=buffers,curdir,folds,resize
+set sessionoptions=buffers,curdir,folds,help,winpos
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		OS specific															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -188,7 +188,7 @@ if has('unix')
 	elseif s:uname == "Linux"
 		let g:ctags_exe='/usr/bin/uctags'
 	endif " uname
-elseif has('windows')
+elseif has('windows')	" XXX 181128: test something else, not 'windows' is for Vim feature
 	let $PATH.=';C:\bin'			" place where win32yank is
 	let $PATH.=';C:\python35_x64'	" work PC
 	let g:ctags_exe='c:\bin\ctags.exe'
@@ -757,7 +757,9 @@ nnoremap dd "_dd
 nnoremap D "_D
 nnoremap C "_C
 nnoremap yD D
+nnoremap yC C
 nnoremap dw "_dw
+nnoremap cw "_cw
 nnoremap diw "_diw
 nnoremap ciw "_ciw
 " yank and delete
@@ -786,6 +788,7 @@ inoremap <C-r>: <C-o>":]p<C-o>:echo "pasted last used command"<cr>
 inoremap <C-r>/ <C-o>:call RemoveBrackets()<cr><C-r>/<C-o>:echo "pasted highlighted/searched text"<cr>
 
 inoremap <C-r>p <C-o>]p<C-o>:echo "pasted from Vim paste buffer"<cr>
+inoremap <C-r>P <C-o>]P<C-o>:echo "pasted from Vim paste buffer"<cr>
 cnoremap <C-r>p <C-r>"
 " TODO 170819: remove '\n'
 inoremap <C-r>f <C-r>=expand("%:t")<CR>
@@ -1139,6 +1142,16 @@ function! SetupVerilogEnvironment()                                        " {{{
 	map <F5> :! iverilog -o %:r.vvp %:r.v %:r_tb.v && vvp %:r.vvp && gtkwave %:r.vcd <ENTER>
 endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" register clear															{{{
+" -----------------------------------------------------------------------------
+function! RegisterClear()
+	let regs=split('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/-"', '\zs')
+	for r in regs
+		call setreg(r, ' ')
+	endfor
+endfunction
+call SetupCommandAlias("regc",  "call RegisterClear()")
+" ------------------------------------------------------------------------- }}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 " Plugins																	{{{
@@ -1703,11 +1716,7 @@ nnoremap <C-w>c :call undoquit#SaveWindowQuitHistory()<cr><C-w>c
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 "		taboo																{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" INFO rename tabs XXX don't work with CtrlSpace (which manages Airline tabline)
-
-" remember tab names after restore
-set sessionoptions+=tabpages,globals
-
+set sessionoptions+=tabpages,globals	" nedded for taboo plugin (used to rename tabs)
 let g:taboo_tabline = 0		" AirLine is OK for this purpose
 let g:airline#extensions#taboo#enabled = 1
 " INFO 171104: remove "%m" - modified flag, Airline will take care of that
@@ -2010,6 +2019,7 @@ endif
 "    - c: don't compress the data
 
 nnoremap <leader>fa :call CscopeFindInteractive(expand('<cword>'))<CR>
+nnoremap <leader>l :call ToggleLocationList()<CR>
 " Some optional key mappings to search directly.
 " s: Find this C symbol
 nnoremap  <leader>fs :call CscopeFind('s', expand('<cword>'))<CR>
@@ -2510,5 +2520,4 @@ nnoremap <End> G
 
 " TODO 181026:check this (on Windows specially)
 " g:session_directory = '~/.vim/sessions' "" or ~\vimfiles\sessions (on Windows).
-" Don't save hidden and unloaded buffers in sessions.
-" set sessionoptions-=buftabers
+" TODO 181128: chane all lines with multiple " to ------
