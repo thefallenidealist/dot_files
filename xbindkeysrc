@@ -6,16 +6,38 @@
 # show/print:           xbindkey -s
 # Even when you laptop screen is locked you will be able to use xbinded keys (to turn the volume down or up).
 
-# Ctrl + i will generate F14 key
-# Release - if not present, then not every keypress will be registered
-# "xdotool key --clearmodifiers Control + Prior"
-# 	Mod4 + bracketleft + Release
+# INFO 181202: m:0x40 = mod4 = any Super key
+# INFO 181202: xbindkeys will start only if F21 & F22 keys are available (they are if xmodmap is started)
 
-"gmrun"
-	alt + F2
+# bad keyboard layout patch													{{{
+# -----------------------------------------------------------------------------
+# ThinkPad T430s with fancy keyboard with bad layout - no Home cluster with
+#      PageUp & PageDown keys
 
-# Mod4 = Super
+# "Super + [" sends "Ctrl+PgDown"
+"xdotool key Control_L+Prior"
+	mod4 + release + bracketleft
 
+# "Super + ]" sends "Ctrl+PgUp"
+"xdotool key Control_L+Next"
+	mod4 + release + bracketright
+
+# PageUp (on T430s) = F21
+"xdotool key F21"
+	release + c:99
+
+# PageDown (on T430s) = F22
+"xdotool key F22"
+	release + c:105
+
+# Super + Home = PageUp
+"xdotool key Prior"
+	release + m:0x40 + Home
+
+# Super + End = PageDown
+"xdotool key Next"
+	release + m:0x40 + End
+# ------------------------------------------------------------------------- }}}
 # xterm combos																{{{
 # -----------------------------------------------------------------------------
 # xterm -title Xterm
@@ -31,6 +53,9 @@
 # ------------------------------------------------------------------------- }}}
 # programs																	{{{
 # -----------------------------------------------------------------------------
+"gmrun"
+	alt + F2
+
 "firefox"
 	mod4 + shift + e
 
@@ -48,6 +73,7 @@
 
 "galculator"
 	mod4 + shift + g
+
 "galculator"
 	mod4 + shift + c
 
@@ -60,9 +86,20 @@
 "xterm -e nvim"
 	mod4 + shift + v
 
-# TODO 181020
-# <keybind key="Print">	<action name="Execute"> <command>scrot '%y.%m.%d-%H:%M:%S.png' -e 'mv $f ~/ss'	</command> </action> </keybind>
-# <keybind key="C-Print">	<action name="Execute"> <command>scrot '%y.%m.%d-%H:%M:%S.png' -se 'mv $f ~/ss'	</command> </action> </keybind>
+"scrot '%y.%m.%d-%H:%M:%S.png' -e 'mv $f ~/ss'"
+	Print
+
+# bad ThinkPad keyboard layout: Super + Delete to PrintScr
+# INFO 181202: FreeBSD: "-i" option needs scrot newer than version in ports tree
+"scrot '%y.%m.%d-%H:%M:%S.png' -e 'mv $f ~/ss'"
+	mod4 + Delete
+
+"scrot '%y.%m.%d-%H:%M:%S.png' -u -e 'mv $f ~/ss'"
+	shift + Print
+
+# bad ThinkPad keyboard layout: Super + Shift + Delete to PrintSrc focused window
+"scrot '%y.%m.%d-%H:%M:%S.png' -u -e 'mv $f ~/ss'"
+	mod4 + shift + Delete
 # ------------------------------------------------------------------------- }}}
 # volume control															{{{
 # -----------------------------------------------------------------------------
@@ -82,24 +119,3 @@
 "mixer vol +5"
 	XF86AudioRaiseVolume
 # ------------------------------------------------------------------------- }}}
-
-# test combo
-# "xterm -e htop"
-# "xdotool mousemove 90 80 click 3" # radi
-# "xdotool key Next"
- 	# mod4 + n
-
-# "xdotool key ctrl+Prior"
-	# Release + KP_End
-
-# "xdotool key Control_L + Prior"	# key combo is OK: works from gmrun
-# "xdotool getactivewindow key Control_L + Prior"	# key combo is OK: works from gmrun
-	# mod4 + bracketleft
-
-# "xdotool keydown Control_L key Prior"
-	# mod4 + bracketleft
-
-# "xdotool key ctrl + Next"
-"gmrun"
-	# Release + mod4 + bracketright
-	mod4 + bracketleft

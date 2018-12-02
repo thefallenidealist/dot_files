@@ -140,8 +140,8 @@ border_color_pressed = #555555 80
 # : - separator
 panel_items = T:L:E:E:B:S:C
 # panel_size = 100% 24
-# panel_size = 100% 37
-panel_size = 100% 4%
+panel_size = 100% 37
+# panel_size = 100% 4%
 panel_margin = 0 0
 # panel_padding = 2 0 2
 panel_background_id = 12
@@ -280,20 +280,19 @@ systray_monitor = 1
 # -----------------------------------------------------------------------------
 # Display CPU temperature
 execp = new
-execp_command = ~/scripts/temperature_cpu.sh
+execp_command = ~/scripts/cpu2.sh
 execp_interval = 1
-
 
 execp_font = sans 9
 execp_font_color = #aaffaa 100
 # ------------------------------------------------------------------------- }}}
-# # Executor 2 - CPU usage													{{{
-# # -----------------------------------------------------------------------------
-# # Display CPU usage
-# execp = new
-# execp_command = ~/scripts/cpu_usage.sh
-# execp_interval = 1
+# Executor 2 - CPU usage													{{{
+# -----------------------------------------------------------------------------
+# Display CPU usage
+execp = new
+execp_command = ~/scripts/cpu_usage.sh
+execp_interval = 1
 
-# execp_font = Monospace 9
-# execp_font_color = #aaffaa 100
-# # ------------------------------------------------------------------------- }}}
+execp_font = sans 9
+execp_font_color = #aaffaa 100
+# ------------------------------------------------------------------------- }}}

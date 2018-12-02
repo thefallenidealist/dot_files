@@ -4,15 +4,17 @@ HISTFILE=~/.history.zsh
 HISTSIZE=1000
 SAVEHIST=1000
 setopt no_beep
-fpath+=~/.zfunc	# additional complete zsh_plugins
 autoload -Uz compinit
 compinit
 autoload colors ; colors
-setopt histignoredups			# Ignore duplicated entries in history
-setopt histignorespace			# and with trailing spaces
+setopt histignoredups		# Ignore duplicated entries in history
+setopt histignorespace		# and with trailing spaces
+setopt sharehistory			# Share history across terminals
+setopt incappendhistory		# Immediately append to the history file, not just when a term is killed
 
 # colors																	{{{
 # -----------------------------------------------------------------------------
+# INFO 181203: Can be used on FreeBSD ls
 LSCOLORS="exfxcxdxbxegedabagacad";	# default, 'x' means default color
 LSCOLORS="ExGxFxdxCxDxDxhbadExEx";
 # LSCOLORS="ExfxcxdxBxegedabagacad";	# dirs are bold and light blue colored
@@ -28,7 +30,25 @@ LSCOLORS="ExGxFxdxCxDxDxhbadExEx";
 # 10.  directory writable to others, with sticky bit
 # 11.  directory writable to others, without sticky bit
 export LSCOLORS
-# TODO 181126: change color of dir after <tab>
+
+# ------------------ auto completition ------------------------------------- {{{
+# menu style when completing, only when there is more than $(select) entries
+# zstyle ':completion:*' menu select=5
+# zstyle ':completion:*' list-colors "no=00" "fi=00" menu select=5
+# zstyle ':completion:*' list-colors '=%*=01;31' menu select=5
+# green
+# INFO http://stackoverflow.com/questions/23152157/how-does-the-zsh-list-colors-syntax-work
+#zstyle ':completion:*:parameters'  list-colors '=*=32'
+# commands are in bolded red
+# zstyle ':completion:*:commands' list-colors '=*=1;31'
+# zstyle ':completion:*:builtins' list-colors '=*=1;38;5;142'
+# zstyle ':completion:*:aliases' list-colors '=*=2;38;5;128'
+# zstyle ':completion:*:*:kill:*' list-colors '=(#b) #([0-9]#)*( *[a-z])*=34=31=33'
+# zstyle ':completion:*:options' list-colors '=^(-- *)=34'
+# zstyle ':completion:*' list-colors 'di=34:ln=35:so=32:pi=33:ex=31:bd=46;34:cd=43;34:su=41;30:sg=46;30:tw=42;30:ow=43;30'
+# -------------------------------------------------------------------------- }}}
+zstyle ':completion:*:parameters'  list-colors '=*=32'
+zstyle ':completion:*:commands' list-colors '=*=1;31'
 # ------------------------------------------------------------------------- }}}
 
 # include per-host configuration
@@ -113,8 +133,8 @@ select-word-style bash
 # -------------------------------------------------------------------------- }}}
 # ------------------ auto completition ------------------------------------- {{{
 # menu style when completing, only when there is more than $(select) entries
-zstyle ':completion:*' menu select=5
-zstyle ':completion:*' list-colors "no=00" "fi=00" menu select=5
+# zstyle ':completion:*' menu select=5
+# zstyle ':completion:*' list-colors "no=00" "fi=00" menu select=5
 zstyle ':completion:*' list-colors '=%*=01;31' menu select=5
 # completion colors (a little different than /bin/ls
 #autoload complist
@@ -123,16 +143,11 @@ zstyle ':completion:*' list-colors '=%*=01;31' menu select=5
 # INFO http://stackoverflow.com/questions/23152157/how-does-the-zsh-list-colors-syntax-work
 #zstyle ':completion:*:parameters'  list-colors '=*=32'
 # commands are in bolded red
-zstyle ':completion:*:commands' list-colors '=*=1;31'
+# zstyle ':completion:*:commands' list-colors '=*=1;31'
 zstyle ':completion:*:builtins' list-colors '=*=1;38;5;142'
 zstyle ':completion:*:aliases' list-colors '=*=2;38;5;128'
 zstyle ':completion:*:*:kill:*' list-colors '=(#b) #([0-9]#)*( *[a-z])*=34=31=33'
 zstyle ':completion:*:options' list-colors '=^(-- *)=34'
-#LS_COLORS='no=00;37:fi=00:di=00;33:ln=04;36:pi=40;33:so=01;35:bd=40;33;01:'
-#export LS_COLORS
-#zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-# colors same as ls(1)
-zstyle ':completion:*' list-colors 'di=34:ln=35:so=32:pi=33:ex=31:bd=46;34:cd=43;34:su=41;30:sg=46;30:tw=42;30:ow=43;30'
 # -------------------------------------------------------------------------- }}}
 
 # ------------------ alias - global ---------------------------------------- {{{

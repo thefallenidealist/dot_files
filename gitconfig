@@ -28,7 +28,7 @@
 	cm = commit --allow-empty-message -m
 	cc = commit						# same as vim fugitive plugin
 	ca = commit --amend				# same as vim fugitive plugin
-	ce = commit --amend --no-edita	# same as vim fugitive plugin
+	ce = commit --amend --no-edit	# same as vim fugitive plugin
 	rc = rebase --continue
 	ra = rebase --abort
 	cp  = cherry-pick

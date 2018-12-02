@@ -170,6 +170,8 @@ endif
 set formatoptions+=j	" pretty formating when joining lines (key J)
 " set nrformats+=alpha  " Ctrl-A/X will also work on single chars
 set sessionoptions=buffers,curdir,folds,help,winpos
+" XXX 181128: won't restore full help window: status will be 'Normal', not
+" 'Help' s so <C-]> won't work as expected
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		OS specific															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -506,6 +508,8 @@ nnoremap <A-]> :tabnext<cr>
 " AltGr + [/] - depends on (xmodmap) keyboard layout
 nnoremap š :tabprev<cr>
 nnoremap đ :tabnext<cr>
+" gt is default for next tab, this is pret close to gt
+nnoremap gr :tabprev<cr>
 
 nnoremap tj :bnext<cr>
 nnoremap tk :bprev<cr>
@@ -1234,6 +1238,9 @@ Plug 'tpope/vim-abolish'            " better search and replace and abbrev :Subv
 Plug 'troydm/zoomwintab.vim'		" <C-w>o wil zoom/unzoom windows/split
 Plug 'AndrewRadev/undoquit.vim'
 Plug 'ntpeters/vim-better-whitespace'	" show red block when there is a trailing whitespace
+Plug 'mtth/scratch.vim'
+Plug 'tpope/vim-tbone.git'
+Plug 'elzr/vim-json'
 
 
 " Plug 'ervandew/supertab'
