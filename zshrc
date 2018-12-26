@@ -273,8 +273,9 @@ alias wip='ifconfig wlan0 | grep inet | cut -d " " -f 2'      # nece pokazat nis
 alias wst='ifconfig wlan0 | grep status | cut -d " " -f 2'
 alias ws='echo `wst; ssid; echo "  IP: "; wip`'
 
-alias w='wget --no-check-certificate'
-#alias w='wget -U "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)" --no-check-certificate'
+# alias w='wget --no-check-certificate'
+# alias w='wget -U "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)" --no-check-certificate'
+alias w='fetch'
 
 # find IPs: nmap -sP 192.168.2.1/24
 # -------------------------------------------------------------------------- }}}
