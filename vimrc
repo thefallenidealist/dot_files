@@ -228,7 +228,7 @@ function! Compile()
 		make
 	elseif expand('%:e') == "c"
 		setlocal makeprg=cc\ -Wall\ %\ -o\ %:r.elf\ -std=c99
-		make
+		make | :!./%:r.elf
 	elseif expand('%:e') == "rs"
 		echo "building Rust"
 		setlocal makeprg=cargo\ build\ $*
@@ -271,6 +271,8 @@ augroup my_group_with_a_very_uniq_name
 	autocmd Filetype help nnoremap <buffer> <cr> <C-]>
 	autocmd Filetype man nnoremap <buffer> <cr> <C-]>
 
+	autocmd Filetype help,man :NumbersDisable	" Disable Numbers plugin in help or man
+
 	" unmap enter in QuickFix window (window at the bottom which isn't preview)
 	autocmd BufReadPost quickfix nnoremap <buffer> <cr> <cr>
 	autocmd Filetype qf set nolist
@@ -295,7 +297,7 @@ augroup my_group_with_a_very_uniq_name
 	" autocmd VimEnter * if @% == "[Command Line]" | echo "QQQQQQ" | else | "AAAAAA" | endif
 
 	autocmd Filetype xdefaults set commentstring=!%s
-	autocmd FileType pf,dnsmasq,fstab,cfg,gitconfig setlocal commentstring=#\ %s
+	autocmd FileType pf,dnsmasq,fstab,cfg,gitconfig,crontab setlocal commentstring=#\ %s
 
 	" Warn if file in current buffer is changed outside of Vim
 	" - default: just warning when trying to write to the file
@@ -432,6 +434,8 @@ call SetupCommandAlias("do", "diffoff")
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		generic mappings													{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" patch moving one char left when leavig Insert mode
+inoremap <silent> <Esc> <Esc>`^
 " disable ed mode:
 nnoremap Q <nop>
 " remap recording
@@ -888,15 +892,6 @@ if has('clipboard')	" not really needed for all options under this
 	" [ - X11 1st
 	" { - Vim paste
 
-	" TODO IDEA
-	" y - vim yank
-	" Y - X11 2nd (clipboard) yank (without leader key)
-	" <leader>y - tmux yank
-	" <leader>Y - X11 1st yank
-	" TODO TODO TODO reorganize all this
-	" mnomoic: yank for tmux
-	vnoremap <leader>yt :w! /tmp/vim_buffer<cr>:echo "vselection copied to /tmp/vim_buffer"<cr>
-
 	nnoremap yiW "+yiw:echo "yank inner word to the X11 2nd clipboard"<cr>
 	vnoremap Y "+y:echo "yank selection to the X11 2nd clipboard"<cr>
 
@@ -918,6 +913,9 @@ if has('clipboard')	" not really needed for all options under this
 	vnoremap <leader>y@ "+y:echo "copied to the X11 2nd clipboard"<cr>
 	nnoremap <leader>p! "*p:echo "pasted from the X11 1st clipboard"<cr>
 	nnoremap <leader>p@ "+p:echo "pasted from the X11 2nd clipboard"<cr>
+
+	" tmux paste (needs plugin)
+	" nnoremap <leader>t :Tput<cr>:echo "copied from tmux buffer"<cr>
 
 	cnoremap <C-r>! <C-r>*
 	cnoremap <C-r>@ <C-r>+
@@ -1172,14 +1170,18 @@ endif
 call plug#begin('~/.vim/plugged')
 
 " AutoComplete
-Plug 'roxma/nvim-completion-manager'
-" NCM fork without Python dependency
-" Plug ''prabirshrestha/asyncomplete'
-if !has('nvim')
-	Plug 'roxma/vim-hug-neovim-rpc'
-endif
-" Plug 'roxma/clang_complete' " can be used for gotoDeclaration
-Plug 'roxma/ncm-clang'
+Plug 'ncm2/ncm2'			" manager
+Plug 'roxma/nvim-yarp'		" dependency
+Plug 'ncm2/ncm2-bufword'	" completion from current buffer
+Plug 'ncm2/ncm2-path'
+Plug 'ncm2/ncm2-tmux'		" completion with words from other tmux panes
+Plug 'ncm2/ncm2-ultisnips'
+Plug 'ncm2/ncm2-racer'		" Rust
+Plug 'ncm2/ncm2-pyclang'	" C/C++
+Plug 'ncm2/ncm2-vim'
+" Plug 'ncm2/ncm2-neoinclude' | Plug 'Shougo/neoinclude.vim'	" INFO 190111: not sure if this is doing anything
+" Plug 'ncm2/ncm2-syntax' | Plug 'Shougo/neco-syntax'
+" Plug 'ncm2/ncm2-path'
 
 " rust
 Plug 'rust-lang/rust.vim'   " Rust lang support
@@ -1268,6 +1270,7 @@ Plug 'kshenoy/vim-signature'	" marks in sign column and with easier shortcuts
 								" use fzf :Marks for search
 Plug 'airblade/vim-gitgutter'	" git: show +-m in sign column, shortcuts [c ]c
 Plug 'tpope/vim-fugitive'		" Git commands for Vim
+Plug 'tpope/vim-tbone'			" Tmux under Vim (copy/paste)
 
 " Vim session plugins
 Plug 'tpope/vim-obsession'	" restore session, needed for tmux ressurect
@@ -1309,13 +1312,25 @@ call plug#end()
 colorscheme molokai
 " NCM																		{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-inoremap <expr><tab> 	pumvisible() ? "\<C-n>" : "\<tab>"
-inoremap <expr><S-tab>	pumvisible() ? "\<C-p>" : "\<S-tab>"
+" NCM2:
+autocmd BufEnter * call ncm2#enable_for_buffer()
+" IMPORTANT: :help Ncm2PopupOpen for more information
+set completeopt=noinsert,menuone,noselect
+" inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
+" for ncm2-ultisnips:
+inoremap <silent> <expr> <CR> ncm2_ultisnips#expand_or("\<CR>", 'n')
+" Use <TAB> to select the popup menu:
+inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+" TODO 190111: cleanup
+
+" inoremap <expr><tab> 	pumvisible() ? "\<C-n>" : "\<tab>"
+" inoremap <expr><S-tab>	pumvisible() ? "\<C-p>" : "\<S-tab>"
 
 " <enter> for expanding snippet
 " <C-u> is UltiSnipsExpandTrigger, <C-y> cancels completition menu
-imap <expr> <CR>  (pumvisible() ?  "\<c-y>\<Plug>(expand_or_nl)" : "\<CR>")
-imap <expr> <Plug>(expand_or_nl) (cm#completed_is_snippet() ? "\<C-u>":"\<CR>")
+" imap <expr> <CR>  (pumvisible() ?  "\<c-y>\<Plug>(expand_or_nl)" : "\<CR>")
+" imap <expr> <Plug>(expand_or_nl) (cm#completed_is_snippet() ? "\<C-u>":"\<CR>")
 
 " <esc> to close autocomplete menu
 " imap <expr> <esc>  (pumvisible() ?  "<c-y>" : "\<esc>") " 2018-01-16: iritating
@@ -1329,18 +1344,6 @@ let g:cm_matcher = {'module': 'cm_matchers.fuzzy_matcher', 'case': 'smartcase'}
 " let g:cm_refresh_length=2
 " let g:cm_refresh_length=[[1,4],[7,3]]   " default
 let g:cm_refresh_length=[[1,4],[7,1]]
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
-" clang_complete															{{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" path to directory where library can be found
-" let g:clang_library_path='/usr/local/llvm40/lib'
-" -> Already set in OS specific part
-" or path directly to the library file
-" let g:clang_library_path='/usr/local/llvm40/lib/libclang.so.4.0'
-
-" <Plug>(clang_complete_goto_declaration_preview)
-au FileType c,cpp  nmap gd <Plug>(clang_complete_goto_declaration)
-
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " Linter																	{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1555,6 +1558,7 @@ nmap <Leader>gu <Plug>GitGutterUndoHunk
 
 call SetupCommandAlias("gitt","GitGutterToggle")
 call SetupCommandAlias("Gcc","Gcommit -m")
+call SetupCommandAlias("Gcm","Gcommit -m")
 call SetupCommandAlias("Gca","Gcommit --amend")
 call SetupCommandAlias("Gce","Gcommit --amend --no-edit")
 
@@ -1871,6 +1875,15 @@ let g:AutoPairsShortcutJump = '<nop>'
 " {{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+" tmux - tbone.vim															{{{
+" -----------------------------------------------------------------------------
+"  cmds: :Tmux Tyank Tput Twrite Tattach
+" TODO 181222: remove newline before yanking
+" mnemonic: yank for tmux
+vnoremap <leader>yt :Tyank<cr>:echo "copied to tmux paste buffer"<cr>
+nnoremap <leader>yt :Tyank<cr>:echo "copied to tmux paste buffer"<cr>
+
+" ------------------------------------------------------------------------- }}}
 
 "		lastplace															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -2026,7 +2039,6 @@ endif
 "    - c: don't compress the data
 
 nnoremap <leader>fa :call CscopeFindInteractive(expand('<cword>'))<CR>
-nnoremap <leader>l :call ToggleLocationList()<CR>
 " Some optional key mappings to search directly.
 " s: Find this C symbol
 nnoremap  <leader>fs :call CscopeFind('s', expand('<cword>'))<CR>

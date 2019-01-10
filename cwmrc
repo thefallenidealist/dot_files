@@ -74,6 +74,7 @@ unbind-key	M-comma		# used in tmux
 unbind-key	M-period	# used in tmux
 
 bind-key	4-Return	terminal
+bind-key	4S-Return	"xterm -e tmux"
 bind-key	4M-r		restart
 bind-key	4-Escape	quit
 unbind-key	CMS-q
@@ -93,7 +94,8 @@ bind-key	M-F5		window-maximize
 bind-key	M-F6		window-hmaximize
 bind-key	M-F7		window-vmaximize
 bind-key	4-f			window-fullscreen
-bind-key	M-Return	window-fullscreen
+bind-key	M-Return	window-maximize
+bind-key	MS-Return	window-fullscreen
 
 bind-key	4-m			window-maximize
 # bind-key	4-n			window-hide
@@ -107,14 +109,20 @@ bind-key	4-u			window-hmaximize	# because it's close to hjkl, same as Alt-F6
 bind-key	4-i			window-vmaximize	# because it's close to hjkl, same as Alt-F7
 						# TODO 181126: Or use 'y' and 'u' because they are below '6' and '7'
 bind-key	4-a			window-stick	# show current window in all groups/desktops (but tint2 will show it only on original desktop)
+
+bind-key	4S-Left		window-resize-left-big
+bind-key	4S-Right	window-resize-right-big
+bind-key	4S-Up		window-resize-up-big
+bind-key	4S-Down		window-resize-down-big
+# TODO 181209: change src to not allow resizing out of visible screen space
 # -------------------------------------------------------------------------- }}}
 bind-key	4-g			window-group	# Toggle group membership of current window.
-bind-key	4-n		window-menu-label	# mnemonic: [n]ame
+bind-key	4-n			window-menu-label	# mnemonic: [n]ame
 
-bind-key	M-Left	window-snap-left
-bind-key	M-Right window-snap-right
-bind-key	M-Up	window-snap-up
-bind-key	M-Down	window-snap-down
+bind-key	M-Left		window-snap-left
+bind-key	M-Right 	window-snap-right
+bind-key	M-Up		window-snap-up
+bind-key	M-Down		window-snap-down
 
 bind-key	4M-h		window-htile
 bind-key	4M-v		window-vtile
