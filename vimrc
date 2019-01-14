@@ -903,8 +903,8 @@ if has('clipboard')	" not really needed for all options under this
 	" X11 secondary buffer		"+
 	" TODO TODO set paste mode before pasting
 	vnoremap <leader>y "+y:echo  "copied to the X11 2nd clipboard"<cr>
-	nnoremap <leader>yy "+yy:echo "copied to the X11 2nd clipboard"<cr>
-	nnoremap <leader>y "+yiw:echo "copied to the X11 2nd clipboard"<cr>
+	nnoremap <leader>yy "+yy:echo "line copied to the X11 2nd clipboard"<cr>
+	nnoremap <leader>y "+yiw:echo "word copied to the X11 2nd clipboard"<cr>
 	nnoremap <leader>p "+p:echo  "pasted from the X11 2nd clipboard"<cr>
 	vnoremap <leader>p "+p:echo  "pasted from the X11 2nd clipboard"<cr>
 
@@ -1243,6 +1243,7 @@ Plug 'ntpeters/vim-better-whitespace'	" show red block when there is a trailing 
 Plug 'mtth/scratch.vim'
 Plug 'tpope/vim-tbone.git'
 Plug 'elzr/vim-json'
+Plug 'westeri/asl-vim'				" ACPI source language syntax
 
 
 " Plug 'ervandew/supertab'
@@ -1437,11 +1438,15 @@ let g:airline#extensions#obsession#indicator_text = 'Ses' " default: '$'
 let g:UltiSnipsExpandTrigger		= "<Plug>(ultisnips_expand)"
 " INFO 180115: <C-o> works but it will break Vim's <C-o> (exit insert mode for
 " one command)
-let g:UltiSnipsJumpForwardTrigger   = "<tab>"   " jump between $1, $2, ...
-let g:UltiSnipsJumpBackwardTrigger  = "<s-tab>"
-let g:UltiSnipsListSnippets         = '<C-l>'
+" let g:UltiSnipsJumpForwardTrigger   = "<tab>"   " jump between $1, $2, ...
+" let g:UltiSnipsJumpBackwardTrigger  = "<s-tab>"
+" let g:UltiSnipsListSnippets         = '<C-l>'
+" NCM2:
+let g:UltiSnipsJumpForwardTrigger = "<c-j>"
+let g:UltiSnipsJumpBackwardTrigger = "<c-k>"
+" let g:UltiSnipsRemoveSelectModeMappings = 0
 " 180218 NCM optional:
-inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ultisnips_expand)")<cr>
+" inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ultisnips_expand)")<cr>
 
 let g:UltiSnipsRemoveSelectModeMappings = 0
 let g:UltiSnipsEnableSnipMate       = 0 " no need to look for SnipMate snippets
@@ -1569,6 +1574,11 @@ call SetupCommandAlias("Gce","Gcommit --amend --no-edit")
 if (bufname('%') == '^fugitive:')
 	nnoremap <buffer> q :wincmd c<cr>
 endif
+
+" 190112 newer Gstatus:
+" call SetupCommandAlias("G","botright Gstatus")
+call SetupCommandAlias("Gstatus","botright Gstatus")
+" call SetupCommandAlias("Gstatus","botright Gstatus<cr> | :resize -10")
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " searching																	{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1953,7 +1963,7 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " temporary highlight the text which is yanked
 let g:highlightedyank_highlight_duration = 1000 " [ms]
-highlight HighlightedyankRegion cterm=reverse gui=reverse
+highlight HighlightedyankRegion gui=reverse ctermbg=130 ctermfg=15
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
