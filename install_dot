@@ -102,6 +102,7 @@ install_dot()
 	ln -sf $BASEDIR/$FILE_ZSH_LOCAL			$HOME/.zshrc_local
 	ln -sf $BASEDIR/gitconfig				$HOME/.gitconfig
 	ln -sf $BASEDIR/$FILE_GITCONFIG_LOCAL	$HOME/.gitconfig_local
+	ln -sf $BASEDIR/ripgreprc				$HOME/.ripgreprc
 }
 # ------------------------------------------------------------------------- }}}
 # GUI config                                                                {{{
