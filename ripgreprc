@@ -1,0 +1,11 @@
+# Created 190126
+
+# exclude tags and tags.temp
+--glob='!tags*'
+--smart-case
+
+# CLI options:
+# -i --ignore-case
+# -S --smart-case
+# -w --word-regex
+# -z --search-zip
