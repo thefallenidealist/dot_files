@@ -1,7 +1,8 @@
 # Created 190126
 
-# exclude tags and tags.temp
---glob='!tags*'
+# INFO 190422: CLI uses: --glob=!tags*
+# don't use ' in rc:
+--glob=!tags*
 --smart-case
 
 # CLI options:
@@ -9,3 +10,20 @@
 # -S --smart-case
 # -w --word-regex
 # -z --search-zip
+# -C --context=3 show N lines before and after hit
+# rg --files -tmake		# find Makefile type files in current dir
+
+
+
+# Don't let ripgrep vomit really long lines to my terminal.
+--max-columns=150
+
+# Add my 'web' type.
+--type-add
+web:*.{html,css,js}*
+
+# search hidden files and folders
+--hidden
+
+# Always show line numbers for matches
+--line-number

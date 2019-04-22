@@ -297,7 +297,7 @@ augroup my_group_with_a_very_uniq_name
 	" autocmd VimEnter * if @% == "[Command Line]" | echo "QQQQQQ" | else | "AAAAAA" | endif
 
 	autocmd Filetype xdefaults set commentstring=!%s
-	autocmd FileType pf,dnsmasq,fstab,cfg,gitconfig,crontab setlocal commentstring=#\ %s
+	autocmd FileType pf,dnsmasq,fstab,cfg,gitconfig,crontab,sshdconfig setlocal commentstring=#\ %s
 
 	" Warn if file in current buffer is changed outside of Vim
 	" - default: just warning when trying to write to the file
@@ -1235,6 +1235,7 @@ Plug 'osyo-manga/vim-anzu'			" show search matches in statusline
 Plug 'jiangmiao/auto-pairs'			" auto close quotes, brackets, ...
 Plug 'tpope/vim-surround'			" replace quotes, brackets,...
 Plug 'tpope/vim-repeat'             " repeat with . previous plugin
+Plug 'vim-scripts/visualrepeat'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-abolish'            " better search and replace and abbrev :Subvert
 Plug 'troydm/zoomwintab.vim'		" <C-w>o wil zoom/unzoom windows/split
@@ -1279,7 +1280,9 @@ Plug 'mhinz/vim-startify'	" Fancy Vim startup screen (shows MRU, session, ...)
 Plug 'xolox/vim-session'
 Plug 'xolox/vim-misc'		" Required for vim-session
 
-Plug 'godlygeek/tabular'	" Tabularize/align
+" Plug 'godlygeek/tabular'	" Tabularize/align
+Plug 'junegunn/vim-easy-align'
+Plug 'rhysd/vim-clang-format'
 
 " TODO 170813: check one day
 " Plug 'timonv/vim-cargo'		" simple plugin, cmds: Cargo{Build, Run, Test, Bench}
@@ -1288,7 +1291,6 @@ Plug 'easymotion/vim-easymotion'	" leader leader and magic begins
 " Plug 'justinmk/vim-sneak'       " lightweight easymotion
 Plug 'myusuf3/numbers.vim'		" disable relative numbers in insert mode and non-active windows
 " Plug 'hyiltiz/vim-plugins-profile'
-" Plug 'junegunn/vim-easy-align'
 " Plug 'matze/vim-move'
 " Plug 'gilligan/vim-lldb'
 " Plug 'LucHermitte/vim-refactor'
@@ -1302,6 +1304,8 @@ Plug 'wesQ3/vim-windowswap'		" Easier window swap: <leader>ww
 
 Plug 'machakann/vim-highlightedyank'	" temporary highlight yanked text/selection
 " Plug 'luochen1990/rainbow'             " colored brackets
+
+" Plug 'arakashic/chromatica.nvim'
 
 " Initialize plugin system
 call plug#end()
@@ -1882,9 +1886,6 @@ let g:AutoPairsShortcutJump = '<nop>'
 " ]oX to enable something
 " \oX to toggle something:
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
-" {{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " tmux - tbone.vim															{{{
 " -----------------------------------------------------------------------------
 "  cmds: :Tmux Tyank Tput Twrite Tattach
@@ -1952,6 +1953,14 @@ if exists(":Tabularize")
 	vnoremap <leader>a: :Tabularize /:\zs<cr>
 endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		EasyAlign															{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Start interactive EasyAlign in visual mode (e.g. vip<Enter>)
+vmap <Enter> <Plug>(EasyAlign)
+
+" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		window swap															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Navigate to the window you'd like to move
@@ -1964,6 +1973,14 @@ endif
 " temporary highlight the text which is yanked
 let g:highlightedyank_highlight_duration = 1000 " [ms]
 highlight HighlightedyankRegion gui=reverse ctermbg=130 ctermfg=15
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+" semantic highlighter														{{{
+let g:chromatica#libclang_path='/usr/local/llvm60/lib'
+let g:chromatica#enable_at_startup=1
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+" {{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -2550,3 +2567,8 @@ nnoremap <End> G
 " TODO 181026:check this (on Windows specially)
 " g:session_directory = '~/.vim/sessions' "" or ~\vimfiles\sessions (on Windows).
 " TODO 181128: chane all lines with multiple " to ------
+
+" 190119 nvim-yarp debuggin
+" Log files will be generated with prefix /tmp/nvim_log
+let $NVIM_PYTHON_LOG_FILE="/tmp/nvim_log"
+let $NVIM_PYTHON_LOG_LEVEL="DEBUG"

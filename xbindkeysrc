@@ -12,15 +12,15 @@
 # bad keyboard layout patch													{{{
 # -----------------------------------------------------------------------------
 # ThinkPad T430s with fancy keyboard with bad layout - no Home cluster with
-#      PageUp & PageDown keys
+# PageUp & PageDown keys
 
-# "Super + [" sends "Ctrl+PgDown"
-"xdotool key Control_L+Prior"
-	mod4 + release + bracketleft
+# "Super + [" sends "Ctrl + PgDown"
+"xdotool key --delay 30 Control_L+Prior"
+	mod4 + bracketleft + release
 
-# "Super + ]" sends "Ctrl+PgUp"
-"xdotool key Control_L+Next"
-	mod4 + release + bracketright
+# "Super + ]" sends "Ctrl + PgUp"
+"xdotool key --delay 30 Control_L+Next"
+	mod4 + bracketright + release
 
 # PageUp (on T430s) = F21
 "xdotool key F21"
@@ -37,6 +37,14 @@
 # Super + End = PageDown
 "xdotool key Next"
 	release + m:0x40 + End
+
+# Super + - = PageUp
+"xdotool key Prior"
+	release + m:0x40 + minus
+
+# Super + = = PageDown
+"xdotool key Next"
+	release + m:0x40 + equal
 # ------------------------------------------------------------------------- }}}
 # xterm combos																{{{
 # -----------------------------------------------------------------------------
@@ -50,9 +58,18 @@
 
 "xterm -e htop"
 	mod4 + shift + h
+
+# INFO 181223: window manager manages Mod4+enter/Mod4+shift+enter for xterm/tmux
+# "xterm -title XScreen -e 'tmux'"
+# "xterm -e tmux"
+	# mod4 + shift + return
+
 # ------------------------------------------------------------------------- }}}
+"skippy-xd"
+	mod4 + Tab
 # programs																	{{{
 # -----------------------------------------------------------------------------
+# "rofi -show run"
 "gmrun"
 	alt + F2
 
@@ -85,6 +102,9 @@
 
 "xterm -e nvim"
 	mod4 + shift + v
+
+"pcmanfm -n Downloads"
+	mod4 + shift + o
 
 "scrot '%y.%m.%d-%H:%M:%S.png' -e 'mv $f ~/ss'"
 	Print
@@ -119,3 +139,26 @@
 "mixer vol +5"
 	XF86AudioRaiseVolume
 # ------------------------------------------------------------------------- }}}
+
+# XXX 190106: won't work as a shortcut but will work from gmrun:
+"/home/johnny/src/simple-click-github/simple-click.elf"
+	mod4 + F1
+
+# XXX works only when cwm is not run
+"sleep 1; xdotool --delay 15 click 1"
+	mod4 + F2
+
+"xte 'mouseclick 1'"
+	mod4 + F3
+
+"rofi -matching fuzzy -show run"
+	mod4 + r
+
+# "rofi -combi-modi window,drun -show combi -modi combi"
+# 	mod4 + R
+
+"rofi -matching fuzzy -show window"
+	mod4 + w
+
+"rofi -matching fuzzy -terminal xterm -show ssh"
+	mod4 + s

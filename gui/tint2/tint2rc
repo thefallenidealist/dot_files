@@ -128,6 +128,13 @@ background_color_hover = #000000 80
 border_color_hover = #555555 80
 background_color_pressed = #000000 80
 border_color_pressed = #555555 80
+
+# Background 13: Executor1: CPU1
+rounded = 2
+border_width = 2
+border_sides = BTLR
+background_color = #202020 100	# grayish
+border_color =     #993300 100	# brownish
 # ------------------------------------------------------------------------- }}}
 # Panel																		{{{
 # -----------------------------------------------------------------------------
@@ -138,7 +145,7 @@ border_color_pressed = #555555 80
 # E - executor
 # C - clock
 # : - separator
-panel_items = T:L:E:E:B:S:C
+panel_items = S:T:L:E:E:E:E:B:S:C
 # panel_size = 100% 24
 panel_size = 100% 37
 # panel_size = 100% 4%
@@ -276,21 +283,94 @@ systray_icon_size = 32
 systray_icon_asb = 100 0 0
 systray_monitor = 1
 # ------------------------------------------------------------------------- }}}
-# Executor 1 - CPU temperature												{{{
+#-------------------------------------
+# Separator 1
+separator = new
+separator_background_id = 0
+separator_color = #5d8185 60
+separator_style = line
+separator_size = 2
+separator_padding = 4 8
+
+#-------------------------------------
+# Separator 2
+separator = new
+separator_background_id = 1
+separator_color = #5d8185 60
+separator_style = line
+separator_size = 2
+separator_padding = 4 8
+
+#-------------------------------------
+# Separator 3
+separator = new
+separator_background_id = 0
+separator_color = #5d8185 60
+separator_style = line
+separator_size = 2
+separator_padding = 4 8
+
+#-------------------------------------
+# Separator 4
+separator = new
+separator_background_id = 0
+separator_color = #5d8185 60
+separator_style = line
+separator_size = 2
+separator_padding = 4 8
+
+#-------------------------------------
+# Separator 5
+separator = new
+separator_background_id = 0
+separator_color = #5d8185 60
+separator_style = line
+separator_size = 2
+separator_padding = 4 8
+
+#-------------------------------------
+# Separator 5
+separator = new
+separator_background_id = 0
+separator_color = #5d8185 60
+separator_style = line
+separator_size = 2
+separator_padding = 4 8
+# Executor 1 - CPU1															{{{
 # -----------------------------------------------------------------------------
 # Display CPU temperature
 execp = new
-execp_command = ~/scripts/cpu2.sh
+execp_command = ~/scripts/tint2-cpu1.sh
 execp_interval = 1
 
 execp_font = sans 9
 execp_font_color = #aaffaa 100
 # ------------------------------------------------------------------------- }}}
-# Executor 2 - CPU usage													{{{
+# Executor 2 - CPU2															{{{
 # -----------------------------------------------------------------------------
 # Display CPU usage
 execp = new
-execp_command = ~/scripts/cpu_usage.sh
+execp_command = ~/scripts/tint2-cpu2.sh
+execp_interval = 1
+
+execp_font = sans 9
+execp_font_color = #aaffaa 100
+# ------------------------------------------------------------------------- }}}
+# Executor 3 - RAM															{{{
+# -----------------------------------------------------------------------------
+# Display CPU usage
+execp = new
+execp_command = ~/scripts/free-memory.sh
+execp_interval = 1
+
+execp_font = sans 9
+execp_font_color = #aaffaa 100
+# ------------------------------------------------------------------------- }}}
+# Executor 4 - WLAN															{{{
+# -----------------------------------------------------------------------------
+# Display CPU usage
+execp = new
+execp_command = ~/scripts/wlan-status.sh
 execp_interval = 1
 
 execp_font = sans 9

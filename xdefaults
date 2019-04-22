@@ -1,3 +1,9 @@
+! INFO 190112: xrdb will warn about single qoute mark in ! comment
+! https://unix.stackexchange.com/questions/373187/is-it-possible-to-make-xrdb-ignore-single-quotes-on-a-commented-line
+! does not work for me
+
+! 190106 FHD LCD: tune a value so Firefox/pcmanfm menus and text are not too small nor too big
+Xft.dpi: 110
 
 ! XTerm.vt100.translations: #override \n\
 !     Ctrl <Key>M: maximize() \n\
@@ -6,15 +12,19 @@ XTerm.vt100.translations: #override \n\
     Ctrl <Key>+: larger-vt-font() \n\
 	Ctrl <Key>-: smaller-vt-font()
 
+! xterm has a convenient builtin function to reverse video, and allows key bindings. I will be using F11.
+*VT100.translations:#override\n<Key>F11:set-reverse-video(toggle)
+
+
 ! xterm -------------------------------------------------------------------- {{{
 ! ------------------------------------------------------------------------------
-UXTerm*faceName: Source Code Pro for Powerline
-UXTerm*faceSize: 12
-
 !XTerm*faceName:		bitstream vera sans mono:pixelsize=12
 !XTerm*faceName:		xft:bitstream vera sans mono:pixelsize=12
 ! XTerm*faceName:		xft:bitstream vera sans mono:pixelsize=13
-XTerm*faceName:			xft:Literation Mono Powerline:pixelsize=13
+! 190106 14 FHD LCD change from 12 to 13:
+XTerm*faceName:			xft:Literation Mono Powerline:pixelsize=15
+! but tmux bar (with current font size) closer to end of xterm window
+xterm*internalBorder:	6 
 ! XTerm*termName:			screen-256color
 XTerm*termName:			xterm-256color
 
@@ -37,6 +47,8 @@ xterm*utf8:			true
 xterm*wideChars:	true
 xterm*locale:		UTF-8
 xterm*scrollBar:	false
+! 190112 do not allow vim to resize maximized xterm (at least under cwm) XXX does not work
+xterm*allowWindowOps:	false
 !XTerm*faceName:		bitstream vera sans mono:pixelsize=12
 !XTerm*faceSize:		9
 !*XTerm*deleteIsDEL:              true	
@@ -102,6 +114,9 @@ XTerm*metaSendsEscape: true
 ! -------------------------------------------------------------------------- }}}
 ! urxvt -------------------------------------------------------------------- {{{
 ! ------------------------------------------------------------------------------
+UXTerm*faceName: Source Code Pro for Powerline
+UXTerm*faceSize: 12
+
 urxvt.background:	black
 ! urxvt.foreground:	grey
 urxvt.foreground:	wheat

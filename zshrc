@@ -9,7 +9,7 @@ compinit
 autoload colors ; colors
 setopt histignoredups		# Ignore duplicated entries in history
 setopt histignorespace		# and with trailing spaces
-setopt sharehistory			# Share history across terminals
+# setopt sharehistory			# Share history across terminals
 setopt incappendhistory		# Immediately append to the history file, not just when a term is killed
 
 # colors																	{{{
@@ -49,6 +49,7 @@ export LSCOLORS
 # -------------------------------------------------------------------------- }}}
 zstyle ':completion:*:parameters'  list-colors '=*=32'
 zstyle ':completion:*:commands' list-colors '=*=1;31'
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'	# INFO 181228: "smart case" autocomplete
 # ------------------------------------------------------------------------- }}}
 
 # include per-host configuration
@@ -83,28 +84,13 @@ PS2="$(print '%{\e[0;31m%}>%{\e[0m%}') "
 RPS1="$(print '%{\e[0;33m%}[%~]%{\e[0;32m%}[%y]%{\e[0;31m%}%{\e[0;31m%}[%D{%y.%m.%d. %H:%M:%S}]%{\e[0m%}')"
 # -------------------------------------------------------------------------- }}}
 
-#export DISPLAY=`hostname`:0.0	#zajeb s DHCPom i /etc/hosts fileom
-#export DISPLAY=localhost:0.0
-# koristi sockete umjesto TCP/IP
 export DISPLAY=:0
-#export EDITOR=`which vim`
 export EDITOR=`which nvim`
 export PAGER='less -XMr'
-#export CC=/usr/bin/cc
+export MANPAGER='less -s -M +Gg' # don't export +G to LESS because it will hang when reading large files
 
-export LANG=POSIX				# da datumi budu na eng
-#export LC_CTYPE=hr_HR.UTF-8
-#export LC_COLLATE=POSIX
-#export LC_ALL=hr_HR.UTF-8		# palatali u shellu, datumi su hr	prevodi dosta toga
+export LANG=POSIX				# date(1) is in english
 export LC_ALL=en_US.UTF-8
-#LC_ALL=hr palatali i hrvatski datumi, LC_ALL=C - nema palatala, eng datumi, LANG nema neku ulogu
-
-# For colourful man pages, navodno RedHat sytle, nije lose
-export LESS_TERMCAP_md=$'\E[01;31m'	# uppercase boldana slova postaju crvena, overidea .Xdefault: *VT100.colorBD
-export LESS_TERMCAP_se=$'\E[0m'		# smanji sirinu status bara gdje pise less ili more
-export LESS_TERMCAP_so=$'\E[01;44;33m'	# plavi status bar gdje pise less ili more
-
-#export COLORFGBG="green;black"	# da mutt ima normalne boje
 
 # Don't expand files matching:
 fignore=(.c~ .old)
@@ -113,7 +99,6 @@ export XDG_CONFIG_HOME="$HOME/.config"
 
 # ------------------ key bindings ------------------------------------------ {{{
 bindkey -e			# Emacs shortcuts
-#binkdey -v		# vi bindkey, zanimljivo za naucit koristit i rijesit se emacs precaca
 
 bindkey "${terminfo[khome]}"	beginning-of-line
 bindkey "${terminfo[kend]}"		end-of-line
@@ -167,10 +152,12 @@ alias -g S='> /dev/null 2>&1'
 # alias cpu='top -HS'
 alias cpu="ps aux | sort -nrk 3,3 | head -n 5"
 alias mem='top -b -o res'
+alias topiow="top -m io -o write -s 1"
+alias topior="top -m io -o read -s 1"
 
 alias s2r='sync; acpiconf -s 3'
 alias s2d='sync; acpiconf -s 4'	# Neb reka da bas radi, bit ce da mu treba pravi swap
-alias reboot='shutdown -r now'
+# alias reboot='doas shutdown -r now'
 alias su='su -l'
 
 alias sw0="swapoff /dev/gpt/swap"
@@ -200,6 +187,7 @@ alias mv='mv -i'
 alias less='less -XMr'
 
 alias df='df -Th'
+alias dfs='df -h | sort -h -k 4'
 alias du='du -h'
 
 #alias grep='grep --color -i'
@@ -248,6 +236,8 @@ alias pkgd='pkg delete'
 alias pkgdd='pkg info -d'
 alias pkgD='pkg info -r'	# which packages depends on that package
 alias pkga='pkg info -a'	# all installed packages
+alias pkgi='pkg info'
+alias pkgs='pkg info -as | sort -k 2 -hr | column -t'
 
 #alias bup0='portaudit -Faq'
 alias bup0='pkg audit -Fq'
@@ -258,15 +248,13 @@ alias bup3='portmaster -dHa'
 alias bup3f='portmaster -Fa'
 # -------------------------------------------------------------------------- }}}
 # ------------------ alias - network --------------------------------------- {{{
-alias pg='ping www.google.com'
-alias pgg='ping guglo'
+alias pg='ping www.opendns.org'
 alias pr='ping 192.168.1.1'
-alias pd='ping 8.8.8.8'
+alias pd='ping 1.1.1.1'
 alias nr='/etc/rc.d/netif restart'
 alias rr='/etc/rc.d/routing restart'
 
 alias wls='ifconfig wlan0 scan'
-alias wco='ifconfig wlan0 ssid'
 alias wif='ifconfig wlan0 | grep ssid | cut -d " " -f 2'
 alias ssid='ifconfig wlan0 | grep ssid | cut -d " " -f 2'
 alias wip='ifconfig wlan0 | grep inet | cut -d " " -f 2'      # nece pokazat nista ako nema IP adresu
@@ -290,6 +278,12 @@ alias cal='/usr/local/bin/cal -e -nod'
 alias feh="feh -d -B black"
 alias kf='killall feh'
 alias xev="xev | grep -A2 --line-buffered '^KeyRelease' | sed -n '/keycode /s/^.*keycode \([0-9]*\).* (.*, \(.*\)).*$/\1 \2/p'"
+
+# state 0x0, keycode 39 (keysym 0x73, s), same_screen YES,
+alias xevm="\xev | grep -A2 '^ButtonRelease'"
+
+
+# alias xev="xev | grep -A2 --line-buffered '^KeyRelease\|^ButtonRelease' | sed -n '/keycode /s/^.*keycode \([0-9]*\).* (.*, \(.*\)).*$/\1 \2/p'"
 
 alias fkomanda='find . -type f -exec chmod 644 {} +'
 alias dkomanda='find . -type d -exec chmod 755 {} +'
@@ -360,27 +354,39 @@ ssh()
 # -------------------------------------------------------------------------- }}}
 # ------------------ custom function - man --------------------------------- {{{
 # better man colors:
-man() {
-	# man termcap:
-	# mb - turn on blinking
-	# md - turn on bold (extra bright) mode
-	# me - turn off all atributes
-	# se - exit standout mode
-	# so - 
-	# ue - 
-	# us - 
-	env \
-		LESS_TERMCAP_mb=$(printf "\e[1;31m") \
-		LESS_TERMCAP_md=$(printf "\e[1;31m") \
-		LESS_TERMCAP_me=$(printf "\e[0m") \
-		LESS_TERMCAP_se=$(printf "\e[0m") \
-		LESS_TERMCAP_so=$(printf "\e[1;44;33m") \
-		LESS_TERMCAP_ue=$(printf "\e[0m") \
-		LESS_TERMCAP_us=$(printf "\e[1;32m") \
-		man "$@"
-}
+# man() {
+# 	# man termcap:
+# 	# mb - turn on blinking
+# 	# md - turn on bold (extra bright) mode
+# 	# me - turn off all atributes
+# 	# se - exit standout mode
+# 	# so - 
+# 	# ue - 
+# 	# us - 
+# 	env \
+# 		LESS_TERMCAP_mb=$(printf "\e[1;31m") \
+# 		LESS_TERMCAP_md=$(printf "\e[1;31m") \
+# 		LESS_TERMCAP_me=$(printf "\e[0m") \
+# 		LESS_TERMCAP_se=$(printf "\e[0m") \
+# 		LESS_TERMCAP_so=$(printf "\e[1;44;33m") \
+# 		LESS_TERMCAP_ue=$(printf "\e[0m") \
+# 		LESS_TERMCAP_us=$(printf "\e[1;32m") \
+# 		man "$@"
+# }
 # -------------------------------------------------------------------------- }}}
+# For colourful man pages, navodno RedHat sytle, nije lose
+# export LESS_TERMCAP_md=$'\E[01;31m'	# uppercase boldana slova postaju crvena, overidea .Xdefault: *VT100.colorBD
+# export LESS_TERMCAP_se=$'\E[0m'		# smanji sirinu status bara gdje pise less ili more
+# export LESS_TERMCAP_so=$'\E[01;44;33m'	# plavi status bar gdje pise less ili more
 
+export LESS_TERMCAP_mb=$(printf "\e[1;31m")
+export LESS_TERMCAP_me=$(printf "\e[0m")
+export LESS_TERMCAP_so=$(printf "\e[1;44;33m")
+export LESS_TERMCAP_ue=$(printf "\e[0m")
+export LESS_TERMCAP_us=$(printf "\e[1;32m")
+
+export LESS_TERMCAP_md=$'\E[01;31m'	# make bold letters red (and bold)
+export LESS_TERMCAP_se=$'\E[0m'		# decrese width of blue status bar below
 
 # cron: con't sell mails:
 MAILTO=""

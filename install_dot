@@ -104,6 +104,10 @@ install_dot()
 	ln -sf $BASEDIR/gitconfig				$HOME/.gitconfig
 	ln -sf $BASEDIR/$FILE_GITCONFIG_LOCAL	$HOME/.gitconfig_local
 	ln -sf $BASEDIR/ripgreprc				$HOME/.ripgreprc
+	ln -sf $BASEDIR/lesskey					$HOME/.lesskey
+	lesskey									$HOME/.lesskey	# generate ~/.less which is binary representation used by less(1)
+	# install tmux plugin:
+	git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 }
 # ------------------------------------------------------------------------- }}}
 # GUI config                                                                {{{

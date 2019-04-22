@@ -9,6 +9,7 @@ xmodmap .xmodmap&
 xrdb .xdefaults&
 xbindkeys&
 tint2&
+xset r rate 250 30&
 
 # fix for T430s with fuck-up keyboard layout:
 xmodmap -e "keycode 111 = Super_R"  # "PrtSc" key between Alt and Ctrl
@@ -21,14 +22,39 @@ osdmixer $((RESOLUTION_X/4)) 100 d d&
 # sh ~/.opt/conky.sh&
 # pcmanfm -n /mnt/local/video/music &
 
-xterm -title tp.root -e 'echo tp root && su -l'&				# tp root
-# exec openbox
-# 181107:
-# exec cwm
-# exec $HOME/.opt/bin/cwm
-# $HOME/.opt/bin/cwm > /tmp/cwm.log
-# exec $HOME/.opt/bin/cwm -vv
-$HOME/.opt/bin/cwm -vv >> /tmp/i3.log 2>&1
+# start compton compositor (slows down dwm, but gives great video
+# playback, no shadows, no frills)
+#--no-fading-openclose
+compton --backend=glx --no-dock-shadow \
+  --no-dnd-shadow --shadow-opacity=0 --menu-opacity=1 \
+  --glx-no-stencil --fade-delta=3 --daemon
+  # --glx-no-stencil --fade-delta=5 --daemon
 
-# exec i3 -V >> ~/.i3/i3log 2>&1
-# exec i3 -V >> /tmp/i3.log 2>&1
+hsetroot -solid '#000000' #	compton cannot use xsetroot
+
+# fancy Alt-Tab program (window chooser)
+skippy-xd --start-daemon&
+
+# needed for automount notify:
+xhost +local:&
+
+# notification deamon
+dunst&
+
+# enable auto lock on idle (also used by mod+l and lock on pointer in
+# upper left corner)
+# xautolock -locker 'sh -c "xset dpms 10 && slock && xset dpms 0"' \
+  # -corners +000 -time 5 -cornerdelay 1 -cornerredelay 10 &
+
+# Enable redshift
+# redshift -l 48.13:11.57 &
+# redshift -l 50:20 &
+
+
+# xterm -title tp.root -e 'echo tp root && su -l'&				# tp root
+# exec xterm -title glavni -geometry 100x20+50+50 -e tmux
+exec xterm -title glavni -geometry 100x20+50+50 -e 'tmux new-session -d -s glavni -n Wcwm ; tmux send-keys -t glavni:Wcwm "cwm -vv" Enter; tmux attach -t glavni:Wcwm '
+
+# 181107:
+exec $HOME/.opt/bin/cwm -vv
+# exec $HOME/.opt/bin/aphelia
