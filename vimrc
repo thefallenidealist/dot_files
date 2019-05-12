@@ -309,33 +309,25 @@ augroup my_group_with_a_very_uniq_name
 	autocmd Filetype verilog call SetupVerilogEnvironment()
 
 	" close preview windows if it is last
-	autocmd WinEnter * if winnr('$') == 1 && getbufvar(winbufnr(winnr()), "&buftype") == "quickfix"|q|endif
+	autocmd WinEnter * if &previewwindow | nnoremap <buffer> q :q!<cr> | endif
+
+	" close NERDTree/Tagbar if it is last window
+	autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+	autocmd bufenter * if (winnr("$") == 1 && (bufwinnr('__Tagbar__')) != -1) | q | endif
+
+	" maps in command-line-window:
+	autocmd CmdwinEnter * map <buffer> <cr> <cr>
+	autocmd CmdwinEnter * map <buffer> q :q<cr>
+	autocmd CmdwinEnter * map <buffer> <esc> :q<cr>
 augroup END
 
 " setup when in diff mode:
 if &diff
-	" TODO 170831: check if is working in nvim-qt on Windows
-	" INFO 170901: This is not working on Windows, check on Unix
-	" cabbrev <buffer> q qa!
-	" nnoremap <buffer> q :qa!<cr>
 	" when fixing merge conflict:
 	map <leader>1 :diffget LOCAL<CR>
 	map <leader>2 :diffget BASE<CR>
 	map <leader>3 :diffget REMOTE<CR>
 endif
-
-" setup for preview window
-if &previewwindow
-	" INFO 170813: echo will work here, but not nnoremap
-	" echoe "Preview Window here!"
-	" nnoremap q :q!<cr>
-endif
-
-" close preview windows if it is last
-aug QFClose
-	autocmd!
-	autocmd WinEnter * if winnr('$') == 1 && getbufvar(winbufnr(winnr()), "&buftype") == "quickfix"|q|endif
-aug END
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		cmd aliases															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -385,7 +377,7 @@ call SetupCommandAlias("we", "WE")
 call SetupCommandAlias("We", "WE")
 
 command! PU PlugUpdate | PlugUpgrade
-command! PI so $MYVIMRC | PlugInstall
+command! PI write | so $MYVIMRC | PlugInstall
 
 " open help in vertical split right
 cabbrev h vert leftabove help
@@ -442,6 +434,7 @@ inoremap <silent> <Esc> <Esc>`^
 nnoremap Q <nop>
 " remap recording
 nnoremap Q q
+nnoremap Q? q/
 " disable old recording shortcut
 nnoremap q <nop>
 " no more ćevap-fingers
@@ -513,6 +506,8 @@ nnoremap tl :tabnext<cr>
 " closer than Ctrl-PgUp/PgDn. Ctrl-[/] is already used
 nnoremap <A-[> :tabprev<cr>
 nnoremap <A-]> :tabnext<cr>
+nnoremap [t :tabprev<cr>
+nnoremap ]t :tabnext<cr>
 " AltGr + [/] - depends on (xmodmap) keyboard layout
 nnoremap š :tabprev<cr>
 nnoremap đ :tabnext<cr>
@@ -525,12 +520,8 @@ nnoremap [b :bnext<cr>
 nnoremap ]b :bprev<cr>
 
 " delete buffer without closing tab or split
-" nnoremap :BD :bd<cr>
-" nnoremap :BD :setl bufhidden=delete <bar> bnext
-" nnoremap :bd :setl bufhidden=delete <bar> bnext
 " INFO '<bar>' is used instead of '|' pipe char
 nnoremap <leader>d :setl bufhidden=delete <bar> bnext<cr>
-nnoremap <leader>D :bd<cr>
 nnoremap <A-w> :BD<cr>
 call SetupCommandAlias("Bd", "bd")
 inoremap <A-w> <C-o>:BD<cr>
@@ -757,7 +748,7 @@ nnoremap cw "_cw
 nnoremap diw "_diw
 nnoremap ciw "_ciw
 nnoremap Y y$
-nnoremap X "_x
+nnoremap X "_X
 " yank and delete
 nnoremap dy yydd
 nnoremap yd yydd
@@ -793,73 +784,6 @@ inoremap <C-r>F <C-r>%
 cnoremap <C-r>F <C-r>%
 " INFO expression register: in insert mode <C-r>=2+2 // in text "4" will be inserted
 
-"	named registers															{{{
-vnoremap <leader>y1 "qy :echo "copied to the register 1(q)"<cr>
-vnoremap <leader>y2 "wy :echo "copied to the register 2(w)"<cr>
-vnoremap <leader>y3 "ey :echo "copied to the register 3(e)"<cr>
-vnoremap <leader>y4 "ry :echo "copied to the register 4(r)"<cr>
-vnoremap <leader>y5 "ty :echo "copied to the register 5(t)"<cr>
-vnoremap <leader>y6 "yy :echo "copied to the register 6(y)"<cr>
-vnoremap <leader>y7 "uy :echo "copied to the register 7(u)"<cr>
-vnoremap <leader>y8 "iy :echo "copied to the register 8(i)"<cr>
-vnoremap <leader>y9 "oy :echo "copied to the register 9(u)"<cr>
-vnoremap <leader>y0 "py :echo "copied to the register 0(p)"<cr>
-" in normal mode - still work on whole line
-nnoremap <leader>y1 "qyy :echo "copied to the register 1(q)"<cr>
-nnoremap <leader>y2 "wyy :echo "copied to the register 2(w)"<cr>
-nnoremap <leader>y3 "eyy :echo "copied to the register 3(e)"<cr>
-nnoremap <leader>y4 "ryy :echo "copied to the register 4(r)"<cr>
-nnoremap <leader>y5 "tyy :echo "copied to the register 5(t)"<cr>
-nnoremap <leader>y6 "yyy :echo "copied to the register 6(y)"<cr>
-nnoremap <leader>y7 "uyy :echo "copied to the register 7(u)"<cr>
-nnoremap <leader>y8 "iyy :echo "copied to the register 8(i)"<cr>
-nnoremap <leader>y9 "oyy :echo "copied to the register 9(o)"<cr>
-nnoremap <leader>y0 "pyy :echo "copied to the register 0(p)"<cr>
-" append - normal mode
-nnoremap <leader>Y1 "Qy :echo "added to the register 1(q)"<cr>
-nnoremap <leader>Y2 "Wy :echo "added to the register 2(w)"<cr>
-nnoremap <leader>Y3 "Ey :echo "added to the register 3(e)"<cr>
-nnoremap <leader>Y4 "Ry :echo "added to the register 4(r)"<cr>
-nnoremap <leader>Y5 "Ty :echo "added to the register 5(t)"<cr>
-nnoremap <leader>Y6 "Yy :echo "added to the register 6(y)"<cr>
-nnoremap <leader>Y7 "Uy :echo "added to the register 7(u)"<cr>
-nnoremap <leader>Y8 "Iy :echo "added to the register 8(i)"<cr>
-nnoremap <leader>Y9 "Oy :echo "added to the register 9(o)"<cr>
-nnoremap <leader>Y0 "Py :echo "added to the register 0(p)"<cr>
-" append - visual mode
-vnoremap <leader>Y1 "Qy :echo "added to the register 1(q)"<cr>
-vnoremap <leader>Y2 "Wy :echo "added to the register 2(w)"<cr>
-vnoremap <leader>Y3 "Ey :echo "added to the register 3(e)"<cr>
-vnoremap <leader>Y4 "Ry :echo "added to the register 4(r)"<cr>
-vnoremap <leader>Y5 "Ty :echo "added to the register 5(t)"<cr>
-vnoremap <leader>Y6 "Yy :echo "added to the register 6(y)"<cr>
-vnoremap <leader>Y7 "Uy :echo "added to the register 7(u)"<cr>
-vnoremap <leader>Y8 "Iy :echo "added to the register 8(i)"<cr>
-vnoremap <leader>Y9 "Oy :echo "added to the register 9(o)"<cr>
-vnoremap <leader>Y0 "Py :echo "added to the register 0(p)"<cr>
-" paste
-nnoremap <leader>p1 "qp :echo "paste from the register 1(q)"<cr>
-nnoremap <leader>p2 "wp :echo "paste from the register 2(w)"<cr>
-nnoremap <leader>p3 "ep :echo "paste from the register 3(e)"<cr>
-nnoremap <leader>p4 "rp :echo "paste from the register 4(r)"<cr>
-nnoremap <leader>p5 "tp :echo "paste from the register 5(t)"<cr>
-nnoremap <leader>p6 "yp :echo "paste from the register 6()"<cr>
-nnoremap <leader>p7 "up :echo "paste from the register 7()"<cr>
-nnoremap <leader>p8 "ip :echo "paste from the register 8()"<cr>
-nnoremap <leader>p9 "op :echo "paste from the register 9()"<cr>
-nnoremap <leader>p0 "pp :echo "paste from the register 0()"<cr>
-" paste in insert mode
-inoremap <C-r>1 <C-o>"q]p<C-o>:echo "paste from the register 1(q)"<cr>
-inoremap <C-r>2 <C-o>"w]p<C-o>:echo "paste from the register 2(w)"<cr>
-inoremap <C-r>3 <C-o>"e]p<C-o>:echo "paste from the register 3(e)"<cr>
-inoremap <C-r>4 <C-o>"r]p<C-o>:echo "paste from the register 4(r)"<cr>
-inoremap <C-r>5 <C-o>"t]p<C-o>:echo "paste from the register 5(t)"<cr>
-inoremap <C-r>6 <C-o>"y]p<C-o>:echo "paste from the register 6(y)"<cr>
-inoremap <C-r>7 <C-o>"u]p<C-o>:echo "paste from the register 7(u)"<cr>
-inoremap <C-r>8 <C-o>"i]p<C-o>:echo "paste from the register 8(i)"<cr>
-inoremap <C-r>9 <C-o>"o]p<C-o>:echo "paste from the register 9(o)"<cr>
-inoremap <C-r>0 <C-o>"p]p<C-o>:echo "paste from the register 0(p)"<cr>
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "	clipboard																{{{
 if has('clipboard')	" not really needed for all options under this
 	" copy filepath to X11 clipboard
@@ -914,6 +838,7 @@ if has('clipboard')	" not really needed for all options under this
 	inoremap <S-Delete> <C-r>*
 endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+nnoremap <leader>ff  :let @" = expand("%")<cr>:echo   "relative path of the file copied to the unnamed register"<CR>
 " Easier copy/paste to the named registers
 " INFO this will slowdown copy to the X11 clipboard (<leader>y)
 " TODO :set paste [y/d/p] :set nopaste
@@ -1214,6 +1139,7 @@ Plug 'Xuyuanp/nerdtree-git-plugin'
 
 Plug 'vim-airline/vim-airline'
 Plug 'gcmt/taboo.vim'				" Rename tabs
+Plug 'skywind3000/vim-preview'		" preview ctags in vsplit
 
 " ******************** basics
 Plug 'ciaranm/securemodelines'
@@ -1250,7 +1176,6 @@ Plug 'altercation/vim-colors-solarized'
 Plug 'tomasiser/vim-code-dark'		" VisualStudio inspired theme
 Plug 'powerman/vim-plugin-AnsiEsc'	" Show shell ANSI colors as colors
 
-" Plug 'brookhong/cscope.vim'		" XXX 180217: on clean Win10
 " Plug 'idanarye/vim-vebugger'
 " needed for vebugger
 " Plug 'Shougo/vimproc.vim', {'do' : 'make'}
@@ -1644,14 +1569,34 @@ nmap <Leader>w <Plug>(easymotion-overwin-w)
 " it will generate a new tag file if there is none (but it needs time, it will report "no tags file found")
 let g:gutentags_ctags_executable = g:ctags_exe
 nnoremap <C-]> g<C-]>
-nnoremap <C-\> g<C-]>
 " buffer
 call SetupCommandAlias("tagsu","GutentagsUpdate")
 call SetupCommandAlias("tagu","GutentagsUpdate")
 " project
 call SetupCommandAlias("tagsu!","GutentagsUpdate!")
 call SetupCommandAlias("tagu!","GutentagsUpdate!")
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+
+" 190512
+" Press tag into vsplit windows, press again to jump to another tag in another file
+" C-w z to close it
+nnoremap <C-]> :PreviewTag<cr>
+" :PreviewSignature
+
+" uctags -R --sort=foldcase --c++-kinds=+p --fields=+ianS --extras=+q -f ~/.vim/tags/libc.tags /usr/include
+set tags+=~/.vim/tags/libc.tags
+
+" TODO 190512:
+" When you are using Language Servers with LanguageClient-neovim, You can use PreviewFile to preview definition instead of jump to it:
+" call LanguageClient#textDocument_definition({'gotoCmd':'PreviewFile'})
+
+" INFO 190512 gen_tags + gtags/global
+" FreeBSD: pkg install global
+" :GenGTAGS  :ClearGTAGS!
+let g:gen_tags#gtags_opts = '-c --verbose'
+
+let g:gen_tags#use_cache_dir = 0	" don't use ~/.cache/tags_dir/<project>
+" git  `<project folder>/.git/tags_dir`
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		tagbar																{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " INFO shows tags (variables, enums, typedes, functions on the windows on the right)
@@ -1708,7 +1653,7 @@ let g:cpp_concepts_highlight = 1
 " 	hi LocalVariable guifg=#ff00ff
 " 	hi GlobalVariable guifg=#ff00ff
 " endfunction
-" au Syntax c,cpp call CustomTagHighlight()
+" autocmd Syntax c,cpp call CustomTagHighlight()
 
 " STD libs:
 " download http://www.cgtk.co.uk/data/vim-scripts/taghighlight/taghighlight_standard_libraries_r2.1.4.zip
@@ -1734,12 +1679,13 @@ nnoremap <C-w>c :call undoquit#SaveWindowQuitHistory()<cr><C-w>c
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 "		taboo																{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" rename current tab
 set sessionoptions+=tabpages,globals	" nedded for taboo plugin (used to rename tabs)
-let g:taboo_tabline = 0		" AirLine is OK for this purpose
-let g:airline#extensions#taboo#enabled = 1
-" INFO 171104: remove "%m" - modified flag, Airline will take care of that
-" otherwise modified tab will show "%#TabModifiedSelected#*%#TabLineSel#"
-let g:taboo_tab_format = "%f"
+let g:airline#extensions#taboo#enabled = 1	" enable
+let g:taboo_tabline = 0						" leave drawing tabline to Airline
+" modified tab will show "%#TabModifiedSelected#*%#TabLineSel#"
+" FIX: manually merge:
+" https://github.com/gcmt/taboo.vim/pull/25
 nnoremap tr :TabooRename<space>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		zoom-win															{{{
@@ -1886,7 +1832,6 @@ let g:AutoPairsShortcutJump = '<nop>'
 " mnemonic: yank for tmux
 vnoremap <leader>yt :Tyank<cr>:echo "copied to tmux paste buffer"<cr>
 nnoremap <leader>yt :Tyank<cr>:echo "copied to tmux paste buffer"<cr>
-
 " ------------------------------------------------------------------------- }}}
 
 "		lastplace															{{{
@@ -1977,110 +1922,6 @@ let g:chromatica#enable_at_startup=1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-"" cscope																	{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-if has('cscope')
-	" unimpared mapping: ]q [q
-
-	" regenerate DB from vim: :!cscope -Rbq :cs reset
-	"	set cscopetag cscopeverbose
-
-	"	if has('quickfix')
-	"		set cscopequickfix=s-,c-,d-,i-,t-,e-
-	"	endif
-
-	" a: Find assignments to this symbol
-	nmap <C-\>a :cs find s <C-R>=expand("<cword>")<CR><CR>
-	" s: Find this C symbol
-	nmap <C-\>s :cs find s <C-R>=expand("<cword>")<CR><CR>
-	" g: Find this definition
-	nmap <C-\>g :cs find g <C-R>=expand("<cword>")<CR><CR>
-	" c: Find functions calling this function
-	nmap <C-\>c :cs find c <C-R>=expand("<cword>")<CR><CR>
-	" t: Find this text string
-	nmap <C-\>t :cs find t <C-R>=expand("<cword>")<CR><CR>
-	" e: Find this egrep pattern
-	nmap <C-\>e :cs find e <C-R>=expand("<cword>")<CR><CR>
-	" f: Find this file
-	nmap <C-\>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
-	" i: Find files #including this file
-	nmap <C-\>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
-	" d: Find functions called by this function
-	nmap <C-\>d :cs find d <C-R>=expand("<cword>")<CR><CR>
-
-	" command -nargs=0 Cscope cs add $VIMSRC/src/cscope.out $VIMSRC/src
-endif
-
-
-" if has('cscope')
-"     set cscopetagorder=0
-"     set cscopetag
-"     set cscopeverbose
-"     set cscopequickfix=s-,c-,d-,i-,t-,e-
-"     set cscopepathcomp=3
-
-"     function! LoadCscope()
-"         let db = findfile("cscope.out", ".;")
-"         if (!empty(db))
-"             let path = strpart(db, 0, match(db, "/cscope.out$"))
-"             set nocscopeverbose " suppress 'duplicate connection' error
-"             exe "cs add " . db . " " . path
-"             set cscopeverbose
-"         endif
-"     endfunction
-"     au BufEnter /* call LoadCscope()
-
-"     nnoremap T :cs find c <C-R>=expand("<cword>")<CR><CR>
-"     " nnoremap t <C-]>
-"     nnoremap gt <C-W><C-]>
-"     nnoremap gT <C-W><C-]><C-W>T
-"     nnoremap <silent> <leader>z :Dispatch echo "Generating tags and cscope database..." &&
-"                         \ /usr/local/bin/ctags -R --fields=+aimSl --c-kinds=+lpx --c++-kinds=+lpx --exclude=.svn 
-"                         \ --exclude=.git && find . -iname '*.c' -o 
-"                         \ -iname '*.cpp' -o -iname '*.h' -o -iname '*.hpp' 
-"                         \ > cscope.files && cscope -b -i cscope.files -f cscope.out &&
-"                         \ echo "Done." <cr><cr>
-
-"     cnoreabbrev csa cs add
-"     cnoreabbrev csf cs find
-"     cnoreabbrev csk cs kill
-"     cnoreabbrev csr cs reset
-"     " cnoreabbrev css cs show
-"     cnoreabbrev csh cs help
-"     cnoreabbrev csc Cscope
-"     command! Cscope :call LoadCscope()
-" endif
-
-" generate db:
-" 1 cscope -bcqR .
-" 2) find . -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" > cscope.files
-"    cscope -q -R -b -i cscope.files
-"    - c: don't compress the data
-
-nnoremap <leader>fa :call CscopeFindInteractive(expand('<cword>'))<CR>
-" Some optional key mappings to search directly.
-" s: Find this C symbol
-nnoremap  <leader>fs :call CscopeFind('s', expand('<cword>'))<CR>
-" g: Find this definition
-nnoremap  <leader>fg :call CscopeFind('g', expand('<cword>'))<CR>
-" d: Find functions called by this function
-nnoremap  <leader>fd :call CscopeFind('d', expand('<cword>'))<CR>
-" c: Find functions calling this function
-nnoremap  <leader>fc :call CscopeFind('c', expand('<cword>'))<CR>
-" t: Find this text string
-nnoremap  <leader>ft :call CscopeFind('t', expand('<cword>'))<CR>
-" e: Find this egrep pattern
-nnoremap  <leader>fe :call CscopeFind('e', expand('<cword>'))<CR>
-" f: Find this file
-nnoremap  <leader>ff :call CscopeFind('f', expand('<cword>'))<CR>
-" i: Find files #including this file
-nnoremap  <leader>fi :call CscopeFind('i', expand('<cword>'))<CR>
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
-" TODO 170812: <leader>sX for searching with ripgrep
-
 " NeoVim terminal															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " example: :vsplit term://htop
@@ -2248,10 +2089,6 @@ if has("gui_running")
 endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
-" todo 1708 Windows Airline font:
-" XXX
-" set rop=type:directx,gamma:1.0,contrast:0.5,level:1,geom:1,renmode:4,taamode:1
-
 " " work specific stuff														{{{
 " """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " on Linux PC for team H
@@ -2279,17 +2116,11 @@ endif
 	endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-nnoremap <C-\> :Tags <C-R><C-W><CR>
-nmap <C-Enter> <C-w>g<C-]><C-w>T
-" Not saying it is required but I enjoy this one more than <C-]> but I guess it is already sort of covered by g<C-]>.
-
-
 " INFO {{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " fold moving:
 " zj/zk - move to start/end of prev/next fold
 " [z/]z - move to start/end of current open fold
-
 
 " programmers vim 															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -2308,13 +2139,6 @@ nmap <C-Enter> <C-w>g<C-]><C-w>T
 " ga: show char under the cursor in decimal, hex, and oct, for unicode: tpope/vim-characterize XXX works without plugin
 " gCtrl-] If there is only one match, it will take you there. If there are multiple matches, it will list them all, letting you choose the one you want, just like :tselect
 
-" multiple files load: args files*.c
-" multiple replace: TODO
-
-" yank until mark a: y'a
-" '. goto place of last edit
-
-" reselect last visually selected block: gv
 " goto preview window Ctrl-W Ctrl-P
 
 " delete lines that do NOT match pattern: :v/pattern/d
@@ -2323,15 +2147,6 @@ nmap <C-Enter> <C-w>g<C-]><C-w>T
 
 set viewoptions-=options	" for mkview, don't store current file
 set viewdir=~/.vim/view
-" :mkview :loadview
-
-" diff
-" open original file in one split, open new split and put newer version (no need to save that buffer) and then:
-" :windo diffon
-" :windo diffoff
-
-" args `ag -l SomethingToSearch`
-" argdo s/something/else/g | w
 
 " IDEA smarter jumping (tag/file/...)
 set isfname+=:	" to recognize :123 as filename (for jumping to specific line)
@@ -2342,12 +2157,7 @@ set isfname+=32	" <space> is part of filename
 " for tag search (like * uses): echo expand('<cword'>)
 " if not tag, check if declaration: gd, then gD
 " check if www link
-" map <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
-" map <A-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
 " execute("e ".mycurf) opens the file saved in mycurf
-
-
-"  vib		select inner block (eg inside {})
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 " searching																{{{
 ":%!/usr/local/bin/zsh!/opt/bin/zsh		-> ! as delimiter (# also works)
@@ -2468,62 +2278,22 @@ set isfname+=32	" <space> is part of filename
 
 " Unicode characters can be inserted by typing ctrl-vu followed by the 4 digit hexadecimal code.
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
-" TODO 16xxxx another '*' should disable highlight
 " TODO 16xxxx <enter> - if it's link under cursor then "gx", if it's tag under cursor then :tag... othervise "o"
 " TODO 170717: tmux <C-j>p -> enter/exit paste mode before/after that command
 " INFO: remmaping Esc will fuckup scroll (scrolling will start to insert chars)
 "
 " INFO 170901: Ako se razjebe ista sta koristi python (npr ncm na Windowsima): pip install --upgrade neovim
-" TODO 170921: Rg/ack skip tags file
-" TODO 170921: snippets
 " TODO 170921: <leader>r -> references to function
 " INFO 170926: vim slowiness
 " syntax off, relative number off, cursorline off -> speedup
-" autocommand spam: :au CursorMoved
+" autocommand spam: :autocmd CursorMoved
 " :syntime on, move around in your ruby file and then, :syntime report
 " old regex engine: :set re=1
 " group autocommands
 " => moze se ubrzat malo, ali i dalje bude spor, i dalje se vidi cursosr
 " TODO 171001: search for keyword in all buffers
 
-" DBG layout:
-" registers: 
-" vsplit
-" vertical resize 24
-" set nocursorline
-
-" TODO 171210: :bd when quickfix is open: delete current buffer, but do not close window (it will fuck up quickfix window height)
-
-
-
-" open header:
-" nnoremap <leader>h :e %:r.h<cr>
-" TODO 180206: Open .c file if header is currently opened
 nnoremap <Leader>h :call HeaderToggle()<CR>
-
-" XXX 180116: Doesn't work anymore. Doesn't work on vimrc from 2017.9.
-" "bubble" move the lines (will have weird things on edge of the buffer)
-" nnoremap <A-k> ddkP
-" nnoremap <A-j> ddp
-" vnoremap <A-k> xkP`[V`]
-" vnoremap <A-j> xp`[V`]
-inoremap <A-S-k> <C-o>dd<C-o>k<C-o>P
-inoremap <A-S-j> <C-o>dd<C-o>p
-" bubble move the lines with unimpared plugin
-" nmap <A-S-k> [e
-" nmap <A-S-j> ]e
-" vmap <A-S-k> [egv
-" vmap <A-S-j> ]egv
-" " manually create that dirs:
-" inoremap <A-k> <C-o>[e
-" inoremap <A-j> <C-o>]e
-
-" TODO 171224: explain this
-" nnoremap [c zk
-
-let g:vebugger_leader='<Leader>x'
-let g:vebugger_path_gdb='arm-none-eabi-gdb --data-directory=~/.local/share/gdb-arm/data-directory'
-
 
 let g:startify_fortune_use_unicode = 1
 " Sort sessions by modification time rather than alphabetically.
@@ -2538,15 +2308,11 @@ cmap w!! w !sudo tee %
 nnoremap <Home> gg
 nnoremap <End> G
 
-" INFO 180218: multiple file search and replace:
-" - search and populate quick list: Greeper or <leader>a
-" - :cdo s/old/new/ge | update
-
 " TODO 181026:check this (on Windows specially)
 " g:session_directory = '~/.vim/sessions' "" or ~\vimfiles\sessions (on Windows).
 " TODO 181128: chane all lines with multiple " to ------
 
-" 190119 nvim-yarp debuggin
+" 190119 nvim-yarp debugging
 " Log files will be generated with prefix /tmp/nvim_log
 let $NVIM_PYTHON_LOG_FILE="/tmp/nvim_log"
 let $NVIM_PYTHON_LOG_LEVEL="DEBUG"
