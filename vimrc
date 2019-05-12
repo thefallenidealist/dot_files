@@ -179,6 +179,7 @@ if has('unix')
 	let s:uname = substitute(system("uname"), '\n', '', '')
 
 	if s:uname == "FreeBSD"
+		let g:python3_host_prog='/usr/local/bin/python3'
 		let g:clang_library_path='/usr/local/llvm50/lib'
 
 		" Universal Ctags - Exuberant Ctags fork
@@ -308,7 +309,7 @@ augroup my_group_with_a_very_uniq_name
 	autocmd Filetype verilog call SetupVerilogEnvironment()
 
 	" close preview windows if it is last
-	au WinEnter * if winnr('$') == 1 && getbufvar(winbufnr(winnr()), "&buftype") == "quickfix"|q|endif
+	autocmd WinEnter * if winnr('$') == 1 && getbufvar(winbufnr(winnr()), "&buftype") == "quickfix"|q|endif
 augroup END
 
 " setup when in diff mode:
@@ -332,8 +333,8 @@ endif
 
 " close preview windows if it is last
 aug QFClose
-	au!
-	au WinEnter * if winnr('$') == 1 && getbufvar(winbufnr(winnr()), "&buftype") == "quickfix"|q|endif
+	autocmd!
+	autocmd WinEnter * if winnr('$') == 1 && getbufvar(winbufnr(winnr()), "&buftype") == "quickfix"|q|endif
 aug END
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		cmd aliases															{{{
@@ -380,8 +381,8 @@ call SetupCommandAlias("Bd", "bd")
 " cabbrev qa1 qa!
 
 command! WE write | edit
-cabbrev we WE
-cabbrev We WE
+call SetupCommandAlias("we", "WE")
+call SetupCommandAlias("We", "WE")
 
 command! PU PlugUpdate | PlugUpgrade
 command! PI so $MYVIMRC | PlugInstall
@@ -401,7 +402,7 @@ cabbrev fpy echo @%
 cabbrev FP echo expand('%:p')
 " reload syntax
 cabbrev rsyn syntax sync fromstart
-cabbrev CC set cursorcolumn!
+call SetupCommandAlias("CC", "set cursorcolumn!")
 
 " folds help: zo zc za, zO, zC, zA (open, close, toggle)
 "	zf create fold (marker/manual)
@@ -421,7 +422,6 @@ cabbrev zoa %foldopen!
 " Don't show ^M in DOS files
 command! FixDos edit ++ff=dos
 
-" XXX CtrlSpace won't restore tabs with only one tab (only at PC on the work, on my everything works™)
 " cabbrev css CtrlSpaceSaveWorkspace
 " cabbrev csl CtrlSpaceLoadWorkspace
 cabbrev css :mksession!
@@ -431,6 +431,8 @@ cabbrev ccc call ToggleColorColumn()
 call SetupCommandAlias("qc", "ccl") " quickfix close (alignmend with :pc[lose])
 call SetupCommandAlias("dt", "diffthis")
 call SetupCommandAlias("do", "diffoff")
+call SetupCommandAlias("sig", "call AppendModeline()")
+call SetupCommandAlias("mode", "call AppendModeline()")
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		generic mappings													{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -459,6 +461,8 @@ nnoremap $ g$
 nnoremap 0 g0
 
 nnoremap e el
+" insert only one char:
+nnoremap s i_<esc>r
 
 " toggle between ^ (goto first non-blank char) and 0 (goto start of the line)
 nnoremap <silent>0 :call ZeroMove()<cr>
@@ -533,6 +537,8 @@ inoremap <A-w> <C-o>:BD<cr>
 
 nnoremap <Tab> :wincmd p<cr>
 nnoremap <S-Tab> :wincmd w<cr>
+" XXX 190422:
+nnoremap <C-w><C-c> :wincmd c<cr>
 " other options: P: reverse previous, W: reverse next
 
 if has('nvim')
@@ -605,26 +611,11 @@ nnoremap T7 :tabmove 6<cr>:echo "current tab moved to position 7"<cr>
 nnoremap T8 :tabmove 7<cr>:echo "current tab moved to position 8"<cr>
 nnoremap T9 :tabmove 8<cr>:echo "current tab moved to position 9"<cr>
 
-" holy fucking gods of Vim, browse only buffers for current tab
-" nnoremap tj :CtrlSpaceGoDown<cr>
-" nnoremap tk :CtrlSpaceGoUp<cr>
-
-" doesn't seems particularly useful:
-"nnoremap <leader>- <Plug>AirlineSelectPrevTab
-"nnoremap <leader>+ <Plug>AirlineSelectNextTab
-
-" XXX 170609 will fuckup CtrlP completition
 nnoremap te :tabedit<space>
-
-" 170312 disabled, never used
-" nnoremap <leader>q :tabprev<cr>
-" nnoremap <leader>w :tabnext<cr>
 
 " jumping, Ctrl-I (tab) is used for switching splits
 nnoremap <C-p> :pop<cr>:echo "Tag jump -1"<cr>
 nnoremap <C-n> :tag<cr>:echo "Tag jump +1"<cr>
-" INFO 180114 <C-[> is rempapped to <F16> with xbindkeys
-nnoremap <F16> :pop<cr>:echo "Taglist jump -1"<cr>
 
 if has('nvim')
 	" INFO Alt-N is used for tmux
@@ -640,9 +631,7 @@ if has('nvim')
 	nnoremap <A-(> :tabn 9<cr>
 	nnoremap <A-)> :tablast<cr>
 endif
-" duplicate current tab
-nnoremap <C-w>d :tab split<cr>:echom "tab duplicated"<cr>
-" close all windows in current tab
+nnoremap <C-w>d :tab split<cr>:echom "current tab duplicated"<cr>
 nnoremap <C-w>C :tabclose<cr>
 
 " resize Vim windows (almost) as tmux splits
@@ -732,14 +721,11 @@ nnoremap <leader>H :noh<cr>
 
 nnoremap <leader>z :setlocal spell!<cr>
 " toggle showing invisible chars
-nnoremap <leader>l :set list!<cr>:set list?<CR>
+nnoremap <leader>; :set list!<cr>:set list?<CR>
 nnoremap <leader>n :set relativenumber!<cr>
 nnoremap <leader>N :set number!<cr>
 nnoremap <leader>r :so $MYVIMRC<cr>:echo "vimrc reloaded"<CR>
 nnoremap <leader>e :e $MYVIMRC<cr>
-
-nnoremap <silent> <leader>ML :call AppendModeline()<cr>
-" INFO there are some leader mappings <leader>0..9 in tabs section
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		plugin mappings														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -770,6 +756,8 @@ nnoremap dw "_dw
 nnoremap cw "_cw
 nnoremap diw "_diw
 nnoremap ciw "_ciw
+nnoremap Y y$
+nnoremap X "_x
 " yank and delete
 nnoremap dy yydd
 nnoremap yd yydd
@@ -1190,14 +1178,14 @@ Plug 'roxma/nvim-cm-racer'  " Rust enginge for NCM
 
 Plug 'roxma/ncm-github'
 " Plug 'huawenyu/neogdb.vim'
-" Plug 'tpope/vim-dispatch'	" async make, needed for cscope code snippet below
+Plug 'neomake/neomake'
 
 Plug 'tpope/vim-unimpaired'	" easier movements around, like [q, ]q (quickfick)
 " Plug 'triglav/vim-visual-increment' " Ctrl-A/X for columns
 " Plug 'vim-scripts/VisIncr'
 " Vim 8: visual select and Ctrl-A
+Plug 'Valloric/ListToggle'	" toggle quickfix and location list
 
-" Plug 'w0rp/ale'				" Linter
 Plug 'SirVer/ultisnips'		" snippet engine
 Plug 'honza/vim-snippets'	" snippet collection
 " Auto generate incremetal tags
@@ -1609,6 +1597,11 @@ call SetupCommandAlias("Gbufs", "Grepper -tool rg -buffers -query")
 call SetupCommandAlias("G",     "Grepper -tool rg -query")
 " call SetupCommandAlias("Gadd",  "Grepper -tool rg -append -query") " XXX 180218
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+" toggle quickfix and location list											{{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:lt_location_list_toggle_map = '<leader>l'
+let g:lt_quickfix_list_toggle_map = '<leader>q'
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " easymotion																{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " easymotion original {{{
@@ -1921,7 +1914,8 @@ let g:airline#extensions#anzu#enabled = 1
 
 let g:indexed_search_mappings = 0		" patched shortcuts will be used
 nnoremap * *N:call RemoveBrackets()<cr>:ShowSearchIndex<cr>
-nnoremap # #N:call RemoveBrackets()<cr>:ShowSearchIndex<cr>
+" match exact (not backwards) - don't remove <>:
+nnoremap # *N:ShowSearchIndex<cr>
 
 " centered search:
 nnoremap n nzz
@@ -2177,18 +2171,14 @@ highlight Conceal		ctermfg=7 ctermbg=233
 set fillchars=fold:\ ,vert:\│
 
 " change the colors in diff mode, similiar to git diff
-highlight DiffAdded		ctermfg=87	guifg=cyan
-highlight DiffRemoved	ctermfg=196	guifg=red
-" diff coors:
-hi DiffAdd                     ctermbg=22  guibg=#005f00
-" hi DiffChange      ctermfg=181 ctermbg=239
-" hi DiffDelete      ctermfg=162 ctermbg=53
-" hi DiffText                    ctermbg=102 cterm=bold
+" highlight DiffAdded		ctermfg=87	guifg=cyan
+" highlight DiffRemoved	ctermfg=196	guifg=red
+highlight DiffAdd    cterm=bold ctermfg=10 ctermbg=17 gui=none guifg=bg guibg=Red
+highlight DiffDelete cterm=bold ctermfg=10 ctermbg=17 gui=none guifg=bg guibg=Red
+highlight DiffChange cterm=bold ctermfg=10 ctermbg=17 gui=none guifg=bg guibg=Red
+highlight DiffText   cterm=bold ctermfg=10 ctermbg=88 gui=none guifg=bg guibg=Red
 
 " auto completion menu
-" highlight pmenu			ctermfg=white ctermbg=52
-" highlight pmenu			ctermfg=120 ctermbg=8
-" highlight pmenu 			ctermbg=232 ctermfg=120
 highlight pmenu				ctermbg=237 ctermfg=254
 
 " hide ANSCI escape chars
@@ -2203,18 +2193,6 @@ highlight ExtraWhitespace ctermbg=202 guibg=Red
 
 " highlight Error			ctermfg=15 ctermbg=9 guifg=White guibg=Red
 " highlight WarningMsg	ctermfg=210 guifg=Red
-
-" linter colors
-" highlight link ALEError			SpellBad
-" highlight link ALEErrorSign		Error
-" highlight link ALEWarning			SpellCap
-" highlight ALEWarning			ctermbg=18 gui=undercurl guisp=Blue
-highlight ALEWarning			ctermbg=235 gui=undercurl guisp=Blue
-" highlight ALEWarningSign		ctermfg=130 ctermbg=220 guifg=Blue guibg=Yellow
-highlight ALEWarningSign		ctermfg=15 ctermbg=240 guifg=Blue guibg=Yellow
-" highlight ALEError		 		ctermbg=236 gui=undercurl guisp=Red
-highlight ALEError		 		ctermbg=234 gui=undercurl guisp=Red
-highlight ALEErrorSign			ctermfg=15 ctermbg=9 guifg=White guibg=Red
 
 " sign column (git +-m, marks, linter signs)
 highlight SignColumn			ctermfg=118 ctermbg=0 guifg=#A6E22E guibg=#232526

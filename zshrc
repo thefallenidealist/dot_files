@@ -270,6 +270,7 @@ alias w='fetch'
 # ------------------ alias - user programs --------------------------------- {{{
 alias vi=nvim
 alias vimdiff="nvim -d"
+alias vim="vi -c FZFMru"
 #alias s='screen -U'
 alias s='tmux'
 alias history='history -Ef'	# pretty history with European dates"

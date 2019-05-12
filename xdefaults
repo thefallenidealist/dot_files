@@ -3,7 +3,8 @@
 ! does not work for me
 
 ! 190106 FHD LCD: tune a value so Firefox/pcmanfm menus and text are not too small nor too big
-Xft.dpi: 110
+! default for FHD 14 is 157 dpi
+Xft.dpi: 130
 
 ! XTerm.vt100.translations: #override \n\
 !     Ctrl <Key>M: maximize() \n\
