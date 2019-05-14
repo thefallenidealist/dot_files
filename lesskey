@@ -1,0 +1,7 @@
+# Created 181204 for ThinkPad T430s shitty keyboard layout
+
+# INFO run lesskey(1) after changing this file to generate non-human readable .less file
+
+#command
+] forw-screen
+[ back-screen

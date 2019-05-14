@@ -3,6 +3,15 @@
 # INFO 190422: CLI uses: --glob=!tags*
 # don't use ' in rc:
 --glob=!tags*
+# --glob=!*diff
+
+# don't respect .gitignore
+# --no-ignore
+
+# -u	don't respect .gitignore (but respects -g globs)
+# -uu
+# -uuu	search binary files also
+
 --smart-case
 
 # CLI options:

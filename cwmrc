@@ -80,7 +80,7 @@ bind-key	4-Escape	quit
 unbind-key	CMS-q
 bind-key	4-r			menu-exec		# execute programs from $PATH
 bind-key	4-space		menu-window		# search for window
-bind-key	C-space		menu-cmd		# execute program from application menu
+# bind-key	C-space		menu-cmd		# execute program from application menu
 
 # window																	{{{
 # -----------------------------------------------------------------------------
@@ -94,8 +94,9 @@ bind-key	M-F5		window-maximize
 bind-key	M-F6		window-hmaximize
 bind-key	M-F7		window-vmaximize
 bind-key	4-f			window-fullscreen
-bind-key	M-Return	window-maximize
-bind-key	MS-Return	window-fullscreen
+unbind-key	M-Return
+unbind-key	M-S-Return
+# bind-key	M-S-Return	window-fullscreen
 
 bind-key	4-m			window-maximize
 # bind-key	4-n			window-hide
@@ -162,7 +163,8 @@ bind-mouse	4S-1	window-resize
 bind-mouse	4-3		window-resize
 # bind-mouse	4S-1	window-group
 # bind-mouse	4S-3	window-hide
-# bind-mouse	"1"		window-raise
+bind-mouse	"S-1"		window-raise2
+bind-mouse	"M-1"		window-raise
 # -------------------------------------------------------------------------- }}}
 
 

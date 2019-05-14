@@ -19,6 +19,7 @@
 	# br = branch --sort=committerdate	# 181127 work PC
 	br2 = for-each-ref --sort=committerdate refs/heads/ --format='%(committerdate:short) %(refname:short)'
 	a = add
+	au = add -u
 	cl = clone
 	#s = show
 	su = submodule update --init --recursive

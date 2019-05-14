@@ -69,7 +69,7 @@ set shortmess+=I	" don't show intro message at startup
 set cursorline		" color the line when the cursor is
 set matchpairs+=<:>	" Include angle brackets in matching.
 set showmatch
-set shortmess+=c    " don't give ins-completion-menu messages
+set shortmess+=c	" don't give ins-completion-menu messages
 
 set encoding=utf-8	" otherwise gVim will complain about listchars and showbreak
 set diffopt+=vertical
@@ -140,6 +140,7 @@ set list	" show invisible chars (tabs and others defined in listchars)
 set backupdir=~/.vim/backup//
 set directory=~/.vim/swap//
 set undodir=~/.vim/undo//
+set undofile	" remember undo after closing buffer
 set nobackup noswapfile
 "		search						{{{
 """""""""""""""""""""""""""""""""""""""
@@ -250,10 +251,9 @@ if has('nvim')
 	nnoremap <A-r> :call Compile()<cr>
 endif
 
-" za gF komandu koja otvori fajl pod kursorom
+" for 'gf' command: open stdio.h and similar
 let &path.="src/include,/usr/include/AL,"
 
-" tags file in CWD
 " search for $CWD/tags, $CWD/.tags and go level up until $HOME
 set tags=tags,.tags;$HOME
 """"""""""""""""""""""""""""""""""""}}}
@@ -1263,6 +1263,15 @@ let g:cm_matcher = {'module': 'cm_matchers.fuzzy_matcher', 'case': 'smartcase'}
 " let g:cm_refresh_length=[[1,4],[7,3]]   " default
 let g:cm_refresh_length=[[1,4],[7,1]]
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+" NCM2 C																	{{{
+" -----------------------------------------------------------------------------
+autocmd FileType c,cpp nnoremap <buffer> gd :<c-u>call ncm2_pyclang#goto_declaration()<cr>
+" path to directory where libclang.so can be found
+" let g:ncm2_pyclang#library_path = '/usr/lib/llvm-5.0/lib'
+" or path to the libclang.so file
+let g:ncm2_pyclang#library_path = '/usr/local/llvm60/lib/libclang.so'
+" TODO 190512: compile_commands.json
+" ------------------------------------------------------------------------- }}}
 " Linter																	{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " INFO 170812: Will only show the first error, can't show multiple errors
@@ -1350,20 +1359,12 @@ let g:airline#extensions#obsession#indicator_text = 'Ses' " default: '$'
 
 " snippets																	{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+inoremap <silent> <expr> <CR> ncm2_ultisnips#expand_or("\<CR>", 'n')
 " let g:UltiSnipsExpandTrigger        = '<C-u>'   " expand snippet
 " 180218 NCM:
 let g:UltiSnipsExpandTrigger		= "<Plug>(ultisnips_expand)"
-" INFO 180115: <C-o> works but it will break Vim's <C-o> (exit insert mode for
-" one command)
-" let g:UltiSnipsJumpForwardTrigger   = "<tab>"   " jump between $1, $2, ...
-" let g:UltiSnipsJumpBackwardTrigger  = "<s-tab>"
-" let g:UltiSnipsListSnippets         = '<C-l>'
-" NCM2:
-let g:UltiSnipsJumpForwardTrigger = "<c-j>"
-let g:UltiSnipsJumpBackwardTrigger = "<c-k>"
-" let g:UltiSnipsRemoveSelectModeMappings = 0
-" 180218 NCM optional:
-" inoremap <silent> <c-u> <c-r>=cm#sources#ultisnips#trigger_or_popup("\<Plug>(ultisnips_expand)")<cr>
+let g:UltiSnipsJumpForwardTrigger="<tab>"		" jumps to ${1}, ${2}, ...
+let g:UltiSnipsJumpBackwardTrigger="<s-tab>"	" jumps to ${2}, ${1}, ...
 
 let g:UltiSnipsRemoveSelectModeMappings = 0
 let g:UltiSnipsEnableSnipMate       = 0 " no need to look for SnipMate snippets
