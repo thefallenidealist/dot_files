@@ -63,10 +63,10 @@ set completeopt=menuone				" f(); can be view in command line with plugin
 set completeopt+=noselect			" fix deoplete auto insert
 set noshowmode						"Don't show the mode(airline is handling this)
 set shortmess+=I	" don't show intro message at startup
+set shortmess+=c	" don't give ins-completion-menu messages
 set cursorline		" color the line when the cursor is
 set matchpairs+=<:>	" Include angle brackets in matching.
 set showmatch
-set shortmess+=c	" don't give ins-completion-menu messages
 
 set encoding=utf-8	" otherwise gVim will complain about listchars and showbreak
 set diffopt+=vertical
@@ -201,53 +201,6 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		build/programming			{{{
 """""""""""""""""""""""""""""""""""""""
-" TODO incoporate this as prefix for part below
-" makeprg can't have spaces
-if has('unix')
-	if s:uname == "FreeBSD"
-		set makeprg="gmake -j4"
-	elseif s:uname == "Linux"
-		set makeprg="make -j4"
-	endif
-endif
-
-function! Compile()
-	" TODO wait for user input after compiling and before running
-	" if enter run program, if q/esc don't
-	if file_readable('Makefile')
-		echo "building Makefile"
-		" make
-		" TODO 170909
-		!gmake
-	elseif file_readable('makefile')
-		echo "building makefile"
-		make
-	elseif expand('%:e') == "cpp"
-		setlocal makeprg=c++\ -Wall\ %\ -o\ %:r.elf\ -std=c++11
-		make
-	elseif expand('%:e') == "c"
-		setlocal makeprg=cc\ -Wall\ %\ -o\ %:r.elf\ -std=c99
-		make | :!./%:r.elf
-	elseif expand('%:e') == "rs"
-		echo "building Rust"
-		setlocal makeprg=cargo\ build\ $*
-		make
-		" TODO 180805: check if Makefile exists then just call make instead of cargo
-		" places to check: . src/ src/rust
-	else
-		echoerr "Don't know how to build :["
-	endif
-endfunction
-
-nnoremap <F5> :call Compile()<cr>
-nnoremap <leader>rr :call Compile()<cr>
-inoremap <F5> :call Compile()<cr>
-inoremap <leader>rr :call Compile()<cr>
-if has('nvim')
-	inoremap <A-r> <C-o>:call Compile()<cr>
-	nnoremap <A-r> :call Compile()<cr>
-endif
-
 " for 'gf' command: open stdio.h and similar
 let &path.="src/include,/usr/include/AL,"
 
@@ -259,42 +212,32 @@ set tags=tags,.tags;$HOME
 augroup my_group_with_a_very_uniq_name
 	" this is executed every time when vimrc is sourced, so clear it at the beggining:
 	autocmd!
-	" INFO 190514: Filetype: will be executed when opening file
+	" INFO 190514: FileType: will be executed when opening file
 	" Buf/WinEnter: Will be executed when entering buffer/window
 
 	" easier quit from this windows
-	autocmd Filetype help nnoremap <buffer> q :wincmd c<cr>
+	autocmd FileType help nnoremap <buffer> q :wincmd c<cr>
 	autocmd FileType qf,quickfix,netrw nnoremap <buffer> q :q<cr>
-	autocmd FileType qf nnoremap <buffer> q :q<cr> :pclose<cr>
+	autocmd FileType qf 10wincmd_	" QF will always have height of 10 lines
 
-	" remap enter in help and man window
-	autocmd Filetype help nnoremap <buffer> <cr> <C-]>
-	autocmd Filetype man nnoremap <buffer> <cr> <C-]>
+	autocmd FileType help,man nnoremap <buffer> <cr> <C-]>
 
-	autocmd Filetype help,man :NumbersDisable	" Disable Numbers plugin in help or man
+	autocmd FileType help,man,qf :NumbersDisable	" Disable Numbers plugin in help or man
 
-	autocmd Filetype qf set nolist
+	autocmd FileType qf set nolist norelativenumber number
 
 	" force Vim to threat .md files as markdown and not Modula
 	" or use tpope/vim-markdown plugin
 	autocmd BufNewFile,BufReadPost *.md set filetype=markdown
 
 	" don't match '<' in C++ (cout << "Something";)
-	autocmd Filetype cpp,make,vim set matchpairs-=<:>
-	autocmd Filetype shell set matchpairs-=`:`	" works, but only in reverse
+	autocmd FileType cpp,make,vim set matchpairs-=<:>
+	autocmd FileType shell set matchpairs-=`:`	" works, but only in reverse
 
 	" in case I ever open a python file
-	autocmd Filetype python set expandtab
+	autocmd FileType python set expandtab
 
-	autocmd FileType qf nnoremap <buffer> p <plug>(quickr_preview)
-	"autocmd FileType qf nnoremap <buffer> q <plug>(quickr_preview_qf_close)
-
-	" autocmd BufWinEnter * if bufname("%") == "[Command Line]" | nnoremap <buffer> q :q<cr> | endif
-	" autocmd BufEnter * if bufname("%") == "[Command Line]" | nnoremap <buffer> q :q<cr> | endif
-	" autocmd BufEnter * if @% == "[Command Line]" | echo "QQQQQQ" | endif
-	" autocmd VimEnter * if @% == "[Command Line]" | echo "QQQQQQ" | else | "AAAAAA" | endif
-
-	autocmd Filetype xdefaults set commentstring=!%s
+	autocmd FileType xdefaults set commentstring=!%s
 	autocmd FileType pf,dnsmasq,fstab,cfg,gitconfig,crontab,sshdconfig setlocal commentstring=#\ %s
 
 	" Warn if file in current buffer is changed outside of Vim
@@ -303,7 +246,7 @@ augroup my_group_with_a_very_uniq_name
 
 	autocmd BufRead,BufNewFile SConstruct,SConscript set filetype=python
 
-	autocmd Filetype verilog call SetupVerilogEnvironment()
+	autocmd FileType verilog call SetupVerilogEnvironment()
 
 	" close preview window if it is last
 	autocmd WinEnter * if &previewwindow | nnoremap <buffer> q :q!<cr> | endif
@@ -316,6 +259,9 @@ augroup my_group_with_a_very_uniq_name
 	autocmd CmdwinEnter * map <buffer> <cr> <cr>
 	autocmd CmdwinEnter * map <buffer> q :q<cr>
 	autocmd CmdwinEnter * map <buffer> <esc> :q<cr>
+
+	" maps in git messenger floating window
+	autocmd FileType gitmessengerpopup map <buffer> <esc> q
 augroup END
 
 " setup when in diff mode:
@@ -382,10 +328,7 @@ call SetupCommandAlias("h", "vert leftabove help")
 " TODO 171214: resize help window split: vertical resize 84
 cabbrev man vert leftabove Man
 " get file path:
-cabbrev fpath echo @%
 cabbrev fp echo @%
-" copy the current filename to the Vim buffer
-cabbrev fpy echo @%
 " copy the current filename to the X11 2nd buffer
 cabbrev fpy echo @%
 cabbrev FP echo expand('%:p')
@@ -525,7 +468,7 @@ inoremap <A-w> <C-o>:BD<cr>
 
 nnoremap <Tab> :wincmd p<cr>
 nnoremap <S-Tab> :wincmd w<cr>
-" XXX 190422:
+" XXX 190422 (works on Windows): " TODO 190516
 nnoremap <C-w><C-c> :wincmd c<cr>
 " other options: P: reverse previous, W: reverse next
 
@@ -1069,6 +1012,8 @@ Plug 'roxma/nvim-cm-racer'  " Rust enginge for NCM
 Plug 'roxma/ncm-github'
 " Plug 'huawenyu/neogdb.vim'
 Plug 'neomake/neomake'
+Plug 'jceb/vim-orgmode'
+Plug 'mattn/calendar-vim'
 
 Plug 'tpope/vim-unimpaired'	" easier movements around, like [q, ]q (quickfick)
 " Plug 'triglav/vim-visual-increment' " Ctrl-A/X for columns
@@ -1077,7 +1022,7 @@ Plug 'tpope/vim-unimpaired'	" easier movements around, like [q, ]q (quickfick)
 Plug 'Valloric/ListToggle'	" toggle quickfix and location list
 
 Plug 'SirVer/ultisnips'		" snippet engine
-Plug 'honza/vim-snippets'	" snippet collection
+" Plug 'honza/vim-snippets'	" snippet collection
 " Auto generate incremetal tags
 Plug 'ludovicchabant/vim-gutentags', { 'for': 'c,cpp,rust' }
 " Plug 'ludovicchabant/vim-gutentags'
@@ -1195,38 +1140,13 @@ call plug#end()
 colorscheme molokai
 " NCM																		{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" NCM2:
+" enable ncm2 for all buffers
 autocmd BufEnter * call ncm2#enable_for_buffer()
 " IMPORTANT: :help Ncm2PopupOpen for more information
 set completeopt=noinsert,menuone,noselect
-" inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
-" for ncm2-ultisnips:
-inoremap <silent> <expr> <CR> ncm2_ultisnips#expand_or("\<CR>", 'n')
 " Use <TAB> to select the popup menu:
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-" TODO 190111: cleanup
-
-" inoremap <expr><tab> 	pumvisible() ? "\<C-n>" : "\<tab>"
-" inoremap <expr><S-tab>	pumvisible() ? "\<C-p>" : "\<S-tab>"
-
-" <enter> for expanding snippet
-" <C-u> is UltiSnipsExpandTrigger, <C-y> cancels completition menu
-" imap <expr> <CR>  (pumvisible() ?  "\<c-y>\<Plug>(expand_or_nl)" : "\<CR>")
-" imap <expr> <Plug>(expand_or_nl) (cm#completed_is_snippet() ? "\<C-u>":"\<CR>")
-
-" <esc> to close autocomplete menu
-" imap <expr> <esc>  (pumvisible() ?  "<c-y>" : "\<esc>") " 2018-01-16: iritating
-" imap <expr> <cr>  (pumvisible() ?  "<c-y>" : "\<cr>") " XXX
-
-inoremap <C-space> <C-o><Plug>(cm_force_refresh)
-
-let g:cm_matcher = {'module': 'cm_matchers.fuzzy_matcher', 'case': 'smartcase'}
-" let g:cm_matcher = {'module': 'cm_matchers.abbrev_matcher', 'case': 'smartcase'}
-"cm_matchers.abbrev_matcher"`	" not really fuzzy
-" let g:cm_refresh_length=2
-" let g:cm_refresh_length=[[1,4],[7,3]]   " default
-let g:cm_refresh_length=[[1,4],[7,1]]
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " NCM2 C																	{{{
 " -----------------------------------------------------------------------------
@@ -1383,17 +1303,21 @@ nnoremap ; :Buffers<CR>
 
 imap <c-x><c-l> <plug>(fzf-complete-line)
 
+function! s:build_quickfix_list(lines)
+	" - <tab> to select multiple files
+	" - call this function to fill QF with that files
+	call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
+	copen
+	cc
+endfunction
+
 let g:fzf_action = {
-			\ 'ctrl-t': 'tab split',
+			\ 'ctrl-q': function('s:build_quickfix_list'),
+			\ 'ctrl-y': 'tab split',
 			\ 'ctrl-x': 'split',
 			\ 'ctrl-v': 'vsplit' }
 
-" Default fzf layout
-" - down / up / left / right
 let g:fzf_layout = { 'down': '~40%' }
-" In Neovim, you can set up fzf window using a Vim command:
-" let g:fzf_layout = { 'window': 'enew' }
-" let g:fzf_layout = { 'window': '-tabnew' }
 
 " [Buffers] Jump to the existing window if possible
 let g:fzf_buffers_jump = 0
@@ -1409,6 +1333,24 @@ if has('nvim')
 		autocmd TermOpen term://*FZF tnoremap <silent> <buffer><nowait> <esc> <c-c>
 	aug END
 end
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+" vim orgmode																{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+" calendar																	{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Change Month & Day names
+let g:calendar_mruler = '1 Jan,2 Feb,3 Mar,4 Apr,5 May,6 Jun,7 Jul,8 Aug,9 Sep,10 Oct,11 Nov,12 Dec'
+" let g:calendar_wruler = '7Su 1Mo 2Tu 3We 4Th 5Fr 6Sa'
+let g:calendar_monday = 2	" Monday (2nd entry in calendar_wruler) is the first day
+let g:calendar_weeknm = 1 " show week number in format: WK01
+augroup calendar
+	autocmd!
+	autocmd FileType calendar set nonumber norelativenumber
+	" autocmd FileType calendar :vertical resize 50
+	autocmd BufWinEnter calendar set winwidth=50 " TODO 190514
+augroup END
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " File managers                                                              {{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1718,6 +1660,37 @@ call SetupCommandAlias("sl", ":OpenSession")	" 'ls' is used
 call SetupCommandAlias("os", ":OpenSession")
 " TODO 170926: Autosave sessions but only if session is loaded/named (don't save session which are not saved by :SaveSession)
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+" vim-startify						{{{
+" ----------------------------------------------------------------------------
+" Fancy Vim startup screen (shows MRU, session, ...)
+" n/k/l - goto next file/list item
+
+" disable mappings:
+augroup plugin-startify
+	autocmd User Startified for key in ['b','s','t','v','n'] |
+				\ execute 'nunmap <buffer>' key | endfor
+augroup END
+
+" run for every new tab
+if has('nvim')
+	autocmd TabNewEntered * Startify
+	nnoremap tm :tabnew<cr>:FZFMru<CR>
+endif
+
+let g:startify_session_dir = '~/.vim/session'
+let g:startify_commands = [
+	\ {'m': ['FZF MRU', 'FZFMru']},
+	\ {'f': ['FZF Files', 'Files']},
+	\ {'o': ['FZF Files', 'Files']},
+	\ {'v': ['vimrc', 'e $MYVIMRC']},
+	\ {'z': ['zshrc', 'e ~/.zshrc']},
+	\ ]
+
+" :SSave[!] [session]
+" :SDelete[!] [session]
+" :SLoad[!] [session]
+" :SClose
+" ------------------------------------------------------------------------ }}}
 " marks																	{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " :SignatureList{Buffer,Global, }Markers
@@ -1761,9 +1734,9 @@ augroup plugin_qf_preview
 	autocmd FileType qf nmap <buffer> <leader>p <plug>(quickr_preview)
 	autocmd FileType qf nmap <buffer> <C-p> <plug>(quickr_preview)
 	autocmd FileType qf nmap <buffer> <C-]> <plug>(quickr_preview)
+	autocmd FileType qf let g:quickr_preview_on_cursor = 0		" 1 = auto enable, only for QF, not location list
 augroup END
 
-let g:quickr_preview_on_cursor = 1		" 1 = auto enable
 let g:quickr_preview_exit_on_enter = 1	" 1 = auto-close on enter XXX 190515
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " autopairs {{{
