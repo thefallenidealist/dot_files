@@ -715,26 +715,15 @@ nnoremap <leader>N :set number!<cr>
 nnoremap <leader>r :so $MYVIMRC<cr>:echo "vimrc reloaded"<CR>
 nnoremap <leader>e :e $MYVIMRC<cr>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		plugin mappings														{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-command! FixWhiteSpace StripWhitespace	" function from 'better white space' plugin
-" call SetupCommandAlias("fws", "FixWhiteSpace")
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-
 "		copy paste mappings													{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" C/P registers:
-" ": unnamed register (dd/yy)
-" *: X11 primary	  (select/middle click)
-" +: X11 secondanry   (Ctrl-C/V)
-
 " paste and adjuste indent
 nnoremap p ]p
 nnoremap P ]P
 " nnoremap p p=`]
 " nnoremap P P=`]
 
-" delete to the black hole register
+" delete to the black hole (_) register
 nnoremap dd "_dd
 nnoremap D "_D
 nnoremap C "_C
@@ -758,29 +747,6 @@ nnoremap yw yiw
 " in case that old behaviour is needed:
 nnoremap yW yw
 
-" INFO shortcuts for insert/command mode: <C-r>X
-" c command
-" / highlighted (*) or searched (/) text - already default
-" p vim paste buffer
-" f filename with extension
-" F filename with full path
-" INFO stuff that won't work:
-" aligning text after <C-o>
-" echoing text after paste (cursor will be moved one place to the left)
-inoremap <C-r>c <C-o>":]p<C-o>:echo "pasted last used command"<cr>
-inoremap <C-r>: <C-o>":]p<C-o>:echo "pasted last used command"<cr>
-inoremap <C-r>/ <C-o>:call RemoveBrackets()<cr><C-r>/<C-o>:echo "pasted highlighted/searched text"<cr>
-
-inoremap <C-r>p <C-o>]p<C-o>:echo "pasted from Vim paste buffer"<cr>
-inoremap <C-r>P <C-o>]P<C-o>:echo "pasted from Vim paste buffer"<cr>
-cnoremap <C-r>p <C-r>"
-" TODO 170819: remove '\n'
-inoremap <C-r>f <C-r>=expand("%:t")<CR>
-cnoremap <C-r>f <C-r>=expand("%:t")<CR>
-inoremap <C-r>F <C-r>%
-cnoremap <C-r>F <C-r>%
-" INFO expression register: in insert mode <C-r>=2+2 // in text "4" will be inserted
-
 "	clipboard																{{{
 if has('clipboard')	" not really needed for all options under this
 	" copy filepath to X11 clipboard
@@ -791,7 +757,7 @@ if has('clipboard')	" not really needed for all options under this
 	nnoremap <leader>FFP :let @* = expand("%:p")<cr>:echo "full path of the file copied to the X11 1st clipboard"<CR>
 	nnoremap <leader>ffp :let @+ = expand("%:p")<cr>:echo "full path of the file copied to the X11 2nd clipboard"<CR>
 
-	" insert mode paste from X11 clipboard
+	" shift + {1,2,3} = X11 1st, X11 2nd, tmux
 	inoremap <C-r>! <C-o>"*]p<C-o>:echo "paste from the X11 1st clipboard"<cr>
 	inoremap <C-r>@ <C-o>"+]p<C-o>:echo "paste from the X11 2st clipboard"<cr>
 
@@ -844,6 +810,8 @@ if has('nvim')
 	" needed for nvim-qt.exe
 	cnoremap <S-Insert> <C-r>+
 endif
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+nnoremap <leader>ff  :let @" = expand("%")<cr>:echo   "relative path of the file copied to the unnamed register"<CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		mouse mappings														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1505,7 +1473,7 @@ let g:grepper.highlight = 1
 
 " - -query must be the last flag
 
-if has('windows')
+if has('win32')
 	" 180218: This doesn't work under my Win10 VM for some reason
 	nnoremap <leader>a :Rg <C-r><C-w><CR>
 else
@@ -1725,10 +1693,6 @@ let g:zoomwintab_hidetabbar = 0
 call SetupCommandAlias("sess", ":Obsession .")
 call SetupCommandAlias("css", ":Obsession .")	" muscle memory
 
-" vim-startify
-""""""""""""""""""""""""""""""""""""""""
-" Fancy Vim startup screen (shows MRU, session, ...)
-" works out of the box
 
 " vim-session
 """"""""""""""""""""""""""""""""""""""""
@@ -1747,17 +1711,6 @@ call SetupCommandAlias("css", ":Obsession .")	" muscle memory
 
 let g:session_autosave = 'no'	" Don't ask when exiting Vim
 let g:session_autosave_periodic = '1'	" Auto save every N minutes
-
-" Disable all session locking - I know what I'm doing :-).
-" Enables multiple loading of the same session
-" let g:session_lock_enabled = 0
-" let g:session_default_name='default_'.getcwd().'_'.system('date +%y%d%m_%H%M') " This will be evaluated only on Vim start
-" XXX 171102: This will not work on Windows gVim:
-if has('unix')
-	" let g:session_default_name='default_'.system('pwd').system('date +%y%d%m') " This will be evaluated only on Vim start
-	" let g:session_test=substitute(strtrans(system('pwd')), '\^@','','g').substitute(session_default_name, '\/','_','g')
-	" let g:session_default_name='default_'.substitute(strtrans(system('pwd')), '\^@','','g').substitute(session_default_name, '\/','_','g')
-endif
 
 let g:session_command_aliases = 1	" :SomethingSession is :SessionSomething
 call SetupCommandAlias("ss", ":SaveSession")
@@ -1852,6 +1805,9 @@ let g:lastplace_ignore = "gitcommit,gitrebase,svn,hgcommit"
 " INFO highlight trailing spaces in red
 " :ToggleWhitespace
 let g:better_whitespace_filetypes_blacklist = ['help', 'Help', 'quickfix', 'vim-plug', 'man', 'diff', 'location']
+
+command! FixWhiteSpace StripWhitespace	" function from 'better white space' plugin
+call SetupCommandAlias("fws", "StripWhitespace")	" function from 'better white space' plugin
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		indexed search														{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -2095,7 +2051,6 @@ if has("gui_running")
 	" TODO same font as xterm
 endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-
 " " work specific stuff														{{{
 " """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " on Linux PC for team H
@@ -2138,7 +2093,6 @@ endif
 " Ctrl-R '1p	paste from the first register in insert mode
 
 " Ctrl-W } show variable/function in a preview window
-" Ctrl-W (ctrl)] open a tag in a split windows	TODO open in a vsp instead split
 " :pc	close preview window
 " C delete to the end of the line and go to insert mode
 
@@ -2243,22 +2197,6 @@ set isfname+=32	" <space> is part of filename
 " U/u/~ in visual mode to upper/lower/toggle case
 
 " startup profiling:  vim --startuptime startup.log, visuasilation: https://github.com/hyiltiz/vim-plugins-profile
-
-" load file without loading it :bad file.txt
-
-" argdo {{{
-" :arg => list files in arglist
-" :argdelete * => clean arglist
-" :argadd **/*.rb => add files to arglist
-" :argdo %s/foo/bar/gc => replace foo by bar in arglist
-" :argdo update => save changes to arglist
-" :argdo undo => undo changes to arglist
-" Navigation in arglist
-" [a => go to the previous file in arglist
-" ]a => go to the next file in arglist
-" [A => go to the first file in arglist
-" ]A => go to the last file in arglist
-" }}}
 "##########################################################################}}}
 " vimL misc							{{{
 " number of tabs: tabpagenr('$')
@@ -2269,9 +2207,6 @@ set isfname+=32	" <space> is part of filename
 " get line under the cursors: getline('.')
 "									}}}
 
-" variables:
-" % - buffer (or file) TODO
-" ^ - alternate file
 " TODO :h pattern-atoms
 " Vim debug:
 " vim -V9myVimLog
@@ -2295,10 +2230,6 @@ set isfname+=32	" <space> is part of filename
 " syntax off, relative number off, cursorline off -> speedup
 " autocommand spam: :autocmd CursorMoved
 " :syntime on, move around in your ruby file and then, :syntime report
-" old regex engine: :set re=1
-" group autocommands
-" => moze se ubrzat malo, ali i dalje bude spor, i dalje se vidi cursosr
-" TODO 171001: search for keyword in all buffers
 
 nnoremap <Leader>h :call HeaderToggle()<CR>
 
@@ -2308,9 +2239,6 @@ let g:startify_session_sort = 0
 
 cmap w!! w !sudo tee %
 
-" TODO 180114: play with this for faster <leader>f (without other key after 'f')
-" set timeoutlen
-
 " 180106 - useful when reading man pages
 nnoremap <Home> gg
 nnoremap <End> G
@@ -2318,6 +2246,9 @@ nnoremap <End> G
 " TODO 181026:check this (on Windows specially)
 " g:session_directory = '~/.vim/sessions' "" or ~\vimfiles\sessions (on Windows).
 " TODO 181128: chane all lines with multiple " to ------
+" TODO 190514: quit QF windows before calling :Files or :FZFMru (otherwise
+" that file will be open in (miniature) QF window split)
+" TODO 190515: disable <C-w>v/s/d commands in location list
 
 " 190119 nvim-yarp debugging
 " Log files will be generated with prefix /tmp/nvim_log
