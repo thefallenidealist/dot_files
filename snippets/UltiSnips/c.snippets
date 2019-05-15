@@ -8,9 +8,26 @@ while (${1})
 }
 endsnippet
 
-snippet include "io int"
+snippet include "include stdio, stdint"
 #include <stdio.h>
 #include <stdint.h>${0}
+endsnippet
+
+snippet incint "include stdint"
+#include <stdint.h>${0}
+endsnippet
+
+snippet incbool "include stdbool"
+#include <stdbool.h>${0}
+endsnippet
+
+snippet deftype "define u8 -> uint8_t"
+#define u32 uint32_t
+#define u16 uint16_t
+#define  u8 uint8_t
+#define i32 int32_t
+#define i16 int16_t
+#define  i8 int8_t
 endsnippet
 
 snippet imain "int main(void)"
@@ -40,8 +57,9 @@ endsnippet
 snippet vfn "void function()"
 void ${1}(${2})
 {
-	${0}
+	${3}
 }
+${0}
 endsnippet
 
 snippet nocxx
@@ -86,7 +104,7 @@ ${0}
 #endif
 endsnippet
 
-snippet for "for (i = 0)"
+snippet for "for (uint8 i = 0)"
 for (uint8_t i = 0; i < ${1}; i++)
 {
 	${0}
@@ -97,8 +115,9 @@ endsnippet
 snippet if "if()"
 if (${1:true})
 {
-	${0:${VISUAL}}
+	${2:${VISUAL}}
 }
+${0}
 endsnippet
 
 snippet ife "if() else"
@@ -108,8 +127,9 @@ if (${1:true})
 }
 else
 {
-	${0}
+	${3}
 }
+${0}
 endsnippet
 
 snippet el "else"
@@ -122,8 +142,9 @@ endsnippet
 snippet elif "else if"
 else if (${1:true})
 {
-	${0:${VISUAL}}
+	${2:${VISUAL}}
 }
+${0}
 endsnippet
 
 # ternary

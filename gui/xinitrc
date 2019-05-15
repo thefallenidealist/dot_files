@@ -50,11 +50,15 @@ dunst&
 # redshift -l 48.13:11.57 &
 # redshift -l 50:20 &
 
+# INFO 190317: setting DPI
+# xrandr --dpi 192&
+xrandr --dpi 96&
 
 # xterm -title tp.root -e 'echo tp root && su -l'&				# tp root
 # exec xterm -title glavni -geometry 100x20+50+50 -e tmux
 exec xterm -title glavni -geometry 100x20+50+50 -e 'tmux new-session -d -s glavni -n Wcwm ; tmux send-keys -t glavni:Wcwm "cwm -vv" Enter; tmux attach -t glavni:Wcwm '
 
+# xrandr --dpi 144
 # 181107:
 exec $HOME/.opt/bin/cwm -vv
 # exec $HOME/.opt/bin/aphelia

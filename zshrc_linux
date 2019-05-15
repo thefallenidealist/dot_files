@@ -4,3 +4,5 @@
 PS1="$(print '%{\e[0;94m%}%M%{\e[0m%}%{\e[0;31m%}%#%{\e[0m%}') "	# use lighter blue color (94 instead of 34)
 alias ls='ls -h --color'
 alias gmake='make'
+alias msg="grc cat /var/log/syslog"
+alias w='wget'

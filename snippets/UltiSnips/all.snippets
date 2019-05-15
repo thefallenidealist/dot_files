@@ -2,19 +2,7 @@
 # INFO: $0 - last stop
 # vim:ft=snippets:
 
-snippet test
-/*
----
-title: ${1:Prva linija}
-date: ${2: `date +%y%m%d`}
-tags: $3
----
-Mirror effect, title is: $1, date is $2
-*/
-$0
-endsnippet
 
-# ${1:`date +%y%m%d`}
 snippet date "yymmdd"
 `!v strftime("%y")``!v strftime("%m")``!v strftime("%d")`
 endsnippet
@@ -59,19 +47,19 @@ snippet TODO2 "TODO YYMMDD"
 TODO `!v strftime("%y%m%d")`
 endsnippet
 
-snippet xxx "with semicolon"
+snippet xxx "XXX YYMMDD:<space>"
 XXX `!v strftime("%y%m%d")`: 
 endsnippet
 
-snippet XXX "with semicolon"
+snippet XXX "XXX YYMMDD:<space>"
 XXX `!v strftime("%y%m%d")`: 
 endsnippet
 
-snippet xxx2
+snippet xxx2 "XXX YYMMDD"
 XXX `!v strftime("%y%m%d")`
 endsnippet
 
-snippet XXX2
+snippet XXX2 "XXX YYMMDD"
 XXX `!v strftime("%y%m%d")`
 endsnippet
 

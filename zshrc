@@ -1,17 +1,49 @@
 # Created probably in 2006
 #  vim: set ft=zsh ts=4 sw=4 tw=0 fdm=marker noet :
 HISTFILE=~/.history.zsh
-HISTSIZE=1000
-SAVEHIST=1000
+HISTSIZE=10000	# maximum number of lines that are kept in a session
+SAVEHIST=10000	# maximum number of lines that are kept in the history file
 setopt no_beep
 autoload -Uz compinit
 compinit
 autoload colors ; colors
+# ------------------ history - local & global ------------------------------ {{{
+setopt extended_history		# record timestamp of command in HISTFILE
 setopt histignoredups		# Ignore duplicated entries in history
 setopt histignorespace		# and with trailing spaces
-# setopt sharehistory			# Share history across terminals
 setopt incappendhistory		# Immediately append to the history file, not just when a term is killed
+# 190505 - up/down - local history, Ctrl-up/down - global history
+setopt sharehistory
 
+# # https://superuser.com/questions/446594/separate-up-arrow-lookback-for-local-and-global-zsh-history
+# up-line-or-local-history()
+# {
+# 	zle set-local-history 1
+# 	zle up-line-or-history
+# 	zle set-local-history 0
+# }
+# zle -N up-line-or-local-history
+
+# down-line-or-local-history()
+# {
+# 	zle set-local-history 1
+# 	zle down-line-or-history
+# 	zle set-local-history 0
+# }
+# zle -N down-line-or-local-history
+
+# # local history
+# bindkey "${terminfo[kcuu1]}" up-line-or-local-history
+# bindkey "${terminfo[kcud1]}" down-line-or-local-history
+
+# # global history
+# bindkey "^[[1;5A" up-line-or-history    # [CTRL] + Cursor up
+# bindkey "^[[1;5B" down-line-or-history  # [CTRL] + Cursor down
+
+# substring history search
+# bindkey "^[[A" history-beginning-search-backward
+# bindkey "^[[B" history-beginning-search-forward
+# -------------------------------------------------------------------------- }}}
 # colors																	{{{
 # -----------------------------------------------------------------------------
 # INFO 181203: Can be used on FreeBSD ls
@@ -60,16 +92,14 @@ else
 fi
 
 export LD_LIBRARY_PATH=$HOME/.opt/lib:$LD_LIBRARY_PATH
-# TOOLCHAIN_ARM=`find /usr/local -maxdepth 1 -type d -name "gcc-arm*"`/bin # find arm-none-eabi- tools
-TOOLCHAIN_ARM=/usr/local/gcc-arm-embedded-7-2017-q4-major/bin	# faster sh startup, needs manual update
-export PATH="$PATH:$HOME/.opt:$HOME/.opt/bin:$HOME/.opt/sbin:$HOME/.opt/scripts"
+export PATH="$HOME/.opt:$HOME/.opt/bin:$HOME/.opt/sbin:$HOME/.opt/scripts:$PATH"
 export PATH="$PATH:/opt/scripts:/opt/bin"
 export PATH="$PATH:$HOME/.cargo/bin:$HOME/.local/bin"
 # export PATH="$PATH:$HOME/.cargo/bin:$HOME/.local/bin:$HOME/.fzf/bin"
-export PATH="$PATH:$TOOLCHAIN_ARM"
-# Thumb toolchain (and GDB -python)
 
 export MANPATH=$HOME/.opt/share/man:$MANPATH
+# INFO 190422: ripgrep will look for a single configuration file if and only if the RIPGREP_CONFIG_PATH environment variable is set and is non-empty.
+export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
 
 # ------------------ prompt - PS1, PS2, RightPS ---------------------------- {{{
 case $(whoami) in
@@ -168,6 +198,8 @@ alias zsnap_used="zfs get -o name,value used |grep @"
 alias zsnap_destroy_all="zfs list -H -o name -t snapshot | xargs -n1 zfs destroy"
 alias beadm=bectl	# 12.0 has beadm tool in base system as bectl
 alias zdf="zpool list -o name,size,allocated,capacity"
+alias jkill="service jail stop"
+alias jrun="service jail start"
 
 # ------------------ 3rd party system utils --------------------------------
 alias freec='freecolor -mt'
@@ -182,6 +214,20 @@ alias ll='ls -l'
 alias llt='ls -lt'
 alias lltr='ls -ltr'
 alias la='ls -A'
+
+# TODO 190428: set custom date format
+alias ls='exa  --time-style long-iso --classify'
+alias l=ls
+alias ll='ls -l'
+alias llg='ls -l --git'
+alias llgg='ls -l --grid'
+alias la='ls -a'
+# TODO 190317: equivalent of ls -ltr
+alias lltr='ls -l --sort newest'
+# TODO 190428: exa tree view
+# alias ltr 
+export EXA_COLORS="da=36"	# timestamp in cyan
+
 alias cp='cp -ia'
 alias mv='mv -i'
 alias less='less -XMr'
@@ -193,7 +239,6 @@ alias du='du -h'
 #alias grep='grep --color -i'
 alias grep='grep --color --exclude=tags'
 alias which='which -a'
-alias whereis="whereis -a"
 
 #override shell built-in commands
 alias pwd='/bin/pwd'
@@ -209,7 +254,6 @@ alias pp='echo `/usr/bin/whoami`@$HOST"["$TTY"]":`/bin/pwd`'
 alias mnt='mount | column -t'
 alias mnt="mount | sed 's/on//g' | sed -e 's/([^()]*)//g' | column -t"
 
-alias msg="grc cat /var/log/messages | grep -v 'wpa_supplicant\|dhclient\|wlan0: link state'"
 alias lsof='fstat | grep -i '
 alias u='(date && uname -a && uptime)'
 alias uu='(date && uname -a && uptime) > `uname -r | cut -b 1-3`.`/bin/date +'%y%m%d'`'
@@ -261,16 +305,13 @@ alias wip='ifconfig wlan0 | grep inet | cut -d " " -f 2'      # nece pokazat nis
 alias wst='ifconfig wlan0 | grep status | cut -d " " -f 2'
 alias ws='echo `wst; ssid; echo "  IP: "; wip`'
 
-# alias w='wget --no-check-certificate'
-# alias w='wget -U "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)" --no-check-certificate'
-alias w='fetch'
-
 # find IPs: nmap -sP 192.168.2.1/24
 # -------------------------------------------------------------------------- }}}
 # ------------------ alias - user programs --------------------------------- {{{
 alias vi=nvim
 alias vimdiff="nvim -d"
 alias vim="vi -c FZFMru"
+alias vio="vi -c Files"
 #alias s='screen -U'
 alias s='tmux'
 alias history='history -Ef'	# pretty history with European dates"
@@ -307,8 +348,8 @@ alias rename_sub="for i in *;  do n=`echo $i |  sed  's/(//g;s/)//;s/ 1080p x265
 # colorized cat, but slow
 alias pcat="pygmentize -f terminal256 -O style=native -g"
 
-# alias gdbA="arm-none-eabi-gdb --data-directory=/usr/local/share/gdb7121"
-alias gdbA="tmux rename-window gdbA; arm-none-eabi-gdb --data-directory=~/.local/share/gdb-arm/data-directory"
+# patched GDB from ports with python support
+alias gdba="tmux rename-window gdb-arm; arm-none-eabi-gdb"
 
 alias grip="grip --norefresh"	# GitHub readme preview, don't auto refresh because GitHubs limitation of 60 refresh in hour
 alias md="grip --norefresh"	# GitHub readme preview, don't auto refresh because GitHubs limitation of 60 refresh in hour
@@ -317,6 +358,7 @@ alias md="grip --norefresh"	# GitHub readme preview, don't auto refresh because 
 #echo "obase=16; 10"|bc
 alias gg='gmake clean && gmake'
 alias ggu='gmake clean && gmake -j4 && gmake upload'
+alias weather='curl wttr.in/Osijek'
 # -------------------------------------------------------------------------- }}}
 
 # ------------------ custom function - zsnap ------------------------------- {{{
@@ -401,13 +443,10 @@ function mm() {
 
 # zsh TODO check one day
 # setopt append_history # Allow multiple terminal sessions to all append to one zsh command history
-# setopt extended_history # save timestamp of command and duration
-# setopt inc_append_history # Add comamnds as they are typed, don't wait until shell exit
-# setopt hist_expire_dups_first # when trimming history, lose oldest duplicates first
-# setopt hist_ignore_space # remove command line from history list when first character on the line is a space
-# setopt hist_reduce_blanks # Remove extra blanks from each command line being added to history
 # setopt correct # spelling correction for commands
 # setopt correctall # spelling correction for arguments
 # lookup functions from here # https://zanshin.net/2013/02/02/zsh-configuration-from-the-ground-up/
 
+# pkg install zsh-syntax-highlighting
+source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fpath=($HOME/.zsh-completions $fpath)

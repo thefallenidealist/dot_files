@@ -20,8 +20,6 @@ set mouse=a
 syntax enable
 filetype plugin indent on
 set showmatch		" show matching search as you type
-" TODO remember highlight setting when reloading vimrc
-"		noh nohlsearch doesn't work
 set background=dark
 set laststatus=2	" always show status bar
 set lazyredraw		" possible fix for slow j/k		INFO disabling cursorline also results in speedup
@@ -31,8 +29,7 @@ set showcmd			" show size of visual block in cmdline at right
 set notitle
 
 set autowrite		" Automatically :write before running commands
-" set autoread		" autoload files that have changed outside of vim
-set noautoread
+set noautoread		" don't autoload files that have changed outside of vim
 
 " better splits
 set splitbelow
@@ -190,9 +187,9 @@ if has('unix')
 		let g:tagbar_ctags_bin=g:ctags_exe
 
 	elseif s:uname == "Linux"
-		let g:ctags_exe='/usr/bin/uctags'
+		let g:ctags_exe='/usr/bin/ctags-exuberant'
 	endif " uname
-elseif has('windows')	" XXX 181128: test something else, not 'windows' is for Vim feature
+elseif has('win32')
 	let $PATH.=';C:\bin'			" place where win32yank is
 	let $PATH.=';C:\python35_x64'	" work PC
 	let g:ctags_exe='c:\bin\ctags.exe'
@@ -262,6 +259,8 @@ set tags=tags,.tags;$HOME
 augroup my_group_with_a_very_uniq_name
 	" this is executed every time when vimrc is sourced, so clear it at the beggining:
 	autocmd!
+	" INFO 190514: Filetype: will be executed when opening file
+	" Buf/WinEnter: Will be executed when entering buffer/window
 
 	" easier quit from this windows
 	autocmd Filetype help nnoremap <buffer> q :wincmd c<cr>
@@ -274,8 +273,6 @@ augroup my_group_with_a_very_uniq_name
 
 	autocmd Filetype help,man :NumbersDisable	" Disable Numbers plugin in help or man
 
-	" unmap enter in QuickFix window (window at the bottom which isn't preview)
-	autocmd BufReadPost quickfix nnoremap <buffer> <cr> <cr>
 	autocmd Filetype qf set nolist
 
 	" force Vim to threat .md files as markdown and not Modula
@@ -308,12 +305,12 @@ augroup my_group_with_a_very_uniq_name
 
 	autocmd Filetype verilog call SetupVerilogEnvironment()
 
-	" close preview windows if it is last
+	" close preview window if it is last
 	autocmd WinEnter * if &previewwindow | nnoremap <buffer> q :q!<cr> | endif
 
 	" close NERDTree/Tagbar if it is last window
-	autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
-	autocmd bufenter * if (winnr("$") == 1 && (bufwinnr('__Tagbar__')) != -1) | q | endif
+	autocmd BufEnter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+	autocmd BufEnter * if (winnr("$") == 1 && (bufwinnr('__Tagbar__')) != -1) | q | endif
 
 	" maps in command-line-window:
 	autocmd CmdwinEnter * map <buffer> <cr> <cr>
@@ -1440,8 +1437,8 @@ let g:fzf_buffers_jump = 0
 " TODO 181105: Check this under Windows
 if has('nvim')
 	aug fzf_setup
-		au!
-		au TermOpen term://*FZF tnoremap <silent> <buffer><nowait> <esc> <c-c>
+		autocmd!
+		autocmd TermOpen term://*FZF tnoremap <silent> <buffer><nowait> <esc> <c-c>
 	aug END
 end
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
@@ -1800,13 +1797,22 @@ let g:SignatureMap = {
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " quickfix preview                                                           {{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" quickr-preview.vim lets you preview the result in detail without spoiling the buffer list. Everything is automatically clened up once quickfix window is closed.
+" preview the result in detail without spoiling the buffer list.
+" Everything is automatically clened up once quickfix window is closed.
 
 let g:quickr_preview_keymaps = 0
-" nmap <space> <plug>(quickr_preview) " XXX 171215: This will interfere <space> for folds
-" nmap q <plug>(quickr_preview_qf_close)
-" XXX won't close preview window after closing quickfix
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+
+augroup plugin_qf_preview
+	autocmd!
+	" XXX 190515: 'p' and Ctrl-Enter won't work
+	autocmd FileType qf nmap <buffer> <leader>p <plug>(quickr_preview)
+	autocmd FileType qf nmap <buffer> <C-p> <plug>(quickr_preview)
+	autocmd FileType qf nmap <buffer> <C-]> <plug>(quickr_preview)
+augroup END
+
+let g:quickr_preview_on_cursor = 1		" 1 = auto enable
+let g:quickr_preview_exit_on_enter = 1	" 1 = auto-close on enter XXX 190515
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " autopairs {{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Plugin to autoclose branckets ()
