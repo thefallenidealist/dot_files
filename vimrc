@@ -270,6 +270,9 @@ if &diff
 	map <leader>1 :diffget LOCAL<CR>
 	map <leader>2 :diffget BASE<CR>
 	map <leader>3 :diffget REMOTE<CR>
+	nnoremap du :diffupdate<cr>
+	nnoremap dg :diffget<cr>
+	call SetupCommandAlias("du", "diffupdate")
 endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		cmd aliases															{{{
@@ -466,8 +469,7 @@ nnoremap <A-w> :BD<cr>
 call SetupCommandAlias("Bd", "bd")
 inoremap <A-w> <C-o>:BD<cr>
 
-nnoremap <Tab> :wincmd p<cr>
-nnoremap <S-Tab> :wincmd w<cr>
+nnoremap <silent><Tab> :call SwitchWindow()<cr>
 " XXX 190422 (works on Windows): " TODO 190516
 nnoremap <C-w><C-c> :wincmd c<cr>
 " other options: P: reverse previous, W: reverse next
@@ -975,6 +977,22 @@ function! RegisterClear()
 endfunction
 call SetupCommandAlias("regc",  "call RegisterClear()")
 " ------------------------------------------------------------------------- }}}
+" switch window																{{{
+" ------------------------------------------------------------------------- }}}
+" created 190524
+" - switch to previous window if available
+" - if not, then cycle
+" - usefull after closing quickfix/location list
+
+function! SwitchWindow()
+	let l:prev_window = winnr('#')
+	" echo "Previous: " . l:prev_window
+	if l:prev_window != 0	" there is previous window
+		wincmd p
+	else	" no previous window, just cycle
+		wincmd w
+	endif
+endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 " Plugins																	{{{
@@ -1095,6 +1113,8 @@ Plug 'kshenoy/vim-signature'	" marks in sign column and with easier shortcuts
 								" use fzf :Marks for search
 Plug 'airblade/vim-gitgutter'	" git: show +-m in sign column, shortcuts [c ]c
 Plug 'tpope/vim-fugitive'		" Git commands for Vim
+Plug 'jreybert/vimagit'			" Git
+Plug 'rhysd/git-messenger.vim'	" fancy git blame
 Plug 'tpope/vim-tbone'			" Tmux under Vim (copy/paste)
 
 " Vim session plugins
@@ -1240,6 +1260,10 @@ let g:airline#extensions#whitespace#enabled = 0
 let g:airline#extensions#obsession#indicator_text = 'Ses' " default: '$'
 
 " let g:airline_section_z = '%3p%% %#__accent_bold#%{g:airline_symbols.linenr}%4l:%3v%#__restore__#%#__accent_bold#/%L%{g:airline_symbols.maxlinenr}%#__restore__# '
+
+" don't show git branch nor hunbks
+let g:airline#extensions#branch#enabled = 0
+let g:airline#extensions#hunks#enabled = 0
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 
 " snippets																	{{{
@@ -1404,6 +1428,9 @@ endif
 " call SetupCommandAlias("G","botright Gstatus")
 call SetupCommandAlias("Gstatus","botright Gstatus")
 " call SetupCommandAlias("Gstatus","botright Gstatus<cr> | :resize -10")
+
+nnoremap <leader>gg :GitMessenger<cr>
+let g:git_messenger_always_into_popup = 1	" jump into popup
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " searching																	{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1487,7 +1514,7 @@ call SetupCommandAlias("tagu!","GutentagsUpdate!")
 " 190512
 " Press tag into vsplit windows, press again to jump to another tag in another file
 " C-w z to close it
-nnoremap <C-]> :PreviewTag<cr>
+nnoremap <C-\> :PreviewTag<cr>
 " :PreviewSignature
 
 " uctags -R --sort=foldcase --c++-kinds=+p --fields=+ianS --extras=+q -f ~/.vim/tags/libc.tags /usr/include
@@ -1670,12 +1697,6 @@ augroup plugin-startify
 	autocmd User Startified for key in ['b','s','t','v','n'] |
 				\ execute 'nunmap <buffer>' key | endfor
 augroup END
-
-" run for every new tab
-if has('nvim')
-	autocmd TabNewEntered * Startify
-	nnoremap tm :tabnew<cr>:FZFMru<CR>
-endif
 
 let g:startify_session_dir = '~/.vim/session'
 let g:startify_commands = [
