@@ -9,10 +9,10 @@
 				# patch ~/.xmodmap or include/append ~/.xmodmap.t430s?
 
 OS=$(uname)
-if [ "$OS" == "FreeBSD" ] ; then
+if [ "$OS" = "FreeBSD" ] ; then
 	PIP="pip-3.6"
 	FILE_ZSH_LOCAL=zshrc_bsd
-elif [ "$OS" == "Linux" ] ; then
+elif [ "$OS" = "Linux" ] ; then
 	PIP="pip"
 	FILE_ZSH_LOCAL=zshrc_linux
 fi
@@ -32,7 +32,7 @@ set_dir()
 {
 	# BASEDIR is used instead of PWD so script can be run from other dirs
 	BASEDIR=$(dirname "$0")
-	if [ "$BASEDIR" == "." ] ; then
+	if [ "$BASEDIR" = "." ] ; then
 		BASEDIR=$PWD	# case when script is run from cwd with ./
 	fi
 }
@@ -143,7 +143,7 @@ check_programs()
 	for i in $PROGRAMS ; do
 		command -v $i > /dev/null;
 		ret=$?
-		if [ "$ret" == "0" ]; then
+		if [ "$ret" = "0" ]; then
 			echo "Command \"$i\" found"
 		else
 			echo "Command \"$i\" not found!"
@@ -180,7 +180,7 @@ main()
 		shift
 	done
 
-	if [ "$REMOVE" == "y" ] ; then
+	if [ "$REMOVE" = "y" ] ; then
 		echo "Removing files"
 		remove_files
 	fi

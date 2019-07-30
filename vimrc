@@ -986,11 +986,16 @@ call SetupCommandAlias("regc",  "call RegisterClear()")
 
 function! SwitchWindow()
 	let l:prev_window = winnr('#')
-	" echo "Previous: " . l:prev_window
-	if l:prev_window != 0	" there is previous window
-		wincmd p
-	else	" no previous window, just cycle
+	let l:curr_window = winnr()
+	" echo "Previous: " . l:prev_window . " current: " . l:curr_window
+
+	if l:prev_window == 0	" there is no previous window, just cycle
 		wincmd w
+	elseif l:curr_window == l:prev_window
+		" for git windows, when split is closed
+		wincmd w
+	else	" there is previous window
+		wincmd p
 	endif
 endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
