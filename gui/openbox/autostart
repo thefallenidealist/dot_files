@@ -1,0 +1,19 @@
+# created 150626
+
+tint2 -c ~/.config/tint2/tint2rc &
+xsetroot -solid black &
+
+sh ~/.opt/conky.sh&
+
+
+#(sleep 3 && application_command) &
+
+pcmanfm -n /mnt/local/net ~/elektronika/datasheetovi &
+pcmanfm -n /mnt/local/video &
+#pcmanfm -n /mnt/local/net/music /mnt/local/net/music/flvW /mnt/local/net/music/epic &
+pcmanfm -n /mnt/local/video/music &
+
+xterm -title tp.root 	-e	'echo tp root && su -l'&				# tp root
+#xterm -title guglo.root	-e	'echo guglo $USER && ssh guglo'&		# guglo root
+#xterm -title music	-e 'screen -U'&		# tp music
+#xterm -title guglo	-e		'echo guglo $USER && ssh -Y guglo'&		# guglo user

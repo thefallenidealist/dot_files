@@ -1,0 +1,32 @@
+
+    <!-- Keybindings for window switching with the arrow keys -->
+	<!-- INFO djeluje mi beskorisno, Alt-Tab mi je sasvim oke
+    <keybind key="W-S-Right">
+      <action name="DirectionalCycleWindows">
+        <direction>right</direction>
+      </action>
+    </keybind>
+    <keybind key="W-S-Left">
+      <action name="DirectionalCycleWindows">
+        <direction>left</direction>
+      </action>
+    </keybind>
+    <keybind key="W-S-Up">
+      <action name="DirectionalCycleWindows">
+        <direction>up</direction>
+      </action>
+    </keybind>
+    <keybind key="W-S-Down">
+      <action name="DirectionalCycleWindows">
+        <direction>down</direction>
+      </action>
+    </keybind>
+	-->
+
+	
+	<!--	poprilicno beskorisno
+    <keybind key="A-Up">	<action name="MoveRelative">	<x>  0</x> <y>-10</y>	</action></keybind>
+    <keybind key="A-Down">	<action name="MoveRelative">	<x>  0</x> <y> 10</y>	</action></keybind>
+    <keybind key="A-Left">	<action name="MoveRelative">	<x>-10</x> <y>  0</y>	</action></keybind>
+    <keybind key="A-Right">	<action name="MoveRelative">	<x> 10</x> <y>  0</y>	</action></keybind>
+	-->

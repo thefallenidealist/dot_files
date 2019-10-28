@@ -1,0 +1,5 @@
+# 160905
+export PATH=$HOME/.opt/bin:$HOME/.opt:$PATH
+
+# Change the language used from the system's default
+#export LC_CTYPE=ja_JP.utf8

@@ -107,8 +107,15 @@
       <!-- 'italic' or 'normal' -->
     </font>
   </theme>
-
   <desktops>
+    <!-- this stuff is only used at startup, pagers allow you to change them
+       during a session
+
+       these are default values to use when other ones are not already set
+       by other applications, or saved in your session
+
+       use obconf if you want to change these without having to log out
+       and back in -->
     <number>8</number>
     <firstdesk>1</firstdesk>
     <names>
@@ -123,7 +130,6 @@
     </names>
     <popupTime>400</popupTime>	<!-- INFO default: 875 -->
 			<!-- The number of milliseconds to show the popup for when switching desktops.  Set this to 0 to disable the popup. -->
-
   </desktops>
 
   <resize>
@@ -176,24 +182,21 @@
   <keyboard>
     <chainQuitKey>C-g</chainQuitKey>
     <!-- Keybindings for desktop switching -->
+    <keybind key="C-A-Left">	<action name="GoToDesktop">		<to>left</to>		</action></keybind>
+    <keybind key="C-A-Right">	<action name="GoToDesktop">		<to>right</to>		</action></keybind>
+    <keybind key="C-A-Up">		<action name="GoToDesktop">		<to>up</to>			</action></keybind>
+    <keybind key="C-A-Down">	<action name="GoToDesktop">		<to>down</to>		</action></keybind>
     <keybind key="C-A-Left">	<action name="GoToDesktop">		<to>Left</to>		</action></keybind>
     <keybind key="C-A-Right">	<action name="GoToDesktop">		<to>Right</to>		</action></keybind>
-    <keybind key="C-A-Up">		<action name="GoToDesktop">		<to>Up</to>			</action></keybind>
-    <keybind key="C-A-Down">	<action name="GoToDesktop">		<to>Down</to>		</action></keybind>
     <keybind key="F21">			<action name="GoToDesktop">		<to>Left</to>		</action></keybind>
     <keybind key="F22">			<action name="GoToDesktop">		<to>Right</to>		</action></keybind>
     <keybind key="W-Left">		<action name="GoToDesktop">		<to>Left</to>		</action></keybind>
     <keybind key="W-Right">		<action name="GoToDesktop">		<to>Right</to>		</action></keybind>
-    <keybind key="S-A-Left">	<action name="SendToDesktop">	<to>Left</to> 		</action></keybind>
-    <keybind key="S-A-Right">	<action name="SendToDesktop">	<to>Right</to>		</action></keybind>
-    <keybind key="S-A-Up">		<action name="SendToDesktop">	<to>Up</to>			</action></keybind>
-    <keybind key="S-A-Down">	<action name="SendToDesktop">	<to>Down</to>		</action></keybind>
-	<!-- INFO Navikao se na poslu, pa neka bude i ovdje -->
-    <keybind key="S-C-A-Left">	<action name="SendToDesktop">	<to>Left</to>		</action></keybind>
-    <keybind key="S-C-A-Right">	<action name="SendToDesktop">	<to>Right</to>		</action></keybind>
-    <keybind key="W-S-Left">	<action name="SendToDesktop">	<to>Left</to>		</action></keybind>
-    <keybind key="W-S-Right">	<action name="SendToDesktop">	<to>Right</to>		</action></keybind>
-    <keybind key="W-d">			<action name="ToggleShowDesktop"/>							 </keybind>
+    <keybind key="S-A-Left">	<action name="SendToDesktop">	<to>left</to> 		</action></keybind>
+    <keybind key="S-A-Right">	<action name="SendToDesktop">	<to>right</to>		</action></keybind>
+    <keybind key="S-A-Up">		<action name="SendToDesktop">	<to>up</to>			</action></keybind>
+    <keybind key="S-A-Down">	<action name="SendToDesktop">	<to>down</to>		</action></keybind>
+    <keybind key="W-d">			<action name="ToggleShowDesktop"/> </keybind>
     <keybind key="W-1">			<action name="GoToDesktop">		<to>1</to>			</action></keybind>
     <keybind key="W-2">			<action name="GoToDesktop">		<to>2</to>			</action></keybind>
     <keybind key="W-3">			<action name="GoToDesktop">		<to>3</to>			</action></keybind>
@@ -233,14 +236,21 @@
     <keybind key="S-C-Left">	<action name="ResizeRelative">	<right>-5</right>	</action></keybind>
     <keybind key="S-C-Right">	<action name="ResizeRelative">	<right>5</right>	</action></keybind>
 
+	<!--	poprilicno beskorisno
+    <keybind key="A-Up">	<action name="MoveRelative">	<x>  0</x> <y>-10</y>	</action></keybind>
+    <keybind key="A-Down">	<action name="MoveRelative">	<x>  0</x> <y> 10</y>	</action></keybind>
+    <keybind key="A-Left">	<action name="MoveRelative">	<x>-10</x> <y>  0</y>	</action></keybind>
+    <keybind key="A-Right">	<action name="MoveRelative">	<x> 10</x> <y>  0</y>	</action></keybind>
+	-->
+
 
     <!-- Keybindings for windows -->
-    <keybind key="A-F3">	<action name="Iconify"/>			</keybind>
-    <keybind key="A-F4">	<action name="Close"/>				</keybind>
-    <keybind key="A-F5">	<action name="ToggleMaximize"/>		</keybind>
-    <keybind key="W-f">		<action name="ToggleFullscreen"/>	</keybind>
-	<keybind key="A-F6">	<action name="ToggleMaximize">		<direction>horizontal</direction></action></keybind>
-	<keybind key="A-F7">	<action name="ToggleMaximizeVert"/>	</keybind>
+    <keybind key="A-F3"> <action name="Iconify"/> </keybind>
+    <keybind key="A-F4"> <action name="Close"/> </keybind>
+    <keybind key="A-F5"> <action name="ToggleMaximize"/> </keybind>
+    <keybind key="W-f">  <action name="ToggleFullscreen"/> </keybind>
+	<!-- TODO 	Alt-F6 MaximizeHorizontal
+				Alt-F7 MaximizeVertical -->
     <keybind key="W-a"><keybind key="g">	<action name="ToggleDecorations"/>	</keybind></keybind>
     <keybind key="W-a"><keybind key="j">	<action name="Reconfigure"/>		</keybind></keybind>
     <keybind key="W-a"><keybind key="S-j">	<action name="Restart"/>			</keybind></keybind>
@@ -279,8 +289,29 @@
       </action>
     </keybind>
 
-	<keybind key="W-Tab">     <action name="NextWindow">		<allDesktops>yes</allDesktops></action></keybind>
-	<keybind key="W-S-Tab">   <action name="PreviousWindow">	<allDesktops>yes</allDesktops></action></keybind>
+    <!-- Keybindings for window switching with the arrow keys -->
+	<!-- INFO djeluje mi beskorisno, Alt-Tab mi je sasvim oke
+    <keybind key="W-S-Right">
+      <action name="DirectionalCycleWindows">
+        <direction>right</direction>
+      </action>
+    </keybind>
+    <keybind key="W-S-Left">
+      <action name="DirectionalCycleWindows">
+        <direction>left</direction>
+      </action>
+    </keybind>
+    <keybind key="W-S-Up">
+      <action name="DirectionalCycleWindows">
+        <direction>up</direction>
+      </action>
+    </keybind>
+    <keybind key="W-S-Down">
+      <action name="DirectionalCycleWindows">
+        <direction>down</direction>
+      </action>
+    </keybind>
+	-->
 
     <!-- Keybindings for running applications -->
     <keybind key="A-F2">	<action name="Execute"> <command>gmrun</command> 	</action> </keybind>
@@ -291,15 +322,14 @@
     <keybind key="W-e"> 	<action name="Execute"> <command>pidgin</command> 	</action> </keybind> 
     <keybind key="W-r"> 	<action name="Execute"> <command>Skype</command> 	</action> </keybind>
     <keybind key="W-t"> 	<action name="Execute"> <command>VirtualBox</command> 	</action> </keybind>
-    <keybind key="W-y"> 	<action name="Execute"> <command>kicad</command> 	</action> </keybind>
+    <keybind key="W-y"> 	<action name="Execute"> <command>eagle</command> 	</action> </keybind>
     <keybind key="W-u"> 	<action name="Execute"> <command>mtpaint</command> 	</action> </keybind>
     <keybind key="W-p"> 	<action name="Execute"> <command>xkill</command> 	</action> </keybind>
     <keybind key="W-g"> 	<action name="Execute"> <command>galculator</command>	</action> </keybind>
     <keybind key="W-h"> 	<action name="Execute"> <command>xterm -e htop</command> </action> </keybind>
 
-	<keybind key="W-o"> 	<action name="Execute"> <command>pcmanfm -n												</command> </action> </keybind>
-	<keybind key="W-j"> 	<action name="Execute"> <command>pcmanfm -n /mnt/local/net ~/elektronika/datasheetovi	</command> </action> </keybind>
-	<keybind key="W-k"> 	<action name="Execute"> <command>pcmanfm -n /mnt/local/video /mnt/local/video/filmovi	</command> </action> </keybind>
+	<keybind key="W-j"> 	<action name="Execute"> <command>pcmanfm -n /mnt/local/net ~/elektronika/datasheetovi</command> </action> </keybind>
+	<keybind key="W-k"> 	<action name="Execute"> <command>pcmanfm -n /mnt/local/video /mnt/local/video/filmovi</command> </action> </keybind>
 	<keybind key="W-l"> 	<action name="Execute"> <command>pcmanfm -n /mnt/local/net/music /mnt/local/net/music/flvW /mnt/local/net/music/epic
 												    </command> </action> </keybind>
 
@@ -308,18 +338,13 @@
     <keybind key="W-v"> 	<action name="Execute"> <command>gvim								</command> </action> </keybind>
     <keybind key="W-m"> 	<action name="Execute"> <command>~/.opt/monitor_off.sh	</command> </action> </keybind>
     <keybind key="W-b"> 	<action name="Execute"> <command>~/.opt/xl				</command> </action> </keybind>
-    <!-- <keybind key="F12">		<action name="Execute"> <command>scrot '%y.%m.%d-%H:%M:%S.png' -e 'mv $f ~/ss'	</command> </action> </keybind> -->
-    <keybind key="Print">	<action name="Execute"> <command>scrot '%y.%m.%d-%H:%M:%S.png' -e 'mv $f ~/ss'	</command> </action> </keybind>
-    <keybind key="C-Print">	<action name="Execute"> <command>scrot '%y.%m.%d-%H:%M:%S.png' -se 'mv $f ~/ss'	</command> </action> </keybind>
+    <keybind key="F12">		<action name="Execute"> <command>scrot '%y.%m.%d-%H:%M:%S.png' -e 'mv $f ~/ss'	</command> </action> </keybind>
+	<!-- XXX ne radi ovaj ispod ni sa Shift ni sa Ctrl -->
+    <keybind key="C-F12">	<action name="Execute"> <command>scrot '%y.%m.%d-%H:%M:%S.png' -se 'mv $f ~/ss'	</command> </action> </keybind>
 
-	<!--
     <keybind key="W-comma">	<action name="Execute"> <command>audacious -r	</command> </action> </keybind>
     <keybind key="W-period"><action name="Execute"> <command>audacious -t	</command> </action> </keybind>
     <keybind key="W-slash">	<action name="Execute"> <command>audacious -f	</command>	</action> </keybind>
-	-->
-    <keybind key="W-comma">	<action name="Execute"> <command>deadbeef --prev	</command> </action> </keybind>
-    <keybind key="W-period"><action name="Execute"> <command>deadbeef --play-pause</command> </action> </keybind>
-    <keybind key="W-slash">	<action name="Execute"> <command>deadbeef --next	</command>	</action> </keybind>
     <keybind key="S-W-comma">				<action name="Execute"> <command>mixer pcm -5	</command> </action> </keybind>
     <keybind key="S-W-period">				<action name="Execute"> <command>mixer pcm 0	</command> </action> </keybind>
     <keybind key="S-W-slash">				<action name="Execute"> <command>mixer pcm +5	</command> </action> </keybind>
@@ -344,14 +369,16 @@
     <!-- Set this to TRUE to move the mouse pointer across the desktop when
        switching due to hitting the edge of the screen -->
     <context name="Frame">
-      <mousebind button="A-Left" action="Press">	<action name="Focus"/> <action name="Raise"/>	</mousebind>
-      <mousebind button="A-Left" action="Click">	<action name="Unshade"/>						</mousebind>
-      <mousebind button="A-Left" action="Drag">		<action name="Move"/>							</mousebind>
-
-	  <!-- INFO moje -->
-	  <!-- Sa Alt-Shift i lijevi clik resize window -->
-      <mousebind button="A-S-Left" action="Drag"> <action name="Resize"/> </mousebind>
-
+      <mousebind button="A-Left" action="Press">
+        <action name="Focus"/>
+        <action name="Raise"/>
+      </mousebind>
+      <mousebind button="A-Left" action="Click">
+        <action name="Unshade"/>
+      </mousebind>
+      <mousebind button="A-Left" action="Drag">
+        <action name="Move"/>
+      </mousebind>
       <mousebind button="A-Right" action="Press">
         <action name="Focus"/>
         <action name="Raise"/>
@@ -789,18 +816,11 @@
   # end of the example
 -->
 
-	<!-- default za sve aplikacije, moze se overridead kasnije dolje -->
+	<!-- ovo ce primjenit za aplikacije koje ne nadje ispod u listi -->
+	<!-- izgleda da ce primjenit za sve jer sjebe i PCmanFM koji ispod ima, ali nema eksplicitno position -->
 	<application class="*">
 		<decor>yes</decor>
 		<focus>yes</focus>
-		<position>
-			<x>center</x>
-			<y>center</y>
-		</position>
-	</application>
-
-	<!-- da ne razjebe tint2 taskbar -->
-	<application name="tint2">
 		<position>
 			<x>0</x>
 			<y>0</y>
@@ -822,24 +842,9 @@
 			<y>0</y>
 		</position>
 		<size>
-			<!-- <width>87%</width> T410 -->
-			<width>88%</width>
-			<height>100%</height>
-		</size>	
-		<maximized>vertical</maximized>
-	</application>
-
-	<application class="Konsole">
-		<decor>yes</decor>
-		<position>
-			<x>0</x>
-			<y>0</y>
-		</position>
-		<size>
-			<width>88%</width>
+			<width>87%</width>
 			<height>100%</height>
 		</size>
-		<maximized>vertical</maximized>
 	</application>
 
 	<application name="lxterminal">
@@ -849,10 +854,9 @@
 			<y>0</y>
 		</position>
 		<size>
-			<width>88%</width>
+			<width>87%</width>
 			<height>100%</height>
 		</size>
-		<maximized>vertical</maximized>
 	</application>
 
 	<!-- za sve Firefox dijelove -->
@@ -869,14 +873,7 @@
 		<maximized>yes</maximized>
 	</application>
 	<!-- Firefox bookmarks, nema string/title -->
-	<!-- Isto i Firefox download YT -->
 	<application class="Firefox*" name="Dialog">
-		<!-- 150712	da YT download bude na sredini -->
-		<!-- XXX radi oke za Bookmarks, ne radi oke za YT downloads -->
-		<position>
-			<x>center</x>
-			<y>center</y>
-		</position>
 		<size>
 			<width>60%</width>
 			<height>100%</height>
@@ -893,11 +890,9 @@
 	<!-- Firefox addons-->
 	<application class="Firefox*" name="Addons">
 		<position>
-		<!-- XXX nije mi jasno kako ispadne poravnat na lijevu stranu (iako mi pase) -->
 			<x>center</x>
 		</position>
 		<size>
-			<width>75%</width>
 			<height>100%</height>
 		</size>
 	</application>
@@ -919,14 +914,6 @@
 			<y>center</y>
 		</position>
 	</application>
-	<!-- Firefox Addons Install-->
-	<!-- na sredini manji od Save As, cudno je ako je lijevo i max visine -->
-	<application class="Firefox*" role="Install">
-		<position>
-			<x>center</x>
-			<y>center</y>
-		</position>
-	</application>
 
 	<application name="galculator*">
 		<position>
@@ -936,29 +923,25 @@
 		</position>
 	</application>
 
-	<!-- *********************************************	-->
-	<!--				PcmanFM							-->
-	<!-- *********************************************	-->
-	<application name="pcmanfm*" type="normal*">	<!-- samo standardni pcmanfm, bez dialoga -->
+	<!--
+	<application title="datasheetovi">
+		<desktop>3</desktop>
+	</application>
+	-->
+
+	<!-- za sve PCmanFM -->
+	<application name="pcmanfm*">
+	<application type="normal*">	<!-- samo standardni pcmanfm, bez dialoga -->
 		<decor>yes</decor>	<!-- PCmanFM i bez dekora ima oke dimenzije -->
 		<position>
 			<x>0</x>
 			<y>0</y>
 		</position>
 		<size>
-			<width>88%</width>
+			<width>87%</width>
 			<height>100%</height>
 		</size>
 	</application>
-
-	<!-- <application name="pcmanfm*" type="dialog" title="Rename File"> -->
-	<application name="pcmanfm*" type="dialog">
-		<focus>yes</focus>
-	</application>
-
-	<application name="pcmanfm*" type="normal*" title="datasheetovi">	<!-- samo standardni pcmanfm, bez dialoga -->
-		<focus>no</focus>	<!-- da ga potiho pokrene, bez automatskog switchanja desktopa -->
-		<desktop>3</desktop>
 	</application>
 
 	<!-- PCmanFM	net, datasheetovi	INFO multiple title jer nekad ga nazove po prvom tabu, nekad po zadnjem-->
@@ -991,22 +974,6 @@
 		<desktop>4</desktop>
 	</application>
 
-	<!-- PCmanFM Rename File -->
-	<!-- Da bude na sredini, a ne gore lijevo, defaulte dimenzije su oke -->
-	<application class="Pcmanfm" title="Rename File">
-		<position>
-			<x>center</x>
-			<y>center</y>
-		</position>
-	</application>
-
-	<!-- TODO DeadBeef add dialog
-WM_CLASS(STRING) = "deadbeef", "Deadbeef"
-WM_ICON_NAME(STRING) = "Adding files..."
-_NET_WM_ICON_NAME(UTF8_STRING) = "Adding files..."
-WM_NAME(STRING) = "Adding files..."
-_NET_WM_NAME(UTF8_STRING) = "Adding files..."
--->
 	<application class="MPlayer*">
 		<decor>no</decor>
 		<position>
@@ -1015,9 +982,6 @@ _NET_WM_NAME(UTF8_STRING) = "Adding files..."
 		</position>
 	</application>
 		
-	<!-- *********************************************	-->
-	<!--				Leafpad							-->
-	<!-- *********************************************	-->
 	<application name="leafpad*">
 		<decor>yes</decor>
 		<position>
@@ -1025,14 +989,12 @@ _NET_WM_NAME(UTF8_STRING) = "Adding files..."
 			<y>0</y>
 		</position>
 		<size>
-			<width>88%</width>
+			<width>87%</width>
 			<height>100%</height>
 		</size>
 	</application>
 
-	<!-- *********************************************	-->
-	<!--				Pidgin							-->
-	<!-- *********************************************	-->
+	<!-- Pidgin -->
 	<application role="buddy_list">
 		<decor>yes</decor>
 		<position>
@@ -1054,7 +1016,7 @@ _NET_WM_NAME(UTF8_STRING) = "Adding files..."
 			<y>0</y>
 		</position>
 		<size>
-			<width>88%</width>
+			<width>87%</width>
 			<!-- <height>100%</height> -->
 			<height>100%</height>
 		</size>
@@ -1067,14 +1029,11 @@ _NET_WM_NAME(UTF8_STRING) = "Adding files..."
 			<y>0</y>
 		</position>
 		<size>
-			<width>88%</width>
+			<width>87%</width>
 			<height>100%</height>
 		</size>
 	</application>
 
-	<!-- *********************************************	-->
-	<!--				GViM							-->
-	<!-- *********************************************	-->
 	<application name="gvim">
 		<decor>yes</decor>
 		<position>
@@ -1082,59 +1041,31 @@ _NET_WM_NAME(UTF8_STRING) = "Adding files..."
 			<y>0</y>
 		</position>
 		<size>
-			<width>88%</width>
+			<width>87%</width>
+			<!-- XXX ne ispadne bas 100%, ne pomaze ni 110% ili u pixelima -->
 			<height>100%</height>
 		</size>
-		<maximized>vertical</maximized>
 	</application>
 
 	<application name="feh">
 		<decor>no</decor>
 	</application>
 
-	<!-- *********************************************	-->
-	<!--				Audacious						-->
-	<!-- *********************************************	-->
-	<application name="*unknown*">
+	<application name="gmpc">
 		<decor>no</decor>
 		<maximized>no</maximized>
 		<desktop>2</desktop>
-		<!-- <focus>no</focus>	-->
+		<focus>no</focus>
 		<position>
 			<x>0</x>
 			<y>0</y>
 		</position>
 		<size>
-			<width>88%</width>
-			<height>100%</height>
-		</size>
-	</application>
-	<!-- Audacious Add files-->
-	<application title="Add Files">
-		<decor>yes</decor>
-	</application>
-
-	<!-- *********************************************	-->
-	<!--				DeadBeef						-->
-	<!-- *********************************************	-->
-	<application name="deadbeef*">
-		<decor>yes</decor>
-		<maximized>no</maximized>
-		<desktop>2</desktop>
-		<!-- <focus>no</focus>	-->
-		<position>
-			<x>0</x>
-			<y>0</y>
-		</position>
-		<size>
-			<width>88%</width>
+			<width>87%</width>
 			<height>100%</height>
 		</size>
 	</application>
 
-	<!-- *********************************************	-->
-	<!--					gmrun						-->
-	<!-- *********************************************	-->
 	<application name="gmrun">
 		<decor>no</decor>
 		<position>
@@ -1143,72 +1074,9 @@ _NET_WM_NAME(UTF8_STRING) = "Adding files..."
 		</position>
 	</application>
 
-	<!-- *********************************************	-->
-	<!--					Eagle						-->
-	<!-- *********************************************	-->
-	<!--	eagle control panel -->
-	<application name="eagle">
-		<decor>no</decor>
-		<position>
-			<x>0</x>
-			<y>0</y>
-		</position>
-		<size>
-			<width>50%</width>
-			<height>100%</height>
-		</size>
-	</application>
 
-	<!--	eagle schematic		-->
-	<application name="eagle" title="*Schematic*">
-		<decor>no</decor>
-		<position>
-			<x>0</x>
-			<y>0</y>
-		</position>
-		<size>
-			<width>100%</width>
-			<height>100%</height>
-		</size>
-	</application>
 
-	<!-- Eagle add -->
-	<application name="eagle" title="ADD">
-		<decor>no</decor>
-		<position>
-			<x>0</x>
-			<y>0</y>
-		</position>
-		<size>
-			<width>70%</width>
-			<height>100%</height>
-		</size>
-	</application>
 
-	<!-- Eagle add -->
-	<application name="eagle" type="dialog">
-		<decor>no</decor>
-		<position>
-			<x>center</x>
-			<y>center</y>
-		</position>
-	</application>
-
-	<!-- *********************************************	-->
-	<!--					FreeRouter					-->
-	<!-- *********************************************	-->
-	<!--	eagle control panel -->
-	<application name="Freerouter">
-		<decor>no</decor>
-		<position>
-			<x>0</x>
-			<y>0</y>
-		</position>
-		<size>
-			<width>20%</width>
-			<height>30%</height>
-		</size>
-	</application>
 
 </applications>
 </openbox_config>
