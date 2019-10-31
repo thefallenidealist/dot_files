@@ -1,4 +1,9 @@
 # created 150626
+# Openbox's own autostart mechanism:
+#     sources /etc/xdg/openbox/environment
+#     sources ~/.config/openbox/environment
+#     runs /etc/xdg/openbox/autostart
+#     runs ~/.config/openbox/autostart
 
 tint2 -c ~/.config/tint2/tint2rc &
 xsetroot -solid black &
