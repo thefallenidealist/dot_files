@@ -10,6 +10,7 @@
 clear lock
 ! CapsLock as Super (Win) key
 keycode  66 = Super_L
+keycode 111 = Super_L
 
 ! INFO 180617: Shift+BS will be recognized in xev, but won't work as Delete
 ! keycode  22 = BackSpace Delete BackSpace BackSpace NoSymbol NoSymbol Terminate_Server
@@ -18,15 +19,17 @@ keycode  22 = BackSpace BackSpace BackSpace BackSpace NoSymbol NoSymbol Terminat
 keycode   9 = Escape Escape Escape Escape
 ! the key left of "1"
 keycode  49 = Escape asciitilde grave grave
-! Disable NumLock and ScrollLock
-keycode  77 =
-keycode  78 =
+keycode  78 = Scroll_Lock NoSymbol Scroll_Lock
 
 ! INFO Mode switch is modern ISO_Level3_Shift
 ! 113 was Alt_R
 keycode 113 = Mode_switch Mode_switch
 ! 117 was Menu (mouse right click) key
 keycode 117 = Super_R Super_R
+! INFO 190730: Linux:
+! !keycode 113 = Mode_switch Mode_switch
+! keycode 108 = Mode_switch Mode_switch
+! !keycode 117 = Super_R Super_R
 
 ! defaults ---------------------------------------------------------------------
 !! default keys on us layout

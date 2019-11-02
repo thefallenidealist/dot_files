@@ -4,14 +4,18 @@
 
 ! 190106 FHD LCD: tune a value so Firefox/pcmanfm menus and text are not too small nor too big
 ! default for FHD 14 is 157 dpi
-Xft.dpi: 130
+! Xft.dpi: 130
+! Xft.dpi: 120
+Xft.dpi: 96
+
+! 190915 increase cursor
+! Xcursor.size: 48
+Xcursor.size: 18
+Xcursor.theme: whiteglass
 
 ! XTerm.vt100.translations: #override \n\
 !     Ctrl <Key>M: maximize() \n\
 !     Ctrl <Key>R: restore()
-XTerm.vt100.translations: #override \n\
-    Ctrl <Key>+: larger-vt-font() \n\
-	Ctrl <Key>-: smaller-vt-font()
 
 ! xterm has a convenient builtin function to reverse video, and allows key bindings. I will be using F11.
 *VT100.translations:#override\n<Key>F11:set-reverse-video(toggle)
@@ -23,7 +27,7 @@ XTerm.vt100.translations: #override \n\
 !XTerm*faceName:		xft:bitstream vera sans mono:pixelsize=12
 ! XTerm*faceName:		xft:bitstream vera sans mono:pixelsize=13
 ! 190106 14 FHD LCD change from 12 to 13:
-XTerm*faceName:			xft:Literation Mono Powerline:pixelsize=15
+XTerm*faceName:			xft:Literation Mono Powerline:pixelsize=16
 ! but tmux bar (with current font size) closer to end of xterm window
 xterm*internalBorder:	6 
 ! XTerm*termName:			screen-256color
@@ -112,6 +116,9 @@ XTerm*metaSendsEscape: true
 ! XTerm*VT100.colorUL:		yellow
 ! XTerm*VT100.colorBD:		white	
 ! XTerm*VT100.cursorColor:	lime green
+
+! 191015 change bold blue for ls to something more visible
+XTerm.VT100.color4: CornflowerBlue
 ! -------------------------------------------------------------------------- }}}
 ! urxvt -------------------------------------------------------------------- {{{
 ! ------------------------------------------------------------------------------
@@ -289,20 +296,6 @@ XCalendar*daynumbers.35*Foreground: Red
 ! Xft.antialias: 1
 ! Xft.rgba: rgb
 
-/* *VT100.translations: !override\ */
-!<Key>Prior: scroll-back(1,pages) \n\
-!<Key>Next: scroll-forw(1,pages)\n\
-/* <Key> plus: larger-vt-font() \n\ */
-!Shift <Key> C: select-cursor-start() select-cursor-end(PRIMARY, CUT_BUFFER0) \n\
-! XXX something from below will fuck up =/+ key
-!Shift <Key> V: insert-selection(PRIMARY, CUT_BUFFER0) \n\
-!Shift <Key>Up:          scroll-back(1,lines) \n\
-!Shift <Key>Down:        scroll-forw(1,lines) \n\
-!Shift <Key>Right:       string(0x1b) string("f") \n\
-!Shift <Key>Left:        string(0x1b) string("b") \n\
-!Shift <Key>Delete:      string(0x1b) string(0x08) \n\
-!Shift <Key>Tab:         string(0x1b) string("*") \n\
-
 ! aterm -------------------------------------------------------------------- {{{
 ! ------------------------------------------------------------------------------
 aterm*geometry:         118x49+1+23
@@ -314,10 +307,6 @@ aterm*scrollBar:	no
 ! -------------------------------------------------------------------------- }}}
 
 mupdf*Background: black
-
-! TODO igrat se sa ovim u nadi da se Ctrl-Enter moze remapat u nesta (npr Ctrl-J) i onda to remapat u Vimu kao Ctrl-]
-! *VT100.Translations: !override Shift <Key>Up	string("s-up")
-! *VT100.Translations: !override Ctrl <Key>Up	string("c-up")
 
 ! comment out to enable tmux to set xterm title
 ! allows other processes to send keypress and mouse events to the xterm window. Because of the security risk, do not enable this unless you are very sure you know what you are doing.

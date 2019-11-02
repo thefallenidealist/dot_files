@@ -120,16 +120,17 @@ install_gui()
 
 	# for non-root users only:
 	if [ "$USER_ID" != "0" ]; then
-		ln -sf $BASEDIR/Xdefaults	$HOME/.Xdefaults
-		ln -sf $BASEDIR/xmodmap		$HOME/.xmodmap
-		ln -sf $BASEDIR/gui/xinitrc	$HOME/.xinitrc
-		ln -sf $BASEDIR/xbindkeysrc	$HOME/.xbindkeysrc
+		ln -sf $BASEDIR/gui/Xdefaults	$HOME/.Xdefaults
+		ln -sf $BASEDIR/gui/xmodmap		$HOME/.xmodmap		# TODO 190730: Linux needs patched xmodmap
+		ln -sf $BASEDIR/gui/xinitrc		$HOME/.xinitrc
+		ln -sf $BASEDIR/gui/xbindkeysrc	$HOME/.xbindkeysrc
 		mkdir -p $HOME/.config
 		ln -sf $BASEDIR/gui/openbox	$HOME/.config
 		ln -sf $BASEDIR/gui/tint2	$HOME/.config
 
-		xrdb	$HOME/.Xdefaults
-		xmodmap	$HOME/.xmodmap
+		xrdb		$HOME/.Xdefaults
+		xmodmap		$HOME/.xmodmap
+		xbindkeys	$HOME/.xbindkeysrc
 	else
 		echo "This is root, no X11 conf needed"
 	fi

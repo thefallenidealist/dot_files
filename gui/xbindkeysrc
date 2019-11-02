@@ -4,6 +4,7 @@
 # reload:               xbindkey -p  (it will reload ~/.xbindkeysrc)
 # identify key:         xbindkey -k /-mk (multikey)
 # show/print:           xbindkey -s
+# debug					xbindkey -n # kill xbindkeys first and then press key shortcut
 # Even when you laptop screen is locked you will be able to use xbinded keys (to turn the volume down or up).
 
 # INFO 181202: m:0x40 = mod4 = any Super key
@@ -65,6 +66,27 @@
 	# mod4 + shift + return
 
 # ------------------------------------------------------------------------- }}}
+# hardware control															{{{
+# -----------------------------------------------------------------------------
+"~/scripts/monitor.sh -i"
+	mod4 + F1
+
+"~/scripts/monitor.sh -e"
+	mod4 + F2
+
+"~/scripts/monitor.sh -c"
+	mod4 + F3
+
+"mixer vol +5"
+	XF86AudioRaiseVolume
+
+"mixer vol -5"
+	XF86AudioLowerVolume
+
+"mixer vol 0"
+	XF86AudioMute
+# ------------------------------------------------------------------------- }}}
+
 "skippy-xd"
 	mod4 + Tab
 # programs																	{{{
@@ -73,7 +95,10 @@
 "gmrun"
 	alt + F2
 
-"firefox"
+"firefox -P default"
+	mod4 + shift + w
+
+"firefox -P "kupovanje + main mail""
 	mod4 + shift + e
 
 "pidgin"
@@ -139,17 +164,6 @@
 "mixer vol +5"
 	XF86AudioRaiseVolume
 # ------------------------------------------------------------------------- }}}
-
-# XXX 190106: won't work as a shortcut but will work from gmrun:
-"/home/johnny/src/simple-click-github/simple-click.elf"
-	mod4 + F1
-
-# XXX works only when cwm is not run
-"sleep 1; xdotool --delay 15 click 1"
-	mod4 + F2
-
-"xte 'mouseclick 1'"
-	mod4 + F3
 
 "rofi -matching fuzzy -show run"
 	mod4 + r
