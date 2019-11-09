@@ -35,7 +35,7 @@
 			on: 'Any' - any monitor, 'Mouse' - where the mouse is, 'Active' - where
 		the active window is, 'Primary' - only on the primary monitor -->
 	<!-- <primaryMonitor>1</primaryMonitor> -->
-	<primaryMonitor>Active</primaryMonitor>
+	<primaryMonitor>Primary</primaryMonitor>
 		<!-- The monitor where Openbox should place popup dialogs such as the
 			focus cycling popup, or the desktop switch popup.  It can be an index
 			from 1, specifying a particular monitor.  Or it can be one of the
@@ -190,22 +190,37 @@ cases. -->
 	<keybind key="W-S-Left">	<action name="SendToDesktop">	<to>Left</to>		</action></keybind>
 	<keybind key="W-S-Right">	<action name="SendToDesktop">	<to>Right</to>		</action></keybind>
 
-		<!-- Keybindings for windows -->
+	<!-- Keybindings for windows -->
+	<keybind key="A-Escape"> <action name="Lower"/> <action name="FocusToBottom"/> <action name="Unfocus"/> </keybind>
+	<!-- Alt-F2 reserved for xbindkeys for gmrun or something similar -->
 	<keybind key="A-F3">	<action name="Iconify"/>			</keybind>
 	<keybind key="A-F4">	<action name="Close"/>				</keybind>
 	<keybind key="A-F5">	<action name="ToggleMaximize"/>		</keybind>
+	<keybind key="W-m">		<action name="ToggleMaximize"/>		</keybind>
 	<keybind key="W-f">		<action name="ToggleFullscreen"/>	</keybind>
 	<keybind key="A-F6">	<action name="ToggleMaximize">		<direction>horizontal</direction></action></keybind>
 	<keybind key="A-F7">	<action name="ToggleMaximizeVert"/>	</keybind>
+
 	<keybind key="W-a"><keybind key="g">	<action name="ToggleDecorations"/>	</keybind></keybind>
 	<keybind key="W-a"><keybind key="j">	<action name="Reconfigure"/>		</keybind></keybind>
 	<keybind key="W-a"><keybind key="S-j">	<action name="Restart"/>			</keybind></keybind>
 
 	<keybind key="S-W-r"><action name="Restart"/>			</keybind>
 	<keybind key="S-W-r"><action name="Restart"/>			</keybind>
+	<keybind key="W-Right">
+		<action name="MoveResizeTo">
+			<!-- move the window to the second monitor -->
+			<monitor>next</monitor>
+		</action>
+	</keybind>
+	<keybind key="W-Left">
+		<action name="MoveResizeTo">
+			<!-- move the window to the second monitor -->
+			<monitor>prev</monitor>
+		</action>
+	</keybind>
 
-	<keybind key="A-Escape"> <action name="Lower"/> <action name="FocusToBottom"/> <action name="Unfocus"/> </keybind>
-	<keybind key="A-space"> <action name="ShowMenu"> <menu>client-menu</menu> </action> </keybind>
+	<!-- <keybind key="A-space"> <action name="ShowMenu"> <menu>client-menu</menu> </action> </keybind> -->
 
 	<!-- Keybindings for window switching -->
 	<keybind key="A-Tab"> <action name="NextWindow"> <finalactions>
@@ -766,6 +781,18 @@ cases. -->
 					<x>center</x>
 					<y>center</y>
 				</position>
+			</application>
+
+			<application name="gsimplecal">
+				<position>
+					<x>-2</x>
+					<y>0</y>
+				</position>
+			</application>
+
+			<application name="yterm"> <!-- special version of xterm for use with tint2 -->
+				<decor>no</decor>
+				<skip_taskbar>yes</skip_taskbar>
 			</application>
 
 			<!-- *********************************************	-->

@@ -2,6 +2,10 @@
 # 140000 oldest backup found
 # 181110 major update
 
+# to reload changes:
+# killall -SIGUSR1 tint2
+# also useful is to start tint2 from terminal and read logs
+
 # Backgrounds																{{{
 # -----------------------------------------------------------------------------
 # Gradients
@@ -12,6 +16,8 @@ end_color = #000000 80
 color_stop = 70.000000 #1c1c1c 80
 
 # -----------------------------------------------------------------------------
+# Background 0 - special background, always  transparent
+
 # Background 1: Taskbar
 rounded = 4
 border_width = 1
@@ -130,11 +136,11 @@ background_color_pressed = #000000 80
 border_color_pressed = #555555 80
 
 # Background 13: Executor1: CPU1
-rounded = 2
-border_width = 2
-border_sides = BTLR
-background_color = #202020 100	# grayish
-border_color =     #993300 100	# brownish
+# rounded = 2
+# border_width = 2
+# border_sides = BTLR
+# background_color = #202020 100	# grayish
+# border_color =     #993300 100	# brownish
 # ------------------------------------------------------------------------- }}}
 # Panel																		{{{
 # -----------------------------------------------------------------------------
@@ -145,19 +151,17 @@ border_color =     #993300 100	# brownish
 # E - executor
 # C - clock
 # : - separator
-panel_items = S:T:L:E:E:E:E:B:S:C
-# panel_size = 100% 24
+panel_items = TLE:E:E:E:EBSC
 panel_size = 100% 37
-# panel_size = 100% 4%
 panel_margin = 0 0
-# panel_padding = 2 0 2
 panel_background_id = 12
 wm_menu = 1
 panel_dock = 0
 panel_position = top center horizontal
 # panel_layer = top
 panel_layer = top
-panel_monitor = all
+# panel_monitor = all		# XXX 191101: "all" will break systray area (volumeicon)
+panel_monitor = primary
 strut_policy = follow_size
 panel_window_name = tint2
 disable_transparency = 1
@@ -166,28 +170,13 @@ font_shadow = 0
 mouse_hover_icon_asb = 100 0 10
 mouse_pressed_icon_asb = 100 0 0
 # ------------------------------------------------------------------------- }}}
-# battery																	{{{
-# -----------------------------------------------------------------------------
-# panel_items+=B
-battery = 1				# enable
-battery_hide = never	# never hide
-# bat1_format = %p %t		# INFO 181110: same as default, but not in two line
-# bat1_format = %p
-# bat2_format = %t
-battery_low_status = 10
-# battery_low_cmd = notify-send "battery low" # TODO 181110
-bat1_font = sans 8
-bat2_font = sans 12
-battery_font_color = #cccccc 100
-battery_padding = 2 0	# horizontal vertical
-battery_background_id = 8
-# ------------------------------------------------------------------------- }}}
+#
 # Taskbar																	{{{
 # -----------------------------------------------------------------------------
-taskbar_mode = single_desktop
+# taskbar_mode = single_desktop
+taskbar_mode = multiple_desktop
 taskbar_background_id = 1
-taskbar_background_id = 0
-taskbar_padding = 1 2 2 # H V spacing
+taskbar_padding = 1 2 2		# H V spacing
 taskbar_sort_order = application	# group by application XXX 181110
 
 taskbar_name = 1	# show virtual desktop names
@@ -206,6 +195,22 @@ taskbar_name_active_background_id = 10
 # task_align = left
 #
 # ------------------------------------------------------------------------- }}}
+# Battery																	{{{
+# -----------------------------------------------------------------------------
+# panel_items+=B
+battery = 1				# enable
+battery_hide = never	# never hide
+# bat1_format = %p %t		# INFO 181110: same as default, but not in two line
+# bat1_format = %p
+# bat2_format = %t
+battery_low_status = 10
+battery_low_cmd = notify-send "battery low"
+bat1_font = sans 12
+bat2_font = sans 8
+battery_font_color = #cccccc 100
+battery_padding = 2 0 # horizontal vertical spacing
+battery_background_id = 8
+# ------------------------------------------------------------------------- }}}
 # Task																		{{{
 # -----------------------------------------------------------------------------
 task_icon = 1
@@ -216,10 +221,6 @@ task_thumbnail = 1
 task_maximum_size = 200
 
 
-# task_font = Monospace 8
-# urgent_nb_of_blink = 100000
-# task_padding = 2 2 4
-# task_font_color = #ffffff 100
 task_background_id = 2
 task_active_background_id = 3
 task_urgent_background_id = 4
@@ -238,24 +239,25 @@ tooltip_hide_timeout = 0.1
 tooltip_padding = 2 2
 tooltip_background_id = 6
 tooltip_font_color = #222222 100
+tooltip_font = sans 14
 # ------------------------------------------------------------------------- }}}
 # Clock																		{{{
 # -----------------------------------------------------------------------------
-time1_format = %a %d.%m.%Y. %H:%M
-# time1_format = %a %H:%M
-# time2_format = %d.%m.%Y
-time1_font = sans 12
-# clock_font_color = #888880 100
+# time1_format = %a %d.%m.%Y. %H:%M
+time1_format = %a %H:%M
+time2_format = %d.%m.%Y.
+time1_font = sans 13 bold
+time2_font = sans 11
 clock_font_color = #ffffff 100
+
 clock_padding = 5 0
 clock_background_id = 9
 clock_tooltip = %A, %d. %B %Y. %H:%M:%S
-# clock_tooltip = %H:%M %a %d.%m.%Y.
-clock_lclick_command = ~/scripts/show_desktop.sh
-clock_rclick_command = orage
-clock_mclick_command = 
-clock_uwheel_command = 
-clock_dwheel_command = 
+# clock_lclick_command = LC_ALL=en_GB.UTF-8 gsimplecal
+clock_lclick_command = LC_ALL=en_GB.UTF-8 zenity --calendar --text ""
+clock_lclick_command = ~/scripts/calendar.sh
+
+clock_mclick_command = ~/scripts/show_desktop.sh
 # ------------------------------------------------------------------------- }}}
 # Launcher																	{{{
 # -----------------------------------------------------------------------------
@@ -272,18 +274,20 @@ launcher_tooltip = 1
 launcher_item_app = /usr/local/share/applications/xterm.desktop
 launcher_item_app = /usr/local/share/applications/pcmanfm.desktop
 launcher_item_app = /usr/local/share/applications/firefox.desktop
+# launcher_item_app = /home/johnny/dot_files/gui/volume.desktop
 # launcher_item_app = /usr/share/applications/skypeforlinux.desktop
 # ------------------------------------------------------------------------- }}}
 # System tray (notification area)											{{{
 # -----------------------------------------------------------------------------
-systray_padding = 0 4 2
-systray_background_id = 4
-systray_sort = ascending
-systray_icon_size = 32
-systray_icon_asb = 100 0 0
-systray_monitor = 1
+systray_padding = 0 0
+systray_background_id = 0
+systray_sort = right2left
+# systray_icon_size = 32
+# systray_icon_asb = 100 0 0
+systray_monitor = primary	# 1 or 2 or primary
 # ------------------------------------------------------------------------- }}}
-#-------------------------------------
+# Separators																{{{
+# -----------------------------------------------------------------------------
 # Separator 1
 separator = new
 separator_background_id = 0
@@ -295,7 +299,7 @@ separator_padding = 4 8
 #-------------------------------------
 # Separator 2
 separator = new
-separator_background_id = 1
+separator_background_id = 0
 separator_color = #5d8185 60
 separator_style = line
 separator_size = 2
@@ -329,19 +333,21 @@ separator_size = 2
 separator_padding = 4 8
 
 #-------------------------------------
-# Separator 5
+# Separator 6
 separator = new
 separator_background_id = 0
 separator_color = #5d8185 60
 separator_style = line
 separator_size = 2
 separator_padding = 4 8
+# ------------------------------------------------------------------------- }}}
 # Executor 1 - CPU1															{{{
 # -----------------------------------------------------------------------------
-# Display CPU temperature
+# Display CPU temperature and current frequency
 execp = new
 execp_command = ~/scripts/tint2-cpu1.sh
 execp_interval = 1
+execp_lclick_command = xterm -e htop
 
 execp_font = sans 9
 execp_font_color = #aaffaa 100
@@ -352,13 +358,14 @@ execp_font_color = #aaffaa 100
 execp = new
 execp_command = ~/scripts/tint2-cpu2.sh
 execp_interval = 1
+execp_lclick_command = xterm -e htop
 
 execp_font = sans 9
 execp_font_color = #aaffaa 100
 # ------------------------------------------------------------------------- }}}
 # Executor 3 - RAM															{{{
 # -----------------------------------------------------------------------------
-# Display CPU usage
+# Display free RAM in percentage and MB
 execp = new
 execp_command = ~/scripts/free-memory.sh
 execp_interval = 1
@@ -371,8 +378,49 @@ execp_font_color = #aaffaa 100
 # Display CPU usage
 execp = new
 execp_command = ~/scripts/wlan-status.sh
-execp_interval = 1
+execp_interval = 10
+execp_lclick_command = doas wifimgr
 
 execp_font = sans 9
 execp_font_color = #aaffaa 100
 # ------------------------------------------------------------------------- }}}
+# # Executor 5 - example														{{{
+# # -----------------------------------------------------------------------------
+# execp = new
+# # execp_command =
+# execp_interval = 1
+# execp_has_icon = 0
+# execp_cache_icon = 0
+# execp_continuous = 0
+# execp_markup = 1
+
+# execp_lclick_command = zenity --info --title "tint2 example" --text "Mouse left click"
+# execp_rclick_command = zenity --info --title "tint2 example" --text "Mouse right click"
+# execp_mclick_command = zenity --info --title "tint2 example" --text "Mouse middle click"
+# execp_uwheel_command = zenity --info --title "tint2 example" --text "Mouse wheel up"
+# execp_dwheel_command = zenity --info --title "tint2 example" --text "Mouse wheel down"
+
+# # execp_font = sans 9
+# # execp_font_color = #aaffaa 100
+# execp_font = Liberation Mono 8
+# execp_font_color = #000000 100
+# execp_padding = 0 0
+# execp_background_id = 0
+# execp_centered = 1
+# execp_icon_w = 0
+# execp_icon_h = 0
+# # ------------------------------------------------------------------------- }}}
+# Executor 5 - weather														{{{
+# -----------------------------------------------------------------------------
+execp = new
+execp_command = ~/scripts/weather.sh
+execp_interval = 120
+execp_lclick_command = ~/scripts/weather-xterm.sh
+# don't show output from curl in tooltip
+execp_tooltip =
+
+execp_font = sans 9
+execp_font_color = #aaffaa 100
+# ------------------------------------------------------------------------- }}}
+# applet (FS, net, RAM, CPU) for systray
+# python2.7 ~/scripts/phwmon/phwmon.py --bg 000000

@@ -23,13 +23,13 @@
 "xdotool key --delay 30 Control_L+Next"
 	mod4 + bracketright + release
 
-# PageUp (on T430s) = F21
-"xdotool key F21"
-	release + c:99
+# # PageUp (on T430s) = F21
+# "xdotool key F21"
+# 	release + c:99
 
-# PageDown (on T430s) = F22
-"xdotool key F22"
-	release + c:105
+# # PageDown (on T430s) = F22
+# "xdotool key F22"
+# 	release + c:105
 
 # Super + Home = PageUp
 "xdotool key Prior"
@@ -128,7 +128,7 @@
 "xterm -e nvim"
 	mod4 + shift + v
 
-"pcmanfm -n Downloads"
+"pcmanfm -n ~/Downloads"
 	mod4 + shift + o
 
 "scrot '%y.%m.%d-%H:%M:%S.png' -e 'mv $f ~/ss'"

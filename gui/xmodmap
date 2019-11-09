@@ -149,20 +149,14 @@ keycode 140 = XF86AudioMute NoSymbol XF86AudioMute
 keycode 150 = NoSymbol NoSymbol
 keycode 150 = F15 F15 F15
 
-! This is already default
 !! Fn + Left
 !keycode 144 = XF86AudioPrev NoSymbol XF86AudioPrev
 !! Fn + Right
 !keycode 153 = XF86AudioNext NoSymbol XF86AudioNext
-!! lower volume
 !keycode 174 = XF86AudioLowerVolume NoSymbol XF86AudioLowerVolume
-!! raise volume
 !keycode 176 = XF86AudioRaiseVolume NoSymbol XF86AudioRaiseVolume
-!
-!keycode 162 = XF86AudioPlay XF86AudioPause XF86AudioPlay XF86AudioPause XF86AudioPlay XF86AudioPause
-!keycode 164 = XF86AudioStop XF86Eject XF86AudioStop XF86Eject XF86AudioStop XF86Eject
 
-! ThinkPad keys
+! ThinkPad keys (on 7 row keyboards, T410/T420)
 keycode 233 = F22
 keycode 234 = F21
 !---------------------------------------------------------------------------}}}

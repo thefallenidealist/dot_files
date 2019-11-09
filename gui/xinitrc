@@ -25,10 +25,9 @@ osdmixer $((RESOLUTION_X/4)) 100 d d&
 # start compton compositor (slows down dwm, but gives great video
 # playback, no shadows, no frills)
 #--no-fading-openclose
-compton --backend=glx --no-dock-shadow \
-  --no-dnd-shadow --shadow-opacity=0 --menu-opacity=1 \
-  --glx-no-stencil --fade-delta=3 --daemon
-  # --glx-no-stencil --fade-delta=5 --daemon
+# compton --backend=glx --no-dock-shadow \
+#   --no-dnd-shadow --shadow-opacity=0 --menu-opacity=1 \
+#   --glx-no-stencil --fade-delta=3 --daemon
 
 hsetroot -solid '#000000' #	compton cannot use xsetroot
 
@@ -52,13 +51,18 @@ dunst&
 
 # INFO 190317: setting DPI
 # xrandr --dpi 192&
-xrandr --dpi 96&
+# xrandr --dpi 96&
+# xrandr --dpi 120&
+xrandr --dpi 96 &
+# xrdb -merge $HOME/.Xresources
 
 # xterm -title tp.root -e 'echo tp root && su -l'&				# tp root
 # exec xterm -title glavni -geometry 100x20+50+50 -e tmux
-exec xterm -title glavni -geometry 100x20+50+50 -e 'tmux new-session -d -s glavni -n Wcwm ; tmux send-keys -t glavni:Wcwm "cwm -vv" Enter; tmux attach -t glavni:Wcwm '
+# exec xterm -title glavni -geometry 100x20+50+50 -e 'tmux new-session -d -s glavni -n Wcwm ; tmux send-keys -t glavni:Wcwm "cwm -vv" Enter; tmux attach -t glavni:Wcwm '
 
 # xrandr --dpi 144
 # 181107:
-exec $HOME/.opt/bin/cwm -vv
+# exec $HOME/.opt/bin/cwm -vv
 # exec $HOME/.opt/bin/aphelia
+# 191028
+exec openbox
