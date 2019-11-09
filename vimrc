@@ -22,7 +22,7 @@ filetype plugin indent on
 set showmatch		" show matching search as you type
 set background=dark
 set laststatus=2	" always show status bar
-set lazyredraw		" possible fix for slow j/k		INFO disabling cursorline also results in speedup
+set lazyredraw		" don't redraw screen in the middle of a macro
 set hidden			" allow changing window without saving buffer first, also needed for Ctrl-Space plugin
 set showcmd			" show size of visual block in cmdline at right
 
@@ -72,21 +72,10 @@ set encoding=utf-8	" otherwise gVim will complain about listchars and showbreak
 set diffopt+=vertical
 "		<tab> and wrapping			{{{
 """""""""""""""""""""""""""""""""""""""
-if (s:work_pc == 1)
-	" you can't use variables on the rhs in the .vimrc.
-	set tabstop=3		" tab size
-	set shiftwidth=3 	" when indenting with '>'
-	set expandtab		" convert tab to spaces
-	set softtabstop=3	" smart <BS> - delete 4 chars"
-	set textwidth=120
-	set diffopt+=iwhite	" ignore whitespace changes and also newlines (^M)
-else
-	set tabstop=4		" tab size
-	set shiftwidth=4 	" when indenting with '>'
-	" 180114: I surrender, spaces as tab:
-	" set expandtab		" convert tab to spaces
-	set softtabstop=4	" smart <BS> - delete 4 chars"
-endif
+set tabstop=4		" tab size
+set shiftwidth=4 	" when indenting with '>'
+" set expandtab		" convert tab to spaces
+set softtabstop=4	" smart <BS> - delete 4 chars"
 
 " soft wrap
 set wrap			" soft break when line is wider than Vim window (not tw)
@@ -133,12 +122,27 @@ set listchars=tab:\│·,extends:>,precedes:<
 " set listchars+=trail:◊
 set list	" show invisible chars (tabs and others defined in listchars)
 
+" undo, swap and backup														{{{
+" -----------------------------------------------------------------------------
 " backupdir (file.txt~), directory (file.txt.swp)
-set backupdir=~/.vim/backup//
+set swapfile
 set directory=~/.vim/swap//
+set writebackup " protect against crash-during-write
+set nobackup " but do not persist backup after successful write
+set backupdir=~/.vim/backup//
+set undofile
 set undodir=~/.vim/undo//
-set undofile	" remember undo after closing buffer
-set nobackup noswapfile
+
+" Create undo directory
+if !isdirectory($HOME . "/.vim/undo")
+call mkdir($HOME . "/.vim/swap", "p")
+call mkdir($HOME . "/.vim/backup", "p")
+call mkdir($HOME . "/.vim/undo", "p")
+call setfperm($HOME . "/.vim/swap",   "rwx------")
+call setfperm($HOME . "/.vim/backup", "rwx------")
+call setfperm($HOME . "/.vim/undo",   "rwx------")
+endif
+" ------------------------------------------------------------------------- }}}
 "		search						{{{
 """""""""""""""""""""""""""""""""""""""
 set ignorecase		" case insensitive search, needed for the line below
@@ -170,6 +174,7 @@ set formatoptions+=j	" pretty formating when joining lines (key J)
 set sessionoptions=buffers,curdir,folds,help,winpos
 " XXX 181128: won't restore full help window: status will be 'Normal', not
 " 'Help' s so <C-]> won't work as expected
+set foldmethod=marker
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		OS specific															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -190,13 +195,17 @@ if has('unix')
 		let g:ctags_exe='/usr/bin/ctags-exuberant'
 	endif " uname
 elseif has('win32')
+	" INFO 190516: /c/python3_x64/python.exe -m pip install --upgrade pip pywin
 	let $PATH.=';C:\bin'			" place where win32yank is
 	let $PATH.=';C:\python35_x64'	" work PC
 	let g:ctags_exe='c:\bin\ctags.exe'
-	let g:python3_host_prog='python.exe'
 	if substitute(system('is_sverige'), '\n','','g') == "1"
-		let g:python3_host_prog='C:\python35_x64\python.exe'
+		let g:python3_host_prog='C:\python3_x64\python.exe'
+		" download from llvm.org "Pre-built Binaries" for Winsows (64-bit)
+		" let g:ncm2_pyclang#library_path = 'C:\msys64\mingw64\bin\libclang.dll'
+		" let g:ncm2_pyclang#library_path = 'C:\Program Files\LLVM\lib\clang\8.0.0\lib\windows'
 	endif
+	cabbrev rm del
 endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		build/programming			{{{
@@ -239,6 +248,7 @@ augroup my_group_with_a_very_uniq_name
 
 	autocmd FileType xdefaults set commentstring=!%s
 	autocmd FileType pf,dnsmasq,fstab,cfg,gitconfig,crontab,sshdconfig setlocal commentstring=#\ %s
+	autocmd FileType c setlocal commentstring=\/\/\ %s
 
 	" Warn if file in current buffer is changed outside of Vim
 	" - default: just warning when trying to write to the file
@@ -250,6 +260,11 @@ augroup my_group_with_a_very_uniq_name
 
 	" close preview window if it is last
 	autocmd WinEnter * if &previewwindow | nnoremap <buffer> q :q!<cr> | endif
+	" close quickfix if last
+	autocmd WinEnter * if winnr('$') == 1 && getbufvar(winbufnr(winnr()), "&buftype") == "quickfix"|q|endif
+	" TODO 190527: close also if QF + NERDTree
+	autocmd WinEnter * if (winnr('$') == 2 && getbufvar(winbufnr(winnr()), "&buftype") == "quickfix" && exists("b:NERDTree") && b:NERDTree.isTabTree()) |q|endif
+
 
 	" close NERDTree/Tagbar if it is last window
 	autocmd BufEnter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
@@ -262,6 +277,9 @@ augroup my_group_with_a_very_uniq_name
 
 	" maps in git messenger floating window
 	autocmd FileType gitmessengerpopup map <buffer> <esc> q
+
+	au InsertEnter * set norelativenumber
+	au InsertLeave * set relativenumber
 augroup END
 
 " setup when in diff mode:
@@ -472,6 +490,8 @@ inoremap <A-w> <C-o>:BD<cr>
 nnoremap <silent><Tab> :call SwitchWindow()<cr>
 " XXX 190422 (works on Windows): " TODO 190516
 nnoremap <C-w><C-c> :wincmd c<cr>
+nnoremap <C-w><C-x> :wincmd l<cr>:wincmd c<cr>:echo "closed window on the right side"<cr>
+nnoremap <C-w>x :wincmd l<cr>:wincmd c<cr>:echo "closed window on the right side"<cr>
 " other options: P: reverse previous, W: reverse next
 
 if has('nvim')
@@ -665,11 +685,12 @@ nnoremap <leader>e :e $MYVIMRC<cr>
 " paste and adjuste indent
 nnoremap p ]p
 nnoremap P ]P
-" nnoremap p p=`]
-" nnoremap P P=`]
+nnoremap p p=`]
+nnoremap P P=`]
 
 " delete to the black hole (_) register
 nnoremap dd "_dd
+nnoremap x "_x
 nnoremap D "_D
 nnoremap C "_C
 nnoremap yD D
@@ -680,6 +701,7 @@ nnoremap diw "_diw
 nnoremap ciw "_ciw
 nnoremap Y y$
 nnoremap X "_X
+nnoremap x "_x
 " yank and delete
 nnoremap dy yydd
 nnoremap yd yydd
@@ -705,8 +727,9 @@ if has('clipboard')	" not really needed for all options under this
 	" shift + {1,2,3} = X11 1st, X11 2nd, tmux
 	inoremap <C-r>! <C-o>"*]p<C-o>:echo "paste from the X11 1st clipboard"<cr>
 	inoremap <C-r>@ <C-o>"+]p<C-o>:echo "paste from the X11 2st clipboard"<cr>
+	inoremap <C-r># <C-o>:Tput<cr><C-o>:echo "paste from the clipboard"<cr>
 
-	" tmux:
+	" tmux keybindings:
 	" p - tmux buffer paste
 	" P - X11 2nd
 	" [ - X11 1st
@@ -723,8 +746,8 @@ if has('clipboard')	" not really needed for all options under this
 	" X11 secondary buffer		"+
 	" TODO TODO set paste mode before pasting
 	vnoremap <leader>y "+y:echo  "copied to the X11 2nd clipboard"<cr>
-	nnoremap <leader>yy "+yy:echo "line copied to the X11 2nd clipboard"<cr>
 	nnoremap <leader>y "+yiw:echo "word copied to the X11 2nd clipboard"<cr>
+	nnoremap <leader>yy "+yy:echo "line copied to the X11 2nd clipboard"<cr>
 	nnoremap <leader>p "+p:echo  "pasted from the X11 2nd clipboard"<cr>
 	vnoremap <leader>p "+p:echo  "pasted from the X11 2nd clipboard"<cr>
 
@@ -734,9 +757,6 @@ if has('clipboard')	" not really needed for all options under this
 	nnoremap <leader>p! "*p:echo "pasted from the X11 1st clipboard"<cr>
 	nnoremap <leader>p@ "+p:echo "pasted from the X11 2nd clipboard"<cr>
 
-	" tmux paste (needs plugin)
-	" nnoremap <leader>t :Tput<cr>:echo "copied from tmux buffer"<cr>
-
 	cnoremap <C-r>! <C-r>*
 	cnoremap <C-r>@ <C-r>+
 
@@ -744,14 +764,6 @@ if has('clipboard')	" not really needed for all options under this
 	inoremap <S-Insert> <C-r>*
 	" ThinkPad keyboard compat:
 	inoremap <S-Delete> <C-r>*
-endif
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-nnoremap <leader>ff  :let @" = expand("%")<cr>:echo   "relative path of the file copied to the unnamed register"<CR>
-" Easier copy/paste to the named registers
-" INFO this will slowdown copy to the X11 clipboard (<leader>y)
-" TODO :set paste [y/d/p] :set nopaste
-
-if has('nvim')
 	" needed for nvim-qt.exe
 	cnoremap <S-Insert> <C-r>+
 endif
@@ -957,6 +969,22 @@ function! HeaderToggle()                                                   " {{{
 		else
 			echo join([err_msg, next_file], "")
 		endif
+	elseif extension == "cpp"
+		let next_file = join([file_name, ".hpp"], "")
+
+		if filereadable(next_file)
+			:e %<.hpp
+		else
+			echo join([err_msg, next_file], "")
+		endif
+	elseif extension == "hpp"
+		let next_file = join([file_name, ".cpp"], "")
+
+		if filereadable(next_file)
+			:e %<.cpp
+		else
+			echo join([err_msg, next_file], "")
+		endif
 	endif
 endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
@@ -979,26 +1007,73 @@ call SetupCommandAlias("regc",  "call RegisterClear()")
 " ------------------------------------------------------------------------- }}}
 " switch window																{{{
 " ------------------------------------------------------------------------- }}}
-" created 190524
+function! SwitchWindow()												"  {{{
+" -----------------------------------------------------------------------------
+" created by me on 190524
 " - switch to previous window if available
 " - if not, then cycle
 " - usefull after closing quickfix/location list
-
-function! SwitchWindow()
 	let l:prev_window = winnr('#')
 	let l:curr_window = winnr()
 	" echo "Previous: " . l:prev_window . " current: " . l:curr_window
 
 	if l:prev_window == 0	" there is no previous window, just cycle
+		" echo "No previous window"
 		wincmd w
 	elseif l:curr_window == l:prev_window
+		" echo "same windows"
 		" for git windows, when split is closed
 		wincmd w
 	else	" there is previous window
+		" echo "switch to previous"
 		wincmd p
 	endif
 endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+function! Line(...)														" {{{
+" ---------------------------------------------------------------------------
+	" created by me on 190520
+	let l:arg_num=a:0
+	let s:line0 = "									{{{"
+	" fold mark just to make it in synch with printf() bellow	{{{
+
+	if &commentstring == '// %s'
+		let s:line1 = printf(" --------------------------------------------------------------------------")
+		let s:line2 = printf(" ---------------------------------------------------------------------- }}}")
+	else
+		let s:line1 = printf(" ---------------------------------------------------------------------------")
+		let s:line2 = printf(" ----------------------------------------------------------------------- }}}")
+	endif
+	let s:line1 = substitute(&commentstring, "%s", s:line1, "")
+	let s:line2 = substitute(&commentstring, "%s", s:line2, "")
+	let s:line0 = substitute(&commentstring, "%s", s:line0, "")
+
+	if l:arg_num == "0"
+		" Just append lines bellow cursor
+		call append(line("."), s:line2)
+		call append(line("."), s:line1)
+		call append(line("."), s:line0)
+		" silent exe "startinsert"
+		call feedkeys('j0la', 'n')
+	elseif l:arg_num == "1"
+		let l:arg1=a:1
+		if l:arg1 == "1"
+			call append(line("."), s:line1)
+		elseif l:arg1 == "2"
+			call append(line("."), s:line2)
+		else
+			echo "arg is wrong"
+		endif
+	else
+		echo "Wrong number of arguments: " arg_num
+	endif
+endfunction
+
+call SetupCommandAlias("lines", "call Line()")
+call SetupCommandAlias("line", "call Line()")
+call SetupCommandAlias("line1", "call Line(1)")
+call SetupCommandAlias("line2", "call Line(2)")
+" ----------------------------------------------------------------------- }}}
 
 " Plugins																	{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1043,12 +1118,13 @@ Plug 'tpope/vim-unimpaired'	" easier movements around, like [q, ]q (quickfick)
 " Plug 'vim-scripts/VisIncr'
 " Vim 8: visual select and Ctrl-A
 Plug 'Valloric/ListToggle'	" toggle quickfix and location list
+Plug 'stefandtw/quickfix-reflector.vim'		" editable quickfix
 
 Plug 'SirVer/ultisnips'		" snippet engine
 " Plug 'honza/vim-snippets'	" snippet collection
 " Auto generate incremetal tags
 Plug 'ludovicchabant/vim-gutentags', { 'for': 'c,cpp,rust' }
-" Plug 'ludovicchabant/vim-gutentags'
+Plug 'jsfaint/gen_tags.vim'
 Plug 'majutsushi/tagbar'	" show tags (func, vars) in window right
 " Plug 'vim-scripts/TagHighlight'	" color typedefs as variables, needs
 " :UpdateTypesFile
@@ -1056,7 +1132,8 @@ Plug 'octol/vim-cpp-enhanced-highlight'	" simpler works out-of-the books, but no
 										" INFO 180525: This line must be here, otherwise C functions won't be highlighted
 " Plug 'jeaye/color_coded'	" semantic highlighter INFO 170818: doesn't work in nvim
 
-Plug 'chrisbra/NrrwRgn' " narrow region
+" Plug 'chrisbra/NrrwRgn' " narrow region
+" Plug 'kana/vim-altr'	" switch files easy
 
 " ******************** files
 " CtrlP look-a-like
@@ -1071,6 +1148,8 @@ Plug 'scrooloose/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 
 Plug 'vim-airline/vim-airline'
+" Plug 'rbong/vim-crystalline'
+" Plug 'mkitt/tabline.vim'
 Plug 'gcmt/taboo.vim'				" Rename tabs
 Plug 'skywind3000/vim-preview'		" preview ctags in vsplit
 
@@ -1079,7 +1158,7 @@ Plug 'ciaranm/securemodelines'
 Plug 'henrik/vim-indexed-search'	" show search as: result 123 of 456
 Plug 'osyo-manga/vim-anzu'			" show search matches in statusline
 									" (second from the right)
-Plug 'jiangmiao/auto-pairs'			" auto close quotes, brackets, ...
+" Plug 'jiangmiao/auto-pairs'			" auto close quotes, brackets, ...
 Plug 'tpope/vim-surround'			" replace quotes, brackets,...
 Plug 'tpope/vim-repeat'             " repeat with . previous plugin
 Plug 'vim-scripts/visualrepeat'
@@ -1184,49 +1263,71 @@ let g:ncm2_pyclang#library_path = '/usr/local/llvm60/lib/libclang.so'
 " ------------------------------------------------------------------------- }}}
 " Linter																	{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" INFO 170812: Will only show the first error, can't show multiple errors
-"              Maybe linter's fault
-" keep the sign gutter open at all times
-let g:ale_sign_column_always = 1
-" INFO 170813: It will be always 2 chars wide, and space is not allowed
-let g:ale_sign_error = '─>'
-let g:ale_sign_warning = '─>'
+" INFO 190422: It is not possible to configure how quickfix locations are
+" displayed. It is only possible to specify how to interpret them with the
+" errorformat option
 
-" for moving between warnings and errors quickly.
-" INFO 170812: There is no support to recognize warnings and errors
-nmap <silent> ]e <Plug>(ale_next_wrap)
-nmap <silent> [e <Plug>(ale_prev_wrap)
+if exists(':Neomake')
+	" call neomake#configure#automake('nrwi', 500)
+	" call neomake#configure#automake('w')
+endif
+" uses location list (:lnext/:prev/[l/]l)
+" unimpared is unconfigurable and already uses [e ]e shortcuts
 
-" run linter only on save
-let g:ale_lint_on_text_changed = 'never'
-" You can disable this option too
-" if you don't want linters to run on opening a file
-" let g:ale_lint_on_enter = 0
+" open the list automatically:
+" let g:neomake_open_list = 2
 
-" use the quickfix list instead of the loclist
-" let g:ale_set_loclist = 0
-" let g:ale_set_quickfix = 1
+nnoremap [e :lprev<cr>
+nnoremap ]e :lnext<cr>
+nnoremap [E :lfirst<cr>
+nnoremap ]E :llast<cr>
+nnoremap [w :lprev<cr>
+nnoremap ]w :lnext<cr>
 
-" Disable linting for some filetypes
-let g:ale_pattern_options = {'\.txt$': {'ale_enabled': 0}}
+highlight LinterErrorSign   ctermfg=red    ctermbg=black
+highlight LinterWarningSign ctermfg=yellow ctermbg=black
+highlight LinterMessageSign ctermfg=white  ctermbg=black
+let g:neomake_error_sign =   {'text': '->', 'texthl': 'LinterErrorSign'}
+let g:neomake_warning_sign = {'text': '->', 'texthl': 'LinterWarningSign', }
+let g:neomake_message_sign = {'text': '->', 'texthl': 'LinterMessageSign', }
 
-" XXX razjebat ce ako se napise to nasred linije
+" let g:neomake_c_enabled_makers=['gcc']
+" let g:neomake_gcc_args=[
+"     \ '-fsyntax-only',
+"     \ '-std=gnu11',
+"     \ '-Wall',
+"     \ '-Wextra',
+"     \ '-fopenmp',
+"     \ '-I.'
+"     \ ]
+let g:neomake_c_clangcheck_exe='clang-check60'
+nnoremap <F5> :Neomake! make<cr>
+nnoremap <F6> :Neomake<cr>
+nnoremap <A-r> :Neomake<cr>
+nnoremap <leader>rr :Neomake<cr>
 
-cabbrev lintoff ALEDisable
-cabbrev linton ALEenable
-cabbrev lint ALEToggle
+" let g:neomake_c_lint_maker = {
+" 	\ 'exe': 'lint',
+" 	\ 'args': ['--option', 'x'],
+" 	\ 'errorformat': '%f:%l:%c: %m',
+" 	\ }
 
-" Set this. Airline will handle the rest.
-let g:airline#extensions#ale#enabled = 1
+" let g:neomake_c_enabled_makers=['gcc']
+let g:neomake_c_enabled_makers=['gcc']
+let g:neomake_make_maker = {
+	\ 'exe': 'gmake',
+	\ 'args': ['elf'],
+	\ 'errorformat': '%f:%l:%c: %m',
+	\ }
+	 " 'errorformat': '%f:%l:%c: %m',
+" " Use the maker like this:
+" " :Neomake! make
 
-" install rls:
-" rustup component add rls --toolchain nightly
-" rustup component add rust-analysis --toolchain nightly
-" rustup component add rust-src --toolchain nightly
-let g:ale_linters = {'rust': ['rustc']}
-" let g:ale_linters = {'rust': ['rls']}
-"  g:ale_rust_rls_executable
-" let g:ale_rust_ignore_error_codes = ['E0432', 'E0433']
+let g:neomake_c_armgcc_maker={
+			\  'exe': 'arm-none-eabi-gcc',
+			\ 'args': ['-mcpu=cortex-m3', '-O0', '-g3', '-nostdlib', '-mfloat-abi=soft', '-Wall', '-Wextra', '-DSTM32F10X_MD', '-DSTM32F1', '-I.', '-Isrc/lib', '-Isrc/lib/inc', '-Isrc', '-ffreestanding', '-mthumb', '-c', ],
+			\ 'errorformat': '%f:%l:%c: %m', }
+set makeprg='gmake'
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " Rust																	{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1269,6 +1370,27 @@ let g:airline#extensions#obsession#indicator_text = 'Ses' " default: '$'
 " don't show git branch nor hunbks
 let g:airline#extensions#branch#enabled = 0
 let g:airline#extensions#hunks#enabled = 0
+
+
+" function! StatusLine(current, width)
+"   return (a:current ? crystalline#mode() . '%#Crystalline#' : '%#CrystallineInactive#')
+"         \ . ' %f%h%w%m%r '
+"         \ . (a:current ? '%#CrystallineFill# %{fugitive#head()} ' : '')
+"         \ . '%=' . (a:current ? '%#Crystalline# %{&paste?"PASTE ":""}%{&spell?"SPELL ":""}' . crystalline#mode_color() : '')
+"         \ . (a:width > 80 ? ' %{&ft}[%{&enc}][%{&ffs}] %l/%L %c%V %P ' : ' ')
+" endfunction
+
+" function! TabLine()
+"   let l:vimlabel = has("nvim") ?  " NVIM " : " VIM "
+"   return crystalline#bufferline(2, len(l:vimlabel), 1) . '%=%#CrystallineTab# ' . l:vimlabel
+" endfunction
+
+" let g:crystalline_statusline_fn = 'StatusLine'
+" let g:crystalline_tabline_fn = 'TabLine'
+" let g:crystalline_theme = 'default'
+
+" set showtabline=2
+" set laststatus=2
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 
 " snippets																	{{{
@@ -1410,13 +1532,13 @@ highlight link GitGutterChangeDelete GitGutterChange
 let g:gitgutter_max_signs=5000	" default was 500
 
 " TODO 170813: goto first line of the preview window
-nmap <Leader>gv <Plug>GitGutterPreviewHunk :wincmd P<CR> :1<CR>
-nmap <Leader>ga <Plug>GitGutterStageHunk
-nmap <Leader>gr <Plug>GitGutterUndoHunk
-nmap <Leader>gu <Plug>GitGutterUndoHunk
+nmap <Leader>gv <Plug>(GitGutterPreviewHunk) :wincmd P<CR> :1<CR>
+nmap <Leader>ga <Plug>(GitGutterStageHunk)
+nmap <Leader>gr <Plug>(GitGutterUndoHunk)
+nmap <Leader>gu <Plug>(GitGutterUndoHunk)
 
 call SetupCommandAlias("gitt","GitGutterToggle")
-call SetupCommandAlias("Gcc","Gcommit -m")
+call SetupCommandAlias("Gcc","Gcommit")
 call SetupCommandAlias("Gcm","Gcommit -m")
 call SetupCommandAlias("Gca","Gcommit --amend")
 call SetupCommandAlias("Gce","Gcommit --amend --no-edit")
@@ -1519,8 +1641,11 @@ call SetupCommandAlias("tagu!","GutentagsUpdate!")
 " 190512
 " Press tag into vsplit windows, press again to jump to another tag in another file
 " C-w z to close it
-nnoremap <C-\> :PreviewTag<cr>
+nnoremap <silent> <C-\> :PreviewTag<cr>
+" nnoremap <silent> <M-e> :PreviewScroll +1<cr>
+" nnoremap <silent> <M-y> :PreviewScroll -1<cr>
 " :PreviewSignature
+" noremap <C-\|>:PreviewSignature!<cr>
 
 " uctags -R --sort=foldcase --c++-kinds=+p --fields=+ianS --extras=+q -f ~/.vim/tags/libc.tags /usr/include
 set tags+=~/.vim/tags/libc.tags
@@ -1919,8 +2044,8 @@ autocmd BufWinEnter,WinEnter term://* startinsert
 " Easier way to jump to alternate file
 " nnoremap <BS> <C-^>
 
-" editing binary files:
-" 		https://vi.stackexchange.com/questions/343/how-to-edit-binary-files-with-vim
+" editing binary files (XXX 190824 only for vim which includes xxd binary)
+" https://vi.stackexchange.com/questions/343/how-to-edit-binary-files-with-vim
 nmap <leader>hr :set binary<CR> :%!xxd<CR> :set filetype=xxd<CR>
 nmap <leader>hw :%!xxd -r<CR> :set binary<CR> :set filetype=<CR> :set fileencoding=<CR> :w<CR> :set nobinary<CR>
 
@@ -2253,3 +2378,9 @@ nnoremap <End> G
 " Log files will be generated with prefix /tmp/nvim_log
 let $NVIM_PYTHON_LOG_FILE="/tmp/nvim_log"
 let $NVIM_PYTHON_LOG_LEVEL="DEBUG"
+" fold {{{
+" -----------------------------------------------------------------------------
+" ------------------------------------------------------------------------- }}}
+"
+" autocmd User VimagitEnterCommit setlocal textwidth=72
+" autocmd User VimagitLeaveCommit setlocal textwidth=0

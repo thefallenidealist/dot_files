@@ -1,8 +1,6 @@
 # Created 181108
 #  vim: set ft=conf ts=4 sw=4 tw=0 fdm=marker noet :
 
-# gap 24 0 0 0    # leave 30 pixels at top of the screen
-
 gap 38 0 0 0    # leave 30 pixels at top of the screen
 # INFO 181109: ThinkPad: 38 pixels because when 30 pixel is used, maximized xterm window still doesn't use extra space
 
@@ -76,9 +74,10 @@ unbind-key	M-period	# used in tmux
 bind-key	4-Return	terminal
 bind-key	4S-Return	"xterm -e tmux"
 bind-key	4M-r		restart
-bind-key	4-Escape	quit
+bind-key	4M-Escape	quit
+bind-key	4M-q		quit
 unbind-key	CMS-q
-bind-key	4-r			menu-exec		# execute programs from $PATH
+# bind-key	4-r			menu-exec		# rofi via xbindkeys is used instead
 bind-key	4-space		menu-window		# search for window
 # bind-key	C-space		menu-cmd		# execute program from application menu
 
@@ -86,6 +85,10 @@ bind-key	4-space		menu-window		# search for window
 # -----------------------------------------------------------------------------
 bind-key	M-Tab		window-cycle-ingroup
 bind-key	MS-Tab		window-rcycle-ingroup
+bind-key	4-k			window-cycle-ingroup
+bind-key	4-j			window-rcycle-ingroup
+# TODO 190526: implement: 4-K/J		- rearrange windows in current group
+
 # bind-key	M-Tab		window-cycle
 # bind-key	MS-Tab		window-rcycle
 bind-key	M-F3		window-hide
@@ -99,7 +102,6 @@ unbind-key	M-S-Return
 # bind-key	M-S-Return	window-fullscreen
 
 bind-key	4-m			window-maximize
-# bind-key	4-n			window-hide
 bind-key	4-comma		window-hide
 bind-key	4-period	window-minimize
 # bind-key	4-j			window-rcycle
@@ -132,8 +134,8 @@ bind-key	4M-v		window-vtile
 # -----------------------------------------------------------------------------
 bind-key	4-h		group-rcycle	# move to non-empty desktop left
 bind-key	4-l		group-cycle		# move to non-empty desktop right
-bind-key	F21		group-rcycle	# move to non-empty desktop left
-bind-key	F22		group-cycle		# move to non-empty desktop right
+# bind-key	F21		group-rcycle	# move to non-empty desktop left
+# bind-key	F22		group-cycle		# move to non-empty desktop right
 
 bind-key	4-1		group-only-1
 bind-key	4-2		group-only-2
@@ -205,3 +207,6 @@ autogroup 0 conky
 
 # TODO 181109: 
 # alt esc toogle last two (even across desktops)
+
+# XXX
+# 190526 selecting window with "skippy-xd" (shortcut: 4+tab) will remember mouse coordinates

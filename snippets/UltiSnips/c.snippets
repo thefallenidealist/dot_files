@@ -21,6 +21,10 @@ snippet incbool "include stdbool"
 #include <stdbool.h>${0}
 endsnippet
 
+snippet inc "#include local"
+#include "${1}"${0}
+endsnippet
+
 snippet deftype "define u8 -> uint8_t"
 #define u32 uint32_t
 #define u16 uint16_t
@@ -98,19 +102,54 @@ snippet i32 "expand i32 int32_t"
 int32_t 
 endsnippet
 
+snippet u8 "expand u8 uint8_t"
+uint8_t ${1}
+endsnippet
+
+snippet u16 "expand u16 uint16_t"
+uint16_t ${1}
+endsnippet
+
 snippet ifdef "#ifdef #endif"
 #ifdef ${1}
 ${0}
 #endif
 endsnippet
 
-snippet for "for (uint8 i = 0)"
-for (uint8_t i = 0; i < ${1}; i++)
+snippet for "for (uint8 X = 0)"
+for (${1:uint8_t} ${2:i} = 0; $2 < ${3}; $2++)
 {
 	${0}
 }
 endsnippet
 
+# XXX 190528: doesn't work
+snippet indent1 "indents selected code by one"
+nesto "$1" do
+	${VISUAL}
+end
+endsnippet
+
+snippet context "rspec: context block"
+context "$1" do
+	${0:${VISUAL:# assertions...}}
+end
+endsnippet
+
+# snippet forr "for (X = N; x<0; x--) [reverse]"
+# for (uint8_t ${1:i} = 0; $1 < ${2}; $1++)
+# {
+# 	${0}
+# }
+# endsnippet
+
+# # for (uint8_t ${1:/* variable name */} = 0; i < ${2}; i++)
+# snippet forn "for (uint8 X = 0)"
+# for (uint8_t ${1:} = 0; $1 < ${2}; $1++)
+# {
+# 	${0}
+# }
+# endsnippet
 
 snippet if "if()"
 if (${1:true})
@@ -178,6 +217,33 @@ snippet case "case"
 case ${1:/* variable case */}:
 	${2}
 	${3:break;}
+endsnippet
+
+snippet headerguard "header guard"
+#ifndef ${1:`!p
+if not snip.c:
+	import random, string
+	name = re.sub(r'[^A-Za-z0-9]+','_', snip.fn).upper()
+	snip.rv = ('%s' % name).upper()
+else:
+	snip.rv = snip.c`}
+#define $1
+
+${VISUAL}$0
+
+#endif // $1
+endsnippet
+
+snippet extc "extern C for C++"
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+${VISUAL}$0
+
+#ifdef __cplusplus
+}
+#endif	// __cplusplus
 endsnippet
 
 # vim:ft=snippets:

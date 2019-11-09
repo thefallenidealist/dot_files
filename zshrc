@@ -47,8 +47,8 @@ setopt sharehistory
 # colors																	{{{
 # -----------------------------------------------------------------------------
 # INFO 181203: Can be used on FreeBSD ls
-LSCOLORS="exfxcxdxbxegedabagacad";	# default, 'x' means default color
-LSCOLORS="ExGxFxdxCxDxDxhbadExEx";
+# LSCOLORS="exfxcxdxbxegedabagacad";	# default, 'x' means default color
+# LSCOLORS="ExGxFxdxCxDxDxhbadExEx";
 # LSCOLORS="ExfxcxdxBxegedabagacad";	# dirs are bold and light blue colored
 # 1.   directory
 # 2.   symbolic link
@@ -317,6 +317,7 @@ alias s='tmux'
 alias history='history -Ef'	# pretty history with European dates"
 
 alias cal='/usr/local/bin/cal -e -nod'
+alias caly='/usr/local/bin/cal -e -nod $(/bin/date +%Y)'
 alias feh="feh -d -B black"
 alias kf='killall feh'
 alias xev="xev | grep -A2 --line-buffered '^KeyRelease' | sed -n '/keycode /s/^.*keycode \([0-9]*\).* (.*, \(.*\)).*$/\1 \2/p'"
@@ -331,7 +332,7 @@ alias fkomanda='find . -type f -exec chmod 644 {} +'
 alias dkomanda='find . -type d -exec chmod 755 {} +'
 alias makni20="for i in *20*; do n=`echo $i|sed 's/%20/\ /g'`; mv $i $n; done"
 
-alias mpa='\mplayer -vo null'
+alias mpa='mpv -vo null'
 alias video2audio="mplayer -vc null -vo null -ao pcm "
 alias avi2wav="mplayer -ao pcm:fast:file=audio.wav -vo null -vc null video.avi"
 alias wav2mp3="lame -b 320 audio.wav"
@@ -358,7 +359,7 @@ alias md="grip --norefresh"	# GitHub readme preview, don't auto refresh because 
 #echo "obase=16; 10"|bc
 alias gg='gmake clean && gmake'
 alias ggu='gmake clean && gmake -j4 && gmake upload'
-alias weather='curl wttr.in/Osijek'
+alias weather='curl wttr.in/Osijek\?F'
 # -------------------------------------------------------------------------- }}}
 
 # ------------------ custom function - zsnap ------------------------------- {{{
@@ -450,3 +451,4 @@ function mm() {
 # pkg install zsh-syntax-highlighting
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fpath=($HOME/.zsh-completions $fpath)
+alias x='xinit ~/.xinitrc -- -dpi 75 -nolisten tcp'

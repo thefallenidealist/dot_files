@@ -21,9 +21,7 @@
 	a = add
 	au = add -u
 	cl = clone
-	#s = show
 	su = submodule update --init --recursive
-	# up = rebase	# SVN muscle memory
 	last = log -1 HEAD
 	l = log --decorate
 	c = commit
@@ -33,6 +31,8 @@
 	ce = commit --amend --no-edit	# same as vim fugitive plugin
 	rc = rebase --continue
 	ra = rebase --abort
+	mc = merge --continue
+	ma = merge --abort
 	cp  = cherry-pick
 	cpc = cherry-pick --continue
 	cpa = cherry-pick --abort
@@ -46,6 +46,7 @@
 	dc = diff --cached
 	dd = diff --submodule
 	dhh = diff HEAD^ HEAD
+	shh = show HEAD^ HEAD
 	dd0 = foreach --recursive git diff
 	dd1 = foreach --recursive git diff --name-status
 	dt = difftool
