@@ -71,7 +71,8 @@ remove_files()
 		$HOME/.xmodmap \
 		$HOME/.xinitrc \
 		$HOME/.config/openbox \
-		$HOME/.config/tint2
+		$HOME/.config/tint2 \
+		$HOME/.config/mpv
 	# rm -rf $HOME/.local
 }
 # ------------------------------------------------------------------------- }}}
@@ -127,6 +128,7 @@ install_gui()
 		mkdir -p $HOME/.config
 		ln -sf $BASEDIR/gui/openbox		$HOME/.config
 		ln -sf $BASEDIR/gui/tint2		$HOME/.config
+		ln -sf $BASEDIR/gui/mpv			$HOME/.config
 
 		xrdb		$HOME/.Xdefaults
 		xmodmap		$HOME/.xmodmap

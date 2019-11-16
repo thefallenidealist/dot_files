@@ -204,6 +204,8 @@ alias jrun="service jail start"
 # ------------------ 3rd party system utils --------------------------------
 alias freec='freecolor -mt'
 alias rsync="rsync -avshu --exclude .zfs"
+alias rssh="rsync -P -e ssh"
+alias sshr="rsync -P -e ssh"
 alias port="nmap -p N hostname | grep open"
 alias ip="w3m www.whatismyip.com | grep 'Your IP Address Is:' | cut -d ':' -f 2 | sed 's/ //'"
 alias pstree='pstree -g 2'
@@ -318,6 +320,8 @@ alias history='history -Ef'	# pretty history with European dates"
 
 alias cal='/usr/local/bin/cal -e -nod'
 alias caly='/usr/local/bin/cal -e -nod $(/bin/date +%Y)'
+alias calp='YEAR=$(/bin/date +%Y); MONTHP=$(expr $(/bin/date +"%m") - 1) ; printf "\t$YEAR.$MONTHP."; /usr/local/bin/cal -e -nod $MONTHP $YEAR'
+alias caln='YEAR=$(/bin/date +%Y); MONTHN=$(expr $(/bin/date +"%m") + 1) ; printf "\t$YEAR.$MONTHN."; /usr/local/bin/cal -e -nod $MONTHN $YEAR'
 alias feh="feh -d -B black"
 alias kf='killall feh'
 alias xev="xev | grep -A2 --line-buffered '^KeyRelease' | sed -n '/keycode /s/^.*keycode \([0-9]*\).* (.*, \(.*\)).*$/\1 \2/p'"
@@ -451,4 +455,3 @@ function mm() {
 # pkg install zsh-syntax-highlighting
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fpath=($HOME/.zsh-completions $fpath)
-alias x='xinit ~/.xinitrc -- -dpi 75 -nolisten tcp'

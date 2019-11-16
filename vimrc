@@ -1074,6 +1074,7 @@ call SetupCommandAlias("line", "call Line()")
 call SetupCommandAlias("line1", "call Line(1)")
 call SetupCommandAlias("line2", "call Line(2)")
 " ----------------------------------------------------------------------- }}}
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 " Plugins																	{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1233,6 +1234,9 @@ Plug 'machakann/vim-highlightedyank'	" temporary highlight yanked text/selection
 " Plug 'luochen1990/rainbow'             " colored brackets
 
 " Plug 'arakashic/chromatica.nvim'
+Plug 'Asheq/close-buffers.vim'
+Plug 'chrisbra/vim-diff-enhanced'
+
 
 " Initialize plugin system
 call plug#end()
@@ -2004,6 +2008,17 @@ highlight HighlightedyankRegion gui=reverse ctermbg=130 ctermfg=15
 let g:chromatica#libclang_path='/usr/local/llvm60/lib'
 let g:chromatica#enable_at_startup=1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+" diff enhanced																{{{
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Patience diff algorithm
+" :PatienceDiff - Use the Patience Diff algorithm for the next diff mode
+" :EnhancedDiff <algorithm> - Use <algorithm> to generate the diff.
+
+" started In Diff-Mode set diffexpr (plugin not loaded yet)
+if &diff
+	let &diffexpr='EnhancedDiff#Diff("git diff", "--diff-algorithm=patience")'
+endif
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " {{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
