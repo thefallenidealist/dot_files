@@ -247,7 +247,7 @@ augroup my_group_with_a_very_uniq_name
 	autocmd FileType python set expandtab
 
 	autocmd FileType xdefaults set commentstring=!%s
-	autocmd FileType pf,dnsmasq,fstab,cfg,gitconfig,crontab,sshdconfig setlocal commentstring=#\ %s
+	autocmd FileType pf,dnsmasq,fstab,cfg,gitconfig,crontab,sshdconfig,resolv setlocal commentstring=#\ %s
 	autocmd FileType c setlocal commentstring=\/\/\ %s
 
 	" Warn if file in current buffer is changed outside of Vim
@@ -342,6 +342,7 @@ call SetupCommandAlias("We", "WE")
 
 command! PU PlugUpdate | PlugUpgrade
 command! PI write | so $MYVIMRC | PlugInstall
+command! PD write | so $MYVIMRC | PlugClean
 
 " open help in vertical split right
 cabbrev h vert leftabove help
@@ -1131,7 +1132,7 @@ Plug 'jsfaint/gen_tags.vim'
 Plug 'majutsushi/tagbar'	" show tags (func, vars) in window right
 " Plug 'vim-scripts/TagHighlight'	" color typedefs as variables, needs
 " :UpdateTypesFile
-Plug 'octol/vim-cpp-enhanced-highlight'	" simpler works out-of-the books, but not as good as TagHighlight
+Plug 'octol/vim-cpp-enhanced-highlight'	" simpler works out-of-the box, but not as good as TagHighlight
 										" INFO 180525: This line must be here, otherwise C functions won't be highlighted
 " Plug 'jeaye/color_coded'	" semantic highlighter INFO 170818: doesn't work in nvim
 
@@ -2102,7 +2103,7 @@ highlight clear ColorColumn		" disable on default
 
 " let &colorcolumn=join(range(81,999),",")        " highlight all afer 80 chars
 " let &colorcolumn="80,".join(range(120,999),",") " double highlight, 80 and 120 chars:
-match ErrorMsg '\%>80v.\+'	" highlight only chars after 'tw' as error message
+" match ErrorMsg '\%>80v.\+'	" highlight only chars after 'tw' as error message
 
 highlight VertSplit		ctermfg=202 ctermbg=232 guifg=#ff5f00
 
