@@ -1093,25 +1093,7 @@ endif
 call plug#begin('~/.vim/plugged')
 
 " AutoComplete
-Plug 'ncm2/ncm2'			" manager
-Plug 'roxma/nvim-yarp'		" dependency
-Plug 'ncm2/ncm2-bufword'	" completion from current buffer
-Plug 'ncm2/ncm2-path'
-Plug 'ncm2/ncm2-tmux'		" completion with words from other tmux panes
-Plug 'ncm2/ncm2-ultisnips'
-Plug 'ncm2/ncm2-racer'		" Rust
-Plug 'ncm2/ncm2-pyclang'	" C/C++
-Plug 'ncm2/ncm2-vim'
-" Plug 'ncm2/ncm2-neoinclude' | Plug 'Shougo/neoinclude.vim'	" INFO 190111: not sure if this is doing anything
-" Plug 'ncm2/ncm2-syntax' | Plug 'Shougo/neco-syntax'
-" Plug 'ncm2/ncm2-path'
 
-" rust
-Plug 'rust-lang/rust.vim'   " Rust lang support
-Plug 'racer-rust/vim-racer' " Rust autocompleter
-Plug 'roxma/nvim-cm-racer'  " Rust enginge for NCM
-
-Plug 'roxma/ncm-github'
 " Plug 'huawenyu/neogdb.vim'
 Plug 'neomake/neomake'
 Plug 'jceb/vim-orgmode'
@@ -1249,25 +1231,6 @@ call plug#end()
 " put this after the theme plugin is installed, but before custom "highlight"
 " overrides
 colorscheme molokai
-" NCM																		{{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" enable ncm2 for all buffers
-autocmd BufEnter * call ncm2#enable_for_buffer()
-" IMPORTANT: :help Ncm2PopupOpen for more information
-set completeopt=noinsert,menuone,noselect
-" Use <TAB> to select the popup menu:
-inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
-" NCM2 C																	{{{
-" -----------------------------------------------------------------------------
-autocmd FileType c,cpp nnoremap <buffer> gd :<c-u>call ncm2_pyclang#goto_declaration()<cr>
-" path to directory where libclang.so can be found
-" let g:ncm2_pyclang#library_path = '/usr/lib/llvm-5.0/lib'
-" or path to the libclang.so file
-let g:ncm2_pyclang#library_path = '/usr/local/llvm60/lib/libclang.so'
-" TODO 190512: compile_commands.json
-" ------------------------------------------------------------------------- }}}
 " Linter																	{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " INFO 190422: It is not possible to configure how quickfix locations are
@@ -1402,10 +1365,6 @@ let g:airline#extensions#hunks#enabled = 0
 
 " snippets																	{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-inoremap <silent> <expr> <CR> ncm2_ultisnips#expand_or("\<CR>", 'n')
-" let g:UltiSnipsExpandTrigger        = '<C-u>'   " expand snippet
-" 180218 NCM:
-let g:UltiSnipsExpandTrigger		= "<Plug>(ultisnips_expand)"
 let g:UltiSnipsJumpForwardTrigger="<tab>"		" jumps to ${1}, ${2}, ...
 let g:UltiSnipsJumpBackwardTrigger="<s-tab>"	" jumps to ${2}, ${1}, ...
 
