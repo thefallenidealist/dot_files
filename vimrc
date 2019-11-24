@@ -1035,15 +1035,15 @@ function! Line(...)														" {{{
 " ---------------------------------------------------------------------------
 	" created by me on 190520
 	let l:arg_num=a:0
-	let s:line1 = "									{{{"
+	let s:line1 = "											{{{"
 	" fold mark just to make it in synch with printf() bellow	{{{
 
 	if &commentstring == "// %s"
 		let s:line2 = printf("----------------------------------------------------------------------------")
 		let s:line3 = printf("------------------------------------------------------------------------- }}}")
 	else
-		let s:line2 = printf(" -----------------------------------------------------------------------------")
-		let s:line3 = printf(" ------------------------------------------------------------------------- }}}")
+		let s:line2 = printf("-----------------------------------------------------------------------------")
+		let s:line3 = printf("------------------------------------------------------------------------- }}}")
 	endif
 	let s:line2 = substitute(&commentstring, "%s", s:line2, "")
 	let s:line3 = substitute(&commentstring, "%s", s:line3, "")
@@ -1094,6 +1094,21 @@ call plug#begin('~/.vim/plugged')
 
 " AutoComplete
 
+Plug 'prabirshrestha/async.vim'
+Plug 'prabirshrestha/vim-lsp'
+Plug 'prabirshrestha/asyncomplete.vim'	" auto complete, inspired ncm2 but written in VimL
+Plug 'prabirshrestha/asyncomplete-lsp.vim'
+Plug 'prabirshrestha/asyncomplete-ultisnips.vim'
+if executable('ctags')
+	" Plug 'prabirshrestha/asyncomplete-tags.vim'
+	Plug 'ludovicchabant/vim-gutentags', { 'for': 'c,cpp,rust' }
+endif
+Plug 'prabirshrestha/asyncomplete-buffer.vim'
+Plug 'prabirshrestha/asyncomplete-file.vim'
+
+" python3 -m pip install pynvim
+Plug 'liuchengxu/vim-clap'
+
 " Plug 'huawenyu/neogdb.vim'
 Plug 'neomake/neomake'
 Plug 'jceb/vim-orgmode'
@@ -1109,7 +1124,6 @@ Plug 'stefandtw/quickfix-reflector.vim'		" editable quickfix
 Plug 'SirVer/ultisnips'		" snippet engine
 " Plug 'honza/vim-snippets'	" snippet collection
 " Auto generate incremetal tags
-Plug 'ludovicchabant/vim-gutentags', { 'for': 'c,cpp,rust' }
 Plug 'jsfaint/gen_tags.vim'
 Plug 'majutsushi/tagbar'	" show tags (func, vars) in window right
 " Plug 'vim-scripts/TagHighlight'	" color typedefs as variables, needs
@@ -1144,7 +1158,7 @@ Plug 'ciaranm/securemodelines'
 Plug 'henrik/vim-indexed-search'	" show search as: result 123 of 456
 Plug 'osyo-manga/vim-anzu'			" show search matches in statusline
 									" (second from the right)
-" Plug 'jiangmiao/auto-pairs'			" auto close quotes, brackets, ...
+" Plug 'tmsvg/pear-tree'				" auto close quotes, brackets, ...
 Plug 'tpope/vim-surround'			" replace quotes, brackets,...
 Plug 'tpope/vim-repeat'             " repeat with . previous plugin
 Plug 'vim-scripts/visualrepeat'
@@ -1231,6 +1245,158 @@ call plug#end()
 " put this after the theme plugin is installed, but before custom "highlight"
 " overrides
 colorscheme molokai
+" autocomplete & LSP														{{{
+" -----------------------------------------------------------------------------
+" -----------------------------------------------------------------------------
+" " 191116
+" let g:LanguageClient_serverCommands = {
+"     \ 'c': ['/usr/local/bin/clangd80'],
+"     \ }
+
+" nnoremap <silent> K :call LanguageClient#textDocument_hover()<CR>
+" nnoremap <silent> gd :call LanguageClient#textDocument_definition()<CR>
+" nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
+
+" Register ccls C++ lanuage server - vim-lsp wiki:
+if executable('ccls')
+	au User lsp_setup call lsp#register_server({
+				\ 'name': 'ccls',
+				\ 'cmd': {server_info->['ccls']},
+				\ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
+				\ 'initialization_options': {},
+				\ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
+				\ })
+
+	" 'initialization_options': {'cache': {'directory': '/tmp/ccls/cache' }},
+endif
+
+" Key bindings for vim-lsp.
+nn <silent> <M-d> :LspDefinition<cr>
+nn <silent> <M-r> :LspReferences<cr>
+nn <f2> :LspRename<cr>
+nn <silent> <M-a> :LspWorkspaceSymbol<cr>
+nn <silent> <M-l> :LspDocumentSymbol<cr>
+
+nnoremap <silent> <M-]> :LspDefinition<cr>
+nnoremap <silent> <C-\\> :LspDeclaration<cr>
+
+" " vim-lsp wiki:
+" if executable('clangd')
+" 	au User lsp_setup call lsp#register_server({
+" 				\ 'name': 'clangd',
+" 				\ 'cmd': {server_info->['clangd', '-background-index']},
+" 				\ 'whitelist': ['c', 'cpp', 'objc', 'objcpp'],
+" 				\ })
+" endif
+
+" " Key bindings for vim-lsp.
+" nn <silent> <M-d> :LspDefinition<cr>
+" nn <silent> <M-r> :LspReferences<cr>
+" nn <f2> :LspRename<cr>
+" nn <silent> <M-a> :LspWorkspaceSymbol<cr>
+" nn <silent> <M-l> :LspDocumentSymbol<cr>
+
+
+" if executable('clangd80')
+" 	augroup lsp_clangd
+" 		autocmd!
+" 		autocmd User lsp_setup call lsp#register_server({
+" 					\ 'name': 'clangd80',
+" 					\ 'cmd': {server_info->['clangd80']},
+" 					\ 'whitelist': ['c', 'cpp', 'objc', 'objcpp'],
+" 					\ })
+" 		autocmd FileType c      setlocal omnifunc=lsp#complete
+" 		autocmd FileType cpp    setlocal omnifunc=lsp#complete
+" 		autocmd FileType objc   setlocal omnifunc=lsp#complete
+" 		autocmd FileType objcpp setlocal omnifunc=lsp#complete
+" 	augroup end
+" endif
+
+" snippets
+if has('python3')
+	" let g:UltiSnipsExpandTrigger="<c-e>"
+	let g:UltiSnipsExpandTrigger="<c-y>"
+	call asyncomplete#register_source(asyncomplete#sources#ultisnips#get_source_options({
+				\ 'name': 'ultisnips',
+				\ 'whitelist': ['*'],
+				\ 'completor': function('asyncomplete#sources#ultisnips#completor'),
+				\ }))
+endif
+
+" ctags
+" au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#tags#get_source_options({
+" 			\ 'name': 'tags',
+" 			\ 'whitelist': ['c'],
+" 			\ 'completor': function('asyncomplete#sources#tags#completor'),
+" 			\ 'config': {
+" 			\    'max_file_size': 50000000,
+" 			\  },
+" 			\ }))
+
+let g:lsp_log_verbose = 1
+let g:lsp_log_file = expand('/tmp/vim-lsp.log')
+
+" for asyncomplete.vim log
+let g:asyncomplete_log_file = expand('/tmp/asyncomplete.log')
+
+let g:lsp_preview_float = 1
+
+" asyncomplete, recomendded by vim-lsp
+inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+" inoremap <expr> <cr>    pumvisible() ? "\<C-y>" : "\<cr>"
+imap <c-space> <Plug>(asyncomplete_force_refresh)
+
+" restart autocomplete on backspace
+function! s:check_back_space() abort
+	let col = col('.') - 1
+	return !col || getline('.')[col - 1]  =~ '\s'
+endfunction
+inoremap <silent><expr> <TAB>
+			\ pumvisible() ? "\<C-n>" :
+			\ <SID>check_back_space() ? "\<TAB>" :
+			\ asyncomplete#force_refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+let g:lsp_diagnostics_enabled = 0	" disable diagnostics support
+let g:lsp_signs_enabled = 1         " enable signs
+let g:lsp_diagnostics_echo_cursor = 1 " enable echo under cursor when in normal mode
+
+
+highlight PopupWindow ctermbg=lightblue guibg=lightblue
+
+au FileType fzf set nonumber norelativenumber
+
+au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#file#get_source_options({
+			\ 'name': 'file',
+			\ 'whitelist': ['*'],
+			\ 'priority': 10,
+			\ 'completor': function('asyncomplete#sources#file#completor')
+			\ }))
+
+call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options({
+			\ 'name': 'buffer',
+			\ 'whitelist': ['*'],
+			\ 'blacklist': ['go'],
+			\ 'completor': function('asyncomplete#sources#buffer#completor'),
+			\ 'config': {
+			\    'max_buffer_size': 5000000,
+			\  },
+			\ }))
+
+" augroup lsp_float_colours
+" 	autocmd!
+" 	if !has('nvim')
+" 		autocmd User lsp_float_opened
+" 					\ call win_execute(lsp#ui#vim#output#getpreviewwinid(),
+" 					\		'setlocal wincolor=PopupWindow')
+" 	else
+" 		autocmd User lsp_float_opened
+" 					\ call nvim_win_set_option(lsp#ui#vim#output#getpreviewwinid(),
+" 					\		'winhighlight', 'Normal:PopupWindow')
+" 	endif
+" augroup end
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " Linter																	{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " INFO 190422: It is not possible to configure how quickfix locations are
@@ -1337,7 +1503,7 @@ let g:airline#extensions#obsession#indicator_text = 'Ses' " default: '$'
 
 " let g:airline_section_z = '%3p%% %#__accent_bold#%{g:airline_symbols.linenr}%4l:%3v%#__restore__#%#__accent_bold#/%L%{g:airline_symbols.maxlinenr}%#__restore__# '
 
-" don't show git branch nor hunbks
+" don't show git branch nor hunks
 let g:airline#extensions#branch#enabled = 0
 let g:airline#extensions#hunks#enabled = 0
 
@@ -1365,6 +1531,10 @@ let g:airline#extensions#hunks#enabled = 0
 
 " snippets																	{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" inoremap <silent> <expr> <CR> ncm2_ultisnips#expand_or("\<CR>", 'n')
+" let g:UltiSnipsExpandTrigger        = '<C-u>'   " expand snippet
+" 180218 NCM:
+" let g:UltiSnipsExpandTrigger		= "<Plug>(ultisnips_expand)"
 let g:UltiSnipsJumpForwardTrigger="<tab>"		" jumps to ${1}, ${2}, ...
 let g:UltiSnipsJumpBackwardTrigger="<s-tab>"	" jumps to ${2}, ${1}, ...
 
@@ -1448,8 +1618,31 @@ if has('nvim')
 	aug fzf_setup
 		autocmd!
 		autocmd TermOpen term://*FZF tnoremap <silent> <buffer><nowait> <esc> <c-c>
+		autocmd FileType fzf set nonumber norelativenumber
 	aug END
 end
+
+" 191124 use floating window for FZF
+let $FZF_DEFAULT_OPTS='--layout=reverse'	" show hints at top of the screen not bottom
+let g:fzf_layout = { 'window': 'call FloatingFZF()' }
+function! FloatingFZF()
+	let buf = nvim_create_buf(v:false, v:true)
+	call setbufvar(buf, '&signcolumn', 'no')
+
+	let height = &lines - 8
+	let width = float2nr(&columns - (&columns * 2 / 10))
+	let col = float2nr((&columns - width) / 2)
+
+	let opts = {
+				\ 'relative': 'editor',
+				\ 'row': 4,
+				\ 'col': col,
+				\ 'width': width,
+				\ 'height': height
+				\ }
+
+	call nvim_open_win(buf, v:true, opts)
+endfunction
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " vim orgmode																{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1524,6 +1717,8 @@ call SetupCommandAlias("Gstatus","botright Gstatus")
 
 nnoremap <leader>gg :GitMessenger<cr>
 let g:git_messenger_always_into_popup = 1	" jump into popup
+
+let g:magit_discard_hunk_mapping="X"   " discard hunk
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " searching																	{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1859,11 +2054,7 @@ let g:quickr_preview_exit_on_enter = 1	" 1 = auto-close on enter XXX 190515
 " autopairs {{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Plugin to autoclose branckets ()
-let g:AutoPairsMapCR = 0    " otherwise NCM expansion with <CR> won't work
 
-" disable <A-b> it's used as Emacs type A-b
-let g:AutoPairsShortcutBackInsert = '<nop>'
-let g:AutoPairsShortcutJump = '<nop>'
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 
 " unimpared                                                                  {{{
@@ -2116,23 +2307,16 @@ if has("gui_running")
 
 	set listchars=tab:│·,extends:>,precedes:<
 	set showbreak=…		" char to be displayed on the beggining of broken line
-	"set listchars=tab:\|·,eol:¬,trail:·
 
-	"	"set lines=150 columns=230
 	set guioptions -=T		" toolbar
 	set guioptions -=r		" right scrollbar
 	set guioptions -=L		" left scrollbar
 	set guioptions -=m		" menubar
 	set guioptions +=a		" auto-copy selected text"
-	" set guioptions -=m		" menu bar (possible Windows only)
 
 	set hlsearch
 	set backspace=2		"indent,eol,start, needed for Windows gVim
 	let g:airline_powerline_fonts = 1
-	" set guifont=Droid\ Sans\ Mono\ Dotted\ for\ Powe:h10
-
-	" initial size:
-	" set lines=70 columns=200
 
 	set mousefocus
 
@@ -2143,40 +2327,34 @@ if has("gui_running")
 	" highlight SpecialKey		term=bold ctermfg=236 gui=italic guifg=#465457
 	highlight SpecialKey		term=bold ctermfg=236 gui=none guifg=#465457
 
-
-
 	"Invisible character colors
 	highlight NonText guifg=#2a4a59
-	" highlight SpecialKey guifg=#2a4a59
-
-	" TODO same font as xterm
 endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 " " work specific stuff														{{{
 " """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" on Linux PC for team H
-" if !has('windows')
-" team H: Linux PC
-" team A: Windows PC
-	let g:work_pc=system('is_work_pc')
-	let g:work_dir=system('is_work_dir')
-	let g:team_a=system('is_sverige') " TODO 170831
-	" sverige: if Windows and work_dir exists
+if filereadable("$HOME\posao.vim")
+	echo "subvimrc2 has been found"
+elseif filereadable("$HOME\AppData\Local\nvim\posao.vim")
+	echo "subvimrc has been found"
+endif
 
-	if work_pc == 1
-		set list
+if substitute(system('is_work_pc'), '\n','','g') == "1"
+	let s:work_pc = 1
+else
+	let s:work_pc = 0
+endif
 
-		if work_dir == 1
-			" expand only if we are working on work stuff
-			if team_a == 1
-				" weird North men use 3 spaces as a tab
-				set tabstop=3		" tab size
-				set shiftwidth=3 	" when indenting with '>'
-			endif
-			set expandtab
-			highlight clear ColorColumn	" don't color background after textwidth
-		endif
-	endif
+if (s:work_pc == 1)
+	" you can't use variables on the rhs in the .vimrc.
+	set tabstop=3		" tab size
+	set shiftwidth=3 	" when indenting with '>'
+	set expandtab		" convert tab to spaces
+	set softtabstop=3	" smart <BS> - delete 4 chars"
+	set textwidth=120
+	set diffopt+=iwhite	" ignore whitespace changes and also newlines (^M)
+	autocmd FileType c setlocal commentstring=/*%s*/
+endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " INFO {{{
@@ -2358,6 +2536,6 @@ let $NVIM_PYTHON_LOG_LEVEL="DEBUG"
 " fold {{{
 " -----------------------------------------------------------------------------
 " ------------------------------------------------------------------------- }}}
-"
+
 " autocmd User VimagitEnterCommit setlocal textwidth=72
 " autocmd User VimagitLeaveCommit setlocal textwidth=0

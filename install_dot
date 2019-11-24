@@ -129,6 +129,7 @@ install_gui()
 		ln -sf $BASEDIR/gui/openbox		$HOME/.config
 		ln -sf $BASEDIR/gui/tint2		$HOME/.config
 		ln -sf $BASEDIR/gui/mpv			$HOME/.config
+		# TODO 191124: how to install mpv scripts?
 
 		xrdb		$HOME/.Xdefaults
 		xmodmap		$HOME/.xmodmap

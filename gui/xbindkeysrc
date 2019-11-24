@@ -87,6 +87,7 @@
 	XF86AudioMute
 # ------------------------------------------------------------------------- }}}
 
+# fancy "Alt-Tab" on Win-Tab
 "skippy-xd"
 	mod4 + Tab
 # programs																	{{{
@@ -106,9 +107,6 @@
 
 "VirtualBox"
 	mod4 + shift + t
-
-"kicad"
-	mod4 + shift + y
 
 "kicad"
 	mod4 + shift + y
@@ -176,3 +174,9 @@
 
 "rofi -matching fuzzy -terminal xterm -show ssh"
 	mod4 + s
+
+"~/scripts/lock.sh"
+	mod4 + b
+
+"~/scripts/lock.sh"
+	mod4 + l

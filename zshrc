@@ -92,7 +92,7 @@ else
 fi
 
 export LD_LIBRARY_PATH=$HOME/.opt/lib:$LD_LIBRARY_PATH
-export PATH="$HOME/.opt:$HOME/.opt/bin:$HOME/.opt/sbin:$HOME/.opt/scripts:$PATH"
+export PATH="$HOME/scripts:$HOME/.opt:$HOME/.opt/bin:$HOME/.opt/sbin:$HOME/.opt/scripts:$PATH"
 export PATH="$PATH:/opt/scripts:/opt/bin"
 export PATH="$PATH:$HOME/.cargo/bin:$HOME/.local/bin"
 # export PATH="$PATH:$HOME/.cargo/bin:$HOME/.local/bin:$HOME/.fzf/bin"
