@@ -1034,26 +1034,25 @@ function! Line(...)														" {{{
 " ---------------------------------------------------------------------------
 	" created by me on 190520
 	let l:arg_num=a:0
-	let s:line0 = "									{{{"
+	let s:line1 = "									{{{"
 	" fold mark just to make it in synch with printf() bellow	{{{
 
-	if &commentstring == '// %s'
-		let s:line1 = printf(" --------------------------------------------------------------------------")
-		let s:line2 = printf(" ---------------------------------------------------------------------- }}}")
+	if &commentstring == "// %s"
+		let s:line2 = printf("----------------------------------------------------------------------------")
+		let s:line3 = printf("------------------------------------------------------------------------- }}}")
 	else
-		let s:line1 = printf(" ---------------------------------------------------------------------------")
-		let s:line2 = printf(" ----------------------------------------------------------------------- }}}")
+		let s:line2 = printf(" -----------------------------------------------------------------------------")
+		let s:line3 = printf(" ------------------------------------------------------------------------- }}}")
 	endif
-	let s:line1 = substitute(&commentstring, "%s", s:line1, "")
 	let s:line2 = substitute(&commentstring, "%s", s:line2, "")
-	let s:line0 = substitute(&commentstring, "%s", s:line0, "")
+	let s:line3 = substitute(&commentstring, "%s", s:line3, "")
+	let s:line1 = substitute(&commentstring, "%s", s:line1, "")
 
 	if l:arg_num == "0"
 		" Just append lines bellow cursor
+		call append(line("."), s:line3)
 		call append(line("."), s:line2)
 		call append(line("."), s:line1)
-		call append(line("."), s:line0)
-		" silent exe "startinsert"
 		call feedkeys('j0la', 'n')
 	elseif l:arg_num == "1"
 		let l:arg1=a:1
@@ -1061,8 +1060,10 @@ function! Line(...)														" {{{
 			call append(line("."), s:line1)
 		elseif l:arg1 == "2"
 			call append(line("."), s:line2)
+		elseif l:arg1 == "3"
+			call append(line("."), s:line3)
 		else
-			echo "arg is wrong"
+			echo "arg is wrong: ".l:arg1
 		endif
 	else
 		echo "Wrong number of arguments: " arg_num
@@ -1073,7 +1074,8 @@ call SetupCommandAlias("lines", "call Line()")
 call SetupCommandAlias("line", "call Line()")
 call SetupCommandAlias("line1", "call Line(1)")
 call SetupCommandAlias("line2", "call Line(2)")
-" ----------------------------------------------------------------------- }}}
+call SetupCommandAlias("line3", "call Line(3)")
+" ------------------------------------------------------------------------- }}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 " Plugins																	{{{
