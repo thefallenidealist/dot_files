@@ -1,0 +1,35 @@
+# Created 190526
+
+# <tab> to open ToC
+# J/K - next/prev page
+# Ctrl-F/B scroll
+# bookmarks: bmark a, blist, bdelete a
+# F11	fullscreen
+# d		dual page view
+# default zoom: + - zz zo zi
+
+# change colors of document
+# color of text:
+# set recolor-darkcolor	gray80
+# color of background:
+set recolor-lightcolor	gray9
+set recolor true
+set recolor-keephue true
+
+map <C-e> scroll down
+map <C-y> scroll up
+map a adjust_window best-fit	# default
+map w adjust_window width		# default: s
+
+set recolor-reverse-video
+map i set recolor true
+
+# zoom and scroll step size
+# set zoom-step 20
+# set scroll-step 80
+
+set incremental-search true
+
+# don't show full path in window title and status bar
+set window-title-basename true
+set statusbar-basename false

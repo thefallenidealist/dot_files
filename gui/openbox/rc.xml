@@ -220,6 +220,46 @@ cases. -->
 		</action>
 	</keybind>
 
+	<!-- poor mans tiling -->
+	<keybind key="A-Left">
+		<action name="UnmaximizeFull"/>
+		<action name="MoveResizeTo">
+			<x>0</x>
+			<y>0</y>
+			<width>50%</width>
+		</action>
+		<action name="ToggleMaximizeVert"/>
+	</keybind>
+	<keybind key="A-Right">
+		<action name="UnmaximizeFull"/>
+		<action name="MoveResizeTo">
+			<x>1/2</x>
+			<y>0</y>
+			<width>50%</width>
+		</action>
+		<action name="ToggleMaximizeVert"/>
+	</keybind>
+	<keybind key="A-Up">
+		<action name="UnmaximizeFull"/>
+		<action name="MoveResizeTo">
+			<x>0</x>
+			<y>0</y>
+			<height>50%</height>
+			<width>100%</width>
+		</action>
+		<action name="ToggleMaximize"><direction>horizontal</direction></action>
+	</keybind>
+	<keybind key="A-Down">
+		<action name="UnmaximizeFull"/>
+		<action name="MoveResizeTo">
+			<x>0</x>
+			<y>1/2</y>
+			<height>50%</height>
+			<width>100%</width>
+		</action>
+		<action name="ToggleMaximize"><direction>horizontal</direction></action>
+	</keybind>
+
 	<!-- <keybind key="A-space"> <action name="ShowMenu"> <menu>client-menu</menu> </action> </keybind> -->
 
 	<!-- Keybindings for window switching -->
@@ -834,7 +874,15 @@ cases. -->
 					WM_NAME(STRING) = "Adding files..."
 					_NET_WM_NAME(UTF8_STRING) = "Adding files..."
 				-->
-				<application class="MPlayer*">
+				<application class="*MPlayer*">
+					<decor>no</decor>
+					<position>
+						<x>center</x>
+						<y>center</y>
+					</position>
+				</application>
+
+				<application class="mpv">
 					<decor>no</decor>
 					<position>
 						<x>center</x>
