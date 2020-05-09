@@ -476,7 +476,6 @@ nnoremap ]t :tabnext<cr>
 nnoremap š :tabprev<cr>
 nnoremap đ :tabnext<cr>
 " gt is default for next tab, this is pret close to gt
-nnoremap gr :tabprev<cr>
 
 nnoremap tj :bnext<cr>
 nnoremap tk :bprev<cr>
@@ -1112,21 +1111,15 @@ Plug 'prabirshrestha/asyncomplete-file.vim'
 Plug 'liuchengxu/vim-clap'
 
 " Plug 'huawenyu/neogdb.vim'
-Plug 'neomake/neomake'
 Plug 'jceb/vim-orgmode'
 Plug 'mattn/calendar-vim'
 
 Plug 'tpope/vim-unimpaired'	" easier movements around, like [q, ]q (quickfick)
-" Plug 'triglav/vim-visual-increment' " Ctrl-A/X for columns
-" Plug 'vim-scripts/VisIncr'
-" Vim 8: visual select and Ctrl-A
 Plug 'Valloric/ListToggle'	" toggle quickfix and location list
 Plug 'stefandtw/quickfix-reflector.vim'		" editable quickfix
 
 Plug 'SirVer/ultisnips'		" snippet engine
 " Plug 'honza/vim-snippets'	" snippet collection
-" Auto generate incremetal tags
-Plug 'jsfaint/gen_tags.vim'
 Plug 'majutsushi/tagbar'	" show tags (func, vars) in window right
 " Plug 'vim-scripts/TagHighlight'	" color typedefs as variables, needs
 " :UpdateTypesFile
@@ -1134,16 +1127,10 @@ Plug 'octol/vim-cpp-enhanced-highlight'	" simpler works out-of-the box, but not 
 										" INFO 180525: This line must be here, otherwise C functions won't be highlighted
 " Plug 'jeaye/color_coded'	" semantic highlighter INFO 170818: doesn't work in nvim
 
-" Plug 'chrisbra/NrrwRgn' " narrow region
-" Plug 'kana/vim-altr'	" switch files easy
-
 " ******************** files
-" CtrlP look-a-like
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'pbogut/fzf-mru.vim'
-" minimalistic file browser, insirated by netrw
-" only list and open files, no rm/cp
 Plug 'dietsche/vim-lastplace'		" Open file at last edit position
 Plug 'bogado/file-line'				" open file.txt:123
 Plug 'scrooloose/nerdtree'
@@ -1787,7 +1774,6 @@ nmap <Leader>w <Plug>(easymotion-overwin-w)
 " select and :NR or <leader>nr
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 
-
 " ctags																		{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " INFO will auto create tags, auto update on save (incremental update)
@@ -1817,13 +1803,6 @@ set tags+=~/.vim/tags/libc.tags
 " When you are using Language Servers with LanguageClient-neovim, You can use PreviewFile to preview definition instead of jump to it:
 " call LanguageClient#textDocument_definition({'gotoCmd':'PreviewFile'})
 
-" INFO 190512 gen_tags + gtags/global
-" FreeBSD: pkg install global
-" :GenGTAGS  :ClearGTAGS!
-let g:gen_tags#gtags_opts = '-c --verbose'
-
-let g:gen_tags#use_cache_dir = 0	" don't use ~/.cache/tags_dir/<project>
-" git  `<project folder>/.git/tags_dir`
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		tagbar																{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1864,33 +1843,6 @@ let g:cpp_member_variable_highlight = 1		" object.*var1*
 " let g:cpp_class_decl_highlight = 1
 let g:cpp_concepts_highlight = 1
 " XXX 170818: won't highlight object name, nor typedefed variable/type
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"	tag highlight															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" INFO tag custom types and functions - useful for C
-" needs tags file
-
-" in C: file do:
-" :UpdateTypesFile
-" after exit:
-" :ReadTypes
-
-" " Highlight local variables
-" let g:TagHighlightSettings={'IncludeLocals':'True'}
-" function CustomTagHighlight()
-" 	hi LocalVariable guifg=#ff00ff
-" 	hi GlobalVariable guifg=#ff00ff
-" endfunction
-" autocmd Syntax c,cpp call CustomTagHighlight()
-
-" STD libs:
-" download http://www.cgtk.co.uk/data/vim-scripts/taghighlight/taghighlight_standard_libraries_r2.1.4.zip
-" and extract to ~/.vim/plugged/TagHighlight
-" INFO 170815: probably not needed (QT, Android and similiar libs)
-" XXX 170815: this will not color malloc() and printf()
-
-
-" $HOME/.vim/syntax/c.vim
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 " undoquit 																	{{{
@@ -2059,15 +2011,6 @@ let g:quickr_preview_exit_on_enter = 1	" 1 = auto-close on enter XXX 190515
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 
-" unimpared                                                                  {{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" plugin with usefull shortcuts
-
-" options:
-" [oX to disable something
-" ]oX to enable something
-" \oX to toggle something:
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " tmux - tbone.vim															{{{
 " -----------------------------------------------------------------------------
 "  cmds: :Tmux Tyank Tput Twrite Tattach
@@ -2159,11 +2102,6 @@ nmap ga <Plug>(EasyAlign)
 let g:highlightedyank_highlight_duration = 1000 " [ms]
 highlight HighlightedyankRegion gui=reverse ctermbg=130 ctermfg=15
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
-" semantic highlighter														{{{
-let g:chromatica#libclang_path='/usr/local/llvm60/lib'
-let g:chromatica#enable_at_startup=1
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " diff enhanced																{{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Patience diff algorithm
@@ -2174,9 +2112,6 @@ let g:chromatica#enable_at_startup=1
 if &diff
 	let &diffexpr='EnhancedDiff#Diff("git diff", "--diff-algorithm=patience")'
 endif
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
-" {{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " NeoVim terminal															{{{
@@ -2194,21 +2129,6 @@ endif
 " auto-insert when in terminal window
 " INFO match buffer name (term://)
 autocmd BufWinEnter,WinEnter term://* startinsert
-
-" set guicursor=
-" let $NVIM_TUI_ENABLE_CURSOR_SHAPE = 1
-"   let &t_SI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=1\x7\<Esc>\\"
-"   let &t_EI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=0\x7\<Esc>\\"
-" let &t_SR = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=2\x7\<Esc>\\"
-
-" change cursor color
-" set termguicolors
-" highlight Cursor guifg=white guibg=black
-" highlight iCursor guifg=white guibg=steelblue
-" set guicursor=n-v-c:block-Cursor
-" set guicursor+=i:ver100-iCursor
-" set guicursor+=n-v-c:blinkon0
-" set guicursor+=i:blinkwait10
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 " Easier way to jump to alternate file
@@ -2361,27 +2281,13 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " INFO {{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" fold moving:
-" zj/zk - move to start/end of prev/next fold
-" [z/]z - move to start/end of current open fold
-
 " programmers vim 															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " @: repeat last : command
 " @@ for next repeat
 " Just type & to repeat the last substitution on the current line. You can repeat it on all lines by typing g&.
-" "*]p	paste from * register, and the indent with the current line
-" Ctrl-R '1p	paste from the first register in insert mode
 
 " Ctrl-W } show variable/function in a preview window
-" :pc	close preview window
-" C delete to the end of the line and go to insert mode
-
-
-" ga: show char under the cursor in decimal, hex, and oct, for unicode: tpope/vim-characterize XXX works without plugin
-" gCtrl-] If there is only one match, it will take you there. If there are multiple matches, it will list them all, letting you choose the one you want, just like :tselect
-
-" goto preview window Ctrl-W Ctrl-P
 
 " delete lines that do NOT match pattern: :v/pattern/d
 " change direction of select in visual mode: 'o'
@@ -2505,15 +2411,6 @@ set isfname+=32	" <space> is part of filename
 " TODO 170717: tmux <C-j>p -> enter/exit paste mode before/after that command
 " INFO: remmaping Esc will fuckup scroll (scrolling will start to insert chars)
 "
-" INFO 170901: Ako se razjebe ista sta koristi python (npr ncm na Windowsima): pip install --upgrade neovim
-" TODO 170921: <leader>r -> references to function
-" INFO 170926: vim slowiness
-" syntax off, relative number off, cursorline off -> speedup
-" autocommand spam: :autocmd CursorMoved
-" :syntime on, move around in your ruby file and then, :syntime report
-
-nnoremap <Leader>h :call HeaderToggle()<CR>
-
 let g:startify_fortune_use_unicode = 1
 " Sort sessions by modification time rather than alphabetically.
 let g:startify_session_sort = 0
@@ -2524,20 +2421,10 @@ cmap w!! w !sudo tee %
 nnoremap <Home> gg
 nnoremap <End> G
 
-" TODO 181026:check this (on Windows specially)
-" g:session_directory = '~/.vim/sessions' "" or ~\vimfiles\sessions (on Windows).
 " TODO 181128: chane all lines with multiple " to ------
 " TODO 190514: quit QF windows before calling :Files or :FZFMru (otherwise
 " that file will be open in (miniature) QF window split)
 " TODO 190515: disable <C-w>v/s/d commands in location list
-
-" 190119 nvim-yarp debugging
-" Log files will be generated with prefix /tmp/nvim_log
-let $NVIM_PYTHON_LOG_FILE="/tmp/nvim_log"
-let $NVIM_PYTHON_LOG_LEVEL="DEBUG"
-" fold {{{
-" -----------------------------------------------------------------------------
-" ------------------------------------------------------------------------- }}}
 
 " autocmd User VimagitEnterCommit setlocal textwidth=72
 " autocmd User VimagitLeaveCommit setlocal textwidth=0
