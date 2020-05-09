@@ -216,83 +216,6 @@ let &path.="src/include,/usr/include/AL,"
 " search for $CWD/tags, $CWD/.tags and go level up until $HOME
 set tags=tags,.tags;$HOME
 """"""""""""""""""""""""""""""""""""}}}
-"		autocmd																{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-augroup my_group_with_a_very_uniq_name
-	" this is executed every time when vimrc is sourced, so clear it at the beggining:
-	autocmd!
-	" INFO 190514: FileType: will be executed when opening file
-	" Buf/WinEnter: Will be executed when entering buffer/window
-
-	" easier quit from this windows
-	autocmd FileType help nnoremap <buffer> q :wincmd c<cr>
-	autocmd FileType qf,quickfix,netrw nnoremap <buffer> q :q<cr>
-	autocmd FileType qf 10wincmd_	" QF will always have height of 10 lines
-
-	autocmd FileType help,man nnoremap <buffer> <cr> <C-]>
-
-	autocmd FileType help,man,qf :NumbersDisable	" Disable Numbers plugin in help or man
-
-	autocmd FileType qf set nolist norelativenumber number
-
-	" force Vim to threat .md files as markdown and not Modula
-	" or use tpope/vim-markdown plugin
-	autocmd BufNewFile,BufReadPost *.md set filetype=markdown
-
-	" don't match '<' in C++ (cout << "Something";)
-	autocmd FileType cpp,make,vim set matchpairs-=<:>
-	autocmd FileType shell set matchpairs-=`:`	" works, but only in reverse
-
-	" in case I ever open a python file
-	autocmd FileType python set expandtab
-
-	autocmd FileType xdefaults set commentstring=!%s
-	autocmd FileType pf,dnsmasq,fstab,cfg,gitconfig,crontab,sshdconfig,resolv setlocal commentstring=#\ %s
-	autocmd FileType c setlocal commentstring=\/\/\ %s
-
-	" Warn if file in current buffer is changed outside of Vim
-	" - default: just warning when trying to write to the file
-	autocmd BufEnter,FocusGained * checktime %
-
-	autocmd BufRead,BufNewFile SConstruct,SConscript set filetype=python
-
-	autocmd FileType verilog call SetupVerilogEnvironment()
-
-	" close preview window if it is last
-	autocmd WinEnter * if &previewwindow | nnoremap <buffer> q :q!<cr> | endif
-	" close quickfix if last
-	autocmd WinEnter * if winnr('$') == 1 && getbufvar(winbufnr(winnr()), "&buftype") == "quickfix"|q|endif
-	" TODO 190527: close also if QF + NERDTree
-	autocmd WinEnter * if (winnr('$') == 2 && getbufvar(winbufnr(winnr()), "&buftype") == "quickfix" && exists("b:NERDTree") && b:NERDTree.isTabTree()) |q|endif
-
-
-	" close NERDTree/Tagbar if it is last window
-	autocmd BufEnter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
-	autocmd BufEnter * if (winnr("$") == 1 && (bufwinnr('__Tagbar__')) != -1) | q | endif
-
-	" maps in command-line-window:
-	autocmd CmdwinEnter * map <buffer> <cr> <cr>
-	autocmd CmdwinEnter * map <buffer> q :q<cr>
-	autocmd CmdwinEnter * map <buffer> <esc> :q<cr>
-
-	" maps in git messenger floating window
-	autocmd FileType gitmessengerpopup map <buffer> <esc> q
-
-	au InsertEnter * set norelativenumber
-	au InsertLeave * set relativenumber
-augroup END
-
-" setup when in diff mode:
-if &diff
-	" when fixing merge conflict:
-	map <leader>1 :diffget LOCAL<CR>
-	map <leader>2 :diffget BASE<CR>
-	map <leader>3 :diffget REMOTE<CR>
-	nnoremap du :diffupdate<cr>
-	nnoremap dg :diffget<cr>
-	call SetupCommandAlias("du", "diffupdate")
-endif
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		cmd aliases															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " INFO all abbrev commands are non recursive
@@ -456,6 +379,85 @@ nnoremap <F4> :set paste!<cr>
 " jump to next misspell (<leader>z and z= are already used for spelling)
 nnoremap ]z ]s
 nnoremap [z [s
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+"		autocmd																{{{
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+augroup my_group_with_a_very_uniq_name
+	" this is executed every time when vimrc is sourced, so clear it at the beggining:
+	autocmd!
+	" INFO 190514: FileType: will be executed when opening file
+	" Buf/WinEnter: Will be executed when entering buffer/window
+
+	" easier quit from this windows
+	autocmd FileType help nnoremap <buffer> q :wincmd c<cr>
+	autocmd FileType qf,quickfix,netrw nnoremap <buffer> q :q<cr>
+	autocmd FileType qf 10wincmd_	" QF will always have height of 10 lines
+	autocmd FileType qf unmap <buffer> <cr>
+
+	autocmd FileType help,man nnoremap <buffer> <cr> <C-]>
+
+	autocmd FileType help,man,qf :NumbersDisable	" Disable Numbers plugin in help or man
+
+	autocmd FileType qf set nolist norelativenumber number
+
+	" force Vim to threat .md files as markdown and not Modula
+	" or use tpope/vim-markdown plugin
+	autocmd BufNewFile,BufReadPost *.md set filetype=markdown
+
+	" don't match '<' in C++ (cout << "Something";)
+	autocmd FileType cpp,make,vim set matchpairs-=<:>
+	autocmd FileType shell set matchpairs-=`:`	" works, but only in reverse
+
+	" in case I ever open a python file
+	autocmd FileType python set expandtab
+
+	autocmd FileType xdefaults set commentstring=!%s
+	autocmd FileType pf,dnsmasq,fstab,cfg,gitconfig,crontab,sshdconfig,resolv,expect setlocal commentstring=#\ %s
+	autocmd FileType c setlocal commentstring=\/\/\ %s
+	autocmd FileType cpp setlocal commentstring=\/\/\ %s
+
+	" Warn if file in current buffer is changed outside of Vim
+	" - default: just warning when trying to write to the file
+	autocmd BufEnter,FocusGained * checktime %
+
+	autocmd BufRead,BufNewFile SConstruct,SConscript set filetype=python
+
+	autocmd FileType verilog call SetupVerilogEnvironment()
+
+	" close preview window if it is last
+	autocmd WinEnter * if &previewwindow | nnoremap <buffer> q :q!<cr> | endif
+	" close quickfix if last
+	autocmd WinEnter * if winnr('$') == 1 && getbufvar(winbufnr(winnr()), "&buftype") == "quickfix"|q|endif
+	" TODO 190527: close also if QF + NERDTree
+	autocmd WinEnter * if (winnr('$') == 2 && getbufvar(winbufnr(winnr()), "&buftype") == "quickfix" && exists("b:NERDTree") && b:NERDTree.isTabTree()) |q|endif
+
+
+	" close NERDTree/Tagbar if it is last window
+	autocmd BufEnter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+	autocmd BufEnter * if (winnr("$") == 1 && (bufwinnr('__Tagbar__')) != -1) | q | endif
+
+	" maps in command-line-window:
+	autocmd CmdwinEnter * map <buffer> <cr> <cr>
+	autocmd CmdwinEnter * map <buffer> q :q<cr>
+	autocmd CmdwinEnter * map <buffer> <esc> :q<cr>
+
+	" maps in git messenger floating window
+	autocmd FileType gitmessengerpopup map <buffer> <esc> q
+
+	au InsertEnter * set norelativenumber
+	au InsertLeave * set relativenumber
+augroup END
+
+" setup when in diff mode:
+if &diff
+	" when fixing merge conflict:
+	map <leader>1 :diffget LOCAL<CR>
+	map <leader>2 :diffget BASE<CR>
+	map <leader>3 :diffget REMOTE<CR>
+	nnoremap du :diffupdate<cr>
+	nnoremap dg :diffget<cr>
+	call SetupCommandAlias("du", "diffupdate")
+endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 "		buffers/windows/tabs keymaps										{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
