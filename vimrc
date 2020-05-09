@@ -388,6 +388,9 @@ augroup my_group_with_a_very_uniq_name
 	" INFO 190514: FileType: will be executed when opening file
 	" Buf/WinEnter: Will be executed when entering buffer/window
 
+	" kill QF/NERDTree/Tagbar if they are last windows
+	autocmd BufEnter * call LastWindow()
+
 	" easier quit from this windows
 	autocmd FileType help nnoremap <buffer> q :wincmd c<cr>
 	autocmd FileType qf,quickfix,netrw nnoremap <buffer> q :q<cr>
@@ -421,20 +424,6 @@ augroup my_group_with_a_very_uniq_name
 	autocmd BufEnter,FocusGained * checktime %
 
 	autocmd BufRead,BufNewFile SConstruct,SConscript set filetype=python
-
-	autocmd FileType verilog call SetupVerilogEnvironment()
-
-	" close preview window if it is last
-	autocmd WinEnter * if &previewwindow | nnoremap <buffer> q :q!<cr> | endif
-	" close quickfix if last
-	autocmd WinEnter * if winnr('$') == 1 && getbufvar(winbufnr(winnr()), "&buftype") == "quickfix"|q|endif
-	" TODO 190527: close also if QF + NERDTree
-	autocmd WinEnter * if (winnr('$') == 2 && getbufvar(winbufnr(winnr()), "&buftype") == "quickfix" && exists("b:NERDTree") && b:NERDTree.isTabTree()) |q|endif
-
-
-	" close NERDTree/Tagbar if it is last window
-	autocmd BufEnter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
-	autocmd BufEnter * if (winnr("$") == 1 && (bufwinnr('__Tagbar__')) != -1) | q | endif
 
 	" maps in command-line-window:
 	autocmd CmdwinEnter * map <buffer> <cr> <cr>
@@ -1077,6 +1066,43 @@ call SetupCommandAlias("line", "call Line()")
 call SetupCommandAlias("line1", "call Line(1)")
 call SetupCommandAlias("line2", "call Line(2)")
 call SetupCommandAlias("line3", "call Line(3)")
+" ------------------------------------------------------------------------- }}}
+function! LastWindow()													"   {{{
+" -----------------------------------------------------------------------------
+" 200509 moved from augroup to separate function
+" close current tab if only remaining buffers are quickfix/nerdtree/tagbar
+
+	let l:no_of_windows = winnr('$')
+	let l:exists_file   = exists("b:NERDTree")
+	let l:exists_tagbar = bufwinnr('__Tagbar__') != -1
+	let l:exists_qf     = bufwinnr('quickfix') != -1
+	let l:is_last_tab	= tabpagenr('$') == 1
+
+	" close if qf/NERDTree/tagbar are last windows:
+	if l:no_of_windows == 1 && (l:exists_qf || l:exists_file || l:exists_tagbar)
+		NERDTreeClose
+	endif
+
+	if l:no_of_windows == 2 && (l:exists_file && l:exists_qf)
+		NERDTreeClose
+		cclose
+		if l:is_last_tab
+			q
+		endif
+	endif
+
+	if l:no_of_windows == 3 && (l:exists_file && l:exists_qf && l:exists_tagbar)
+		NERDTreeClose
+		TagbarClose
+		cclose
+		if l:is_last_tab
+			q
+		endif
+	endif
+endfunction
+" ------------------------------------------------------------------------- }}}
+" function! placeholder()												"   {{{
+" -----------------------------------------------------------------------------
 " ------------------------------------------------------------------------- }}}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
