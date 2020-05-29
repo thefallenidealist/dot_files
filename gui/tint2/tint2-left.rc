@@ -153,15 +153,17 @@ border_color_pressed = #555555 80
 # : - separator
 panel_items = TLE:E:E:E:EEBSC
 panel_size = 100% 37
-panel_margin = 1 0
+panel_margin = 0 0
 panel_background_id = 12
-panel_dock = 1
+wm_menu = 1
+panel_dock = 0
 panel_position = top center horizontal
+# panel_layer = top
 panel_layer = top
-panel_monitor = all
-# strut_policy = none # follow_size
-panel_window_name = tint2-master
-wm_menu = 1		# forward mouse clicks to WM
+panel_monitor = all		# XXX 191101: "all" will break systray area (volumeicon)
+# panel_monitor = 1
+strut_policy = follow_size
+panel_window_name = tint2
 disable_transparency = 1
 mouse_effects = 1
 font_shadow = 0
@@ -286,7 +288,8 @@ systray_background_id = 0
 systray_sort = right2left
 # systray_icon_size = 32
 # systray_icon_asb = 100 0 0
-systray_monitor = primary	# 1 or 2 or primary
+# systray_monitor = primary	# 1 or 2 or primary
+systray_monitor = all
 # ------------------------------------------------------------------------- }}}
 # Separators																{{{
 # -----------------------------------------------------------------------------

@@ -1,0 +1,66 @@
+" created 200510
+" vim: set ft=vim ts=4 sw=4 tw=78 fdm=marker noet :
+
+" :viewconfig
+
+colors dark
+
+" set newtab about:newtab	" XXX 200510
+set newtab about:blank
+
+" key bindings																{{{
+" -----------------------------------------------------------------------------
+" :help bind
+unbind <C-d>
+unbind <C-u>
+bind <C-[> tabprev
+bind <C-]> tabnext
+bind h tabprev
+bind l tabnext
+
+bind d tabclose
+bind u undo
+
+bind H back
+bind L forward
+
+unbind --mode=ex <C-p>
+unbind --mode=ex <C-n>
+bind --mode=ex <C-p> ex.prev_history
+bind --mode=ex <C-b> ex.next_history
+
+unbindurl mail\.google\.com j
+unbindurl mail\.google\.com k
+unbindurl mail\.google\.com o
+unbindurl mail\.google\.com x
+unbindurl mail\.google\.com e
+
+bind + zoom +0.1 true
+bind - zoom -0.1 true
+" ------------------------------------------------------------------------- }}}
+
+" set hintchars fjkdsla;gh
+set hintchars asdfgzxcvbqwer
+
+bind / fillcmdline find
+bind ? fillcmdline find -?
+bind n findnext 1
+bind N findnext -1
+
+bind j scrollline 5
+bind k scrollline -5
+
+" autocmd DocStart mail.google.com mode ignore
+
+" search																	{{{
+" -----------------------------------------------------------------------------
+set searchurls.w   https://en.wikipedia.org/w/index.php?search=%s
+set searchurls.wd  https://en.wiktionary.org/wiki/?search=%s
+" ------------------------------------------------------------------------- }}}
+
+" Inject Google Translate
+" This (clearly) is remotely hosted code. Google will be sent the whole
+" contents of the page you are on if you run `:translate`
+" From https://github.com/jeremiahlee/page-translator
+command translate js let googleTranslateCallback = document.createElement('script'); googleTranslateCallback.innerHTML = "function googleTranslateElementInit(){ new google.translate.TranslateElement(); }"; document.body.insertBefore(googleTranslateCallback, document.body.firstChild); let googleTranslateScript = document.createElement('script'); googleTranslateScript.charset="UTF-8"; googleTranslateScript.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit&tl=&sl=&hl="; document.body.insertBefore(googleTranslateScript, document.body.firstChild);
+

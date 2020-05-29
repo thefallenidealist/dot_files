@@ -1,0 +1,18 @@
+! Created 191103
+! only keys specific to internal (ThinkPad T430s keyboard)
+
+!------------------------------------------------------------------------------
+! ThinkPad keys																{{{
+!------------------------------------------------------------------------------
+! mute speaker
+keycode 140 = XF86AudioMute NoSymbol XF86AudioMute
+! Fn key, can't work as normal key nor as modifier
+keycode 150 = NoSymbol NoSymbol
+keycode 150 = F15 F15 F15
+
+! ThinkPad keys
+keycode 233 = F22
+keycode 234 = F21
+!---------------------------------------------------------------------------}}}
+!-------------------------------------------------------------------------------
+!  vim: set ts=4 sw=4 tw=78 noet foldmethod=marker:

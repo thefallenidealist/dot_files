@@ -4,9 +4,8 @@
 
 ! 190106 FHD LCD: tune a value so Firefox/pcmanfm menus and text are not too small nor too big
 ! default for FHD 14 is 157 dpi
-! Xft.dpi: 130
-! Xft.dpi: 120
-Xft.dpi: 96
+! larger dpi -> larger font, needs restart after change, xrandr --dpi NNN won't have efect
+Xft.dpi: 120
 
 ! 190915 increase cursor
 ! Xcursor.size: 48

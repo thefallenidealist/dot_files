@@ -1,6 +1,7 @@
 # vim: set ft=conf ts=4 sw=4 tw=0 fdm=marker noet :
 # 140000 oldest backup found
 # 181110 major update
+# 200925 dual monitor setup
 
 # to reload changes:
 # killall -SIGUSR1 tint2
@@ -151,16 +152,18 @@ border_color_pressed = #555555 80
 # E - executor
 # C - clock
 # : - separator
-panel_items = TLE:E:E:E:EEBSC
+panel_items = TE:E:E:E:EEBSC
 panel_size = 100% 37
-panel_margin = 1 0
+panel_margin = 0 0
 panel_background_id = 12
-panel_dock = 1
+panel_dock = 0	# must be 0 when WM is used to place docks to left/right monitor
 panel_position = top center horizontal
 panel_layer = top
-panel_monitor = all
+panel_monitor = primary
+# panel_monitor = all
 # strut_policy = none # follow_size
-panel_window_name = tint2-master
+panel_window_name = tint2
+# panel_window_name = tint2-master
 wm_menu = 1		# forward mouse clicks to WM
 disable_transparency = 1
 mouse_effects = 1
@@ -168,14 +171,13 @@ font_shadow = 0
 mouse_hover_icon_asb = 100 0 10
 mouse_pressed_icon_asb = 100 0 0
 # ------------------------------------------------------------------------- }}}
-#
 # Taskbar																	{{{
 # -----------------------------------------------------------------------------
-# taskbar_mode = single_desktop
-taskbar_mode = multiple_desktop
+taskbar_mode = single_desktop
+taskbar_hide_different_monitor = 1
 taskbar_background_id = 1
 taskbar_padding = 1 2 2		# H V spacing
-taskbar_sort_order = application	# group by application XXX 181110
+taskbar_sort_order = application
 
 taskbar_name = 1	# show virtual desktop names
 taskbar_name_padding = 6 2
@@ -286,7 +288,8 @@ systray_background_id = 0
 systray_sort = right2left
 # systray_icon_size = 32
 # systray_icon_asb = 100 0 0
-systray_monitor = primary	# 1 or 2 or primary
+# systray_monitor = primary	# 1 or 2 or primary
+systray_monitor = all
 # ------------------------------------------------------------------------- }}}
 # Separators																{{{
 # -----------------------------------------------------------------------------
@@ -412,17 +415,3 @@ execp_centered = 1
 execp_icon_w = 0
 execp_icon_h = 0
 # ------------------------------------------------------------------------- }}}
-# Executor 5 - weather														{{{
-# -----------------------------------------------------------------------------
-execp = new
-execp_command = ~/scripts/weather.sh
-execp_interval = 120
-execp_lclick_command = ~/scripts/weather-xterm.sh
-# don't show output from curl in tooltip
-execp_tooltip =
-
-execp_font = sans 9
-execp_font_color = #aaffaa 100
-# ------------------------------------------------------------------------- }}}
-# applet (FS, net, RAM, CPU) for systray
-# python2.7 ~/scripts/phwmon/phwmon.py --bg 000000

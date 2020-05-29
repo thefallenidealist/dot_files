@@ -5,6 +5,7 @@ export RESOLUTION_Y=$(xdpyinfo | awk '/dimensions:/ { print $2; exit }' | cut -d
 
 #xterm&
 xsetroot -solid black&
+setxkbmap -option "terminate:ctrl_alt_bksp"
 xmodmap .xmodmap&
 xrdb .xdefaults&
 xbindkeys&
@@ -17,7 +18,8 @@ xmodmap -e "keycode 111 = Super_R"  # "PrtSc" key between Alt and Ctrl
 unclutter --timeout 1&		# hide mouse pointer - no problem when hiding cursor on mpv
 # hhpc -i 1&		# unclutter alterntive, works also on hw accelated videos XXX 181126: freezes mouse under cwm
 # osdmixer 300 100 d d&
-osdmixer $((RESOLUTION_X/4)) 100 d d&
+killall osdmixer; osdmixer $((RESOLUTION_X/4)) 100 d d&
+volumeicon&
 
 # sh ~/.opt/conky.sh&
 # pcmanfm -n /mnt/local/video/music &
@@ -38,7 +40,7 @@ skippy-xd --start-daemon&
 xhost +local:&
 
 # notification deamon
-dunst&
+# dunst&
 
 # enable auto lock on idle (also used by mod+l and lock on pointer in
 # upper left corner)

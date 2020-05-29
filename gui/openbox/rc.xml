@@ -28,14 +28,14 @@
 </focus>
 
 <placement>
-	<policy>Smart</policy>
-		<!-- 'Smart' or 'UnderMouse' -->
-	<monitor>Primary</monitor>
+	<!-- <policy>Smart</policy> -->
+	<policy>UnderMouse</policy>		<!-- 'Smart' or 'UnderMouse' -->
+	<monitor>UnderMouse</monitor>
 		<!-- with Smart placement on a multi-monitor system, try to place new windows
 			on: 'Any' - any monitor, 'Mouse' - where the mouse is, 'Active' - where
 		the active window is, 'Primary' - only on the primary monitor -->
 	<!-- <primaryMonitor>1</primaryMonitor> -->
-	<primaryMonitor>Primary</primaryMonitor>
+	<primaryMonitor>Active</primaryMonitor>
 		<!-- The monitor where Openbox should place popup dialogs such as the
 			focus cycling popup, or the desktop switch popup.  It can be an index
 			from 1, specifying a particular monitor.  Or it can be one of the
@@ -144,22 +144,12 @@ cases. -->
 </margins>
 
 <dock>
+	<!-- only used when tint2 was panel_dock=1 -->
 	<position>TopLeft</position>
-	<!-- (Top|Bottom)(Left|Right|)|Top|Bottom|Left|Right|Floating -->
-	<floatingX>0</floatingX>
-	<floatingY>0</floatingY>
-	<noStrut>no</noStrut>
 	<stacking>Above</stacking>
-	<!-- 'Above', 'Normal', or 'Below' -->
-	<direction>Vertical</direction>
-	<!-- 'Vertical' or 'Horizontal' -->
+	<direction>Horizontal</direction>
 	<autoHide>no</autoHide>
-	<hideDelay>300</hideDelay>
-	<!-- in milliseconds (1000 = 1 second) -->
-	<showDelay>300</showDelay>
-	<!-- in milliseconds (1000 = 1 second) -->
 	<moveButton>Middle</moveButton>
-	<!-- 'Left', 'Middle', 'Right' -->
 </dock>
 
 <!-- keyboard shortcuts									{{{-->
@@ -177,6 +167,11 @@ cases. -->
 	<keybind key="W-6">			<action name="GoToDesktop">		<to>6</to>			</action></keybind>
 	<keybind key="W-7">			<action name="GoToDesktop">		<to>7</to>			</action></keybind>
 	<keybind key="W-8">			<action name="GoToDesktop">		<to>8</to>			</action></keybind>
+		<!-- Windows 10 compat -->
+	<keybind key="C-W-Left">	<action name="GoToDesktop">		<to>Left</to>		</action></keybind>
+	<keybind key="C-W-Right">	<action name="GoToDesktop">		<to>Right</to>		</action></keybind>
+	<keybind key="W-Left">		<action name="GoToDesktop">		<to>Left</to>		</action></keybind>
+	<keybind key="W-Right">		<action name="GoToDesktop">		<to>Right</to>		</action></keybind>
 
 	<keybind key="S-W-1">		<action name="SendToDesktop">	<to>1</to>			</action></keybind>
 	<keybind key="S-W-2">		<action name="SendToDesktop">	<to>2</to>			</action></keybind>
@@ -189,6 +184,9 @@ cases. -->
 
 	<keybind key="W-S-Left">	<action name="SendToDesktop">	<to>Left</to>		</action></keybind>
 	<keybind key="W-S-Right">	<action name="SendToDesktop">	<to>Right</to>		</action></keybind>
+	<!-- Windows 10 compat, maybe -->
+	<keybind key="C-W-S-Left">	<action name="SendToDesktop">	<to>Left</to>		</action></keybind>
+	<keybind key="C-W-S-Right">	<action name="SendToDesktop">	<to>Right</to>		</action></keybind>
 
 	<!-- Keybindings for windows -->
 	<keybind key="A-Escape"> <action name="Lower"/> <action name="FocusToBottom"/> <action name="Unfocus"/> </keybind>
@@ -205,20 +203,9 @@ cases. -->
 	<keybind key="W-a"><keybind key="j">	<action name="Reconfigure"/>		</keybind></keybind>
 	<keybind key="W-a"><keybind key="S-j">	<action name="Restart"/>			</keybind></keybind>
 
-	<keybind key="S-W-r"><action name="Restart"/>			</keybind>
-	<keybind key="S-W-r"><action name="Restart"/>			</keybind>
-	<keybind key="W-Right">
-		<action name="MoveResizeTo">
-			<!-- move the window to the second monitor -->
-			<monitor>next</monitor>
-		</action>
-	</keybind>
-	<keybind key="W-Left">
-		<action name="MoveResizeTo">
-			<!-- move the window to the second monitor -->
-			<monitor>prev</monitor>
-		</action>
-	</keybind>
+	<!-- move window to the other monitor -->
+	<keybind key="W-A-Right">	<action name="MoveResizeTo"> <monitor>next</monitor> </action> </keybind>
+	<keybind key="W-A-Left">	<action name="MoveResizeTo"> <monitor>prev</monitor> </action> </keybind>
 
 	<!-- poor mans tiling -->
 	<keybind key="A-Left">
@@ -712,17 +699,38 @@ cases. -->
 			<application class="*">
 				<decor>yes</decor>
 				<focus>yes</focus>
-				<position>
+				<!-- <position> -->
+				<position force="no">
 					<x>center</x>
 					<y>center</y>
 				</position>
 			</application>
 
 			<!-- da ne razjebe tint2 taskbar -->
-			<application name="tint2">
+			<application title="tint2">
 				<position>
-					<x>0</x>
-					<y>0</y>
+				<x>center</x>
+				<y>top</y>
+				<y>100</y>
+				<monitor>1</monitor>
+				</position>
+			</application>
+
+			<application title="tint2-master">
+				<position>
+					<x>center</x>
+					<y>top</y>
+					<y>100</y>
+					<monitor>1</monitor>
+				</position>
+			</application>
+			<!-- 200529: left, non-primary monitor -->
+			<application title="tint2-slave">
+				<position>
+					<x>center</x>
+					<y>top</y>
+					<y>100</y>
+					<monitor>2</monitor>
 				</position>
 			</application>
 
