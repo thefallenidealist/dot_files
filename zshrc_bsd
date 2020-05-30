@@ -5,5 +5,6 @@ PS1="$(print '%{\e[0;34m%}%M%{\e[0m%}%{\e[0;31m%}%#%{\e[0m%}') "
 alias ls='ls -IGh'
 # 190514: GNU/shit decided to rename this:
 alias msg="grc cat /var/log/messages | grep -v 'wpa_supplicant\|dhclient\|wlan0: link state'"
-alias w='fetch'
+# alias w='fetch'
+alias w='wget'
 alias whereis="whereis -a"

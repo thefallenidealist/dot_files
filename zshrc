@@ -94,8 +94,9 @@ fi
 export LD_LIBRARY_PATH=$HOME/.opt/lib:$LD_LIBRARY_PATH
 export PATH="$HOME/scripts:$HOME/.opt:$HOME/.opt/bin:$HOME/.opt/sbin:$HOME/.opt/scripts:$PATH"
 export PATH="$PATH:/opt/scripts:/opt/bin"
-export PATH="$PATH:$HOME/.cargo/bin:$HOME/.local/bin"
-# export PATH="$PATH:$HOME/.cargo/bin:$HOME/.local/bin:$HOME/.fzf/bin"
+export PATH="$PATH:$HOME/.cargo/bin:$HOME/.local/bin:$HOME/.opt/riscv"
+# 200227 needed for root, for some reason it is not default:
+export PATH="$PATH:/usr/local/sbin:/usr/local/bin"
 
 export MANPATH=$HOME/.opt/share/man:$MANPATH
 # INFO 190422: ripgrep will look for a single configuration file if and only if the RIPGREP_CONFIG_PATH environment variable is set and is non-empty.
@@ -114,7 +115,7 @@ PS2="$(print '%{\e[0;31m%}>%{\e[0m%}') "
 RPS1="$(print '%{\e[0;33m%}[%~]%{\e[0;32m%}[%y]%{\e[0;31m%}%{\e[0;31m%}[%D{%y.%m.%d. %H:%M:%S}]%{\e[0m%}')"
 # -------------------------------------------------------------------------- }}}
 
-export DISPLAY=:0
+# export DISPLAY=:0
 export EDITOR=`which nvim`
 export PAGER='less -XMr'
 export MANPAGER='less -s -M +Gg' # don't export +G to LESS because it will hang when reading large files
@@ -182,8 +183,9 @@ alias -g S='> /dev/null 2>&1'
 # alias cpu='top -HS'
 alias cpu="ps aux | sort -nrk 3,3 | head -n 5"
 alias mem='top -b -o res'
-alias topiow="top -m io -o write -s 1"
-alias topior="top -m io -o read -s 1"
+alias iotopw="top -m io -o write -s 1"
+alias iotopr="top -m io -o read -s 1"
+alias iotop="top -m io -o total"
 
 alias s2r='sync; acpiconf -s 3'
 alias s2d='sync; acpiconf -s 4'	# Neb reka da bas radi, bit ce da mu treba pravi swap
@@ -256,6 +258,8 @@ alias pp='echo `/usr/bin/whoami`@$HOST"["$TTY"]":`/bin/pwd`'
 alias mnt='mount | column -t'
 alias mnt="mount | sed 's/on//g' | sed -e 's/([^()]*)//g' | column -t"
 
+alias newfs.ntfs='mkntfs'
+
 alias lsof='fstat | grep -i '
 alias u='(date && uname -a && uptime)'
 alias uu='(date && uname -a && uptime) > `uname -r | cut -b 1-3`.`/bin/date +'%y%m%d'`'
@@ -295,7 +299,7 @@ alias bup3f='portmaster -Fa'
 # -------------------------------------------------------------------------- }}}
 # ------------------ alias - network --------------------------------------- {{{
 alias pg='ping www.opendns.org'
-alias pr='ping 192.168.1.1'
+alias pr="ping $(netstat -rn | grep default | awk '{print $2}')"
 alias pd='ping 1.1.1.1'
 alias nr='/etc/rc.d/netif restart'
 alias rr='/etc/rc.d/routing restart'
@@ -314,6 +318,7 @@ alias vi=nvim
 alias vimdiff="nvim -d"
 alias vim="vi -c FZFMru"
 alias vio="vi -c Files"
+alias vis="vi -S"
 #alias s='screen -U'
 alias s='tmux'
 alias history='history -Ef'	# pretty history with European dates"
@@ -364,29 +369,11 @@ alias md="grip --norefresh"	# GitHub readme preview, don't auto refresh because 
 alias gg='gmake clean && gmake'
 alias ggu='gmake clean && gmake -j4 && gmake upload'
 alias weather='curl wttr.in/Osijek\?F'
+
+alias zathura-tabbed="tabbed -c zathura -e"		# XXX 200315 don't work as expected
+alias rgf="rg --no-ignore --files | grep "
 # -------------------------------------------------------------------------- }}}
 
-# ------------------ custom function - zsnap ------------------------------- {{{
-function zsnap()
-{
-	# make recursive snapshots of specific pool or all available pools
-	TIMESTAMP="`/bin/date +%y%m%d`_`/bin/date +%H%M`"
-	if [ ! -z $1 ]; then
-		# make snapshot for one pool (given as argument to the function)
-		zfs snapshot -r $i@$TIMESTAMP
-	else # if called without arguments
-		# make snapshot for all pools: pool@<date>
-		TIMESTAMP="`/bin/date +%y%m%d`_`/bin/date +%H%M`"
-
-		echo "Making snaphosts [ @$TIMESTAMP ] for pools:"
-		for i in `zpool list -Ho name,health | grep -v UNAVAIL | cut -f 1` ; do
-			echo $i
-			# zfs snapshot -r $i@`/bin/date +%y%m%d`_`/bin/date +%H%M` ;
-			zfs snapshot -r $i@$TIMESTAMP
-		done
-	fi
-}
-# -------------------------------------------------------------------------- }}}
 # ------------------ custom function - ssh --------------------------------- {{{
 ssh()
 {
@@ -455,3 +442,8 @@ function mm() {
 # pkg install zsh-syntax-highlighting
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fpath=($HOME/.zsh-completions $fpath)
+
+# 191207
+QT_QPA_PLATFORMTHEME=qt5c
+
+source /home/johnny/.config/broot/launcher/bash/br

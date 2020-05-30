@@ -54,8 +54,17 @@ bind k scrollline -5
 
 " search																	{{{
 " -----------------------------------------------------------------------------
-set searchurls.w   https://en.wikipedia.org/w/index.php?search=%s
-set searchurls.wd  https://en.wiktionary.org/wiki/?search=%s
+set searchurls.w    https://en.wikipedia.org/w/index.php?search=%s
+set searchurls.wd   https://en.wiktionary.org/wiki/?search=%s
+set searchurls.g    https://www.google.com/search?q=%s Google
+set searchurls.gi   https://www.google.com/search?tbm=isch&q=%s
+set searchurls.yt   https://www.youtube.com/results?search_query=%s
+set searchurls.maps https://www.google.com/maps?q=%s
+set searchurls.e    https://www.ebay.com/sch/?_nkw=%s
+set searchurls.gh   https://github.com/search?q=%s
+set searchurls.so   https://stackoverflow.com/search?q=%s
+set searchurls.su   https://superuser.com/search?q=%s
+set searchurls.imdb https://www.imdb.com/find?s=all&q=%s
 " ------------------------------------------------------------------------- }}}
 
 " Inject Google Translate

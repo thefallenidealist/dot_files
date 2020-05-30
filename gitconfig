@@ -1,13 +1,22 @@
 # INFO to view options: git config --list (or -l)
 # vim: set ft=gitconfig ts=4 sw=4 tw=0 fdm=manual noet :
+
 [include]
 	path = ~/.gitconfig_local
+	# path = ~/github-private/.gitconfig-private
+
+# 200204: must be before [include]
+# [includeIf "gitdir:~/github-private/"]
+	# path = ~/github-private/.gitconfig-private
+
 
 [core]
 	pager = less -F -X
-	autocrlf = false	# 181127 work PC
+	# autocrlf = false	# 181127 work PC
+	# autocrlf=true
 
 [alias]
+	# private = config user.email "me@private-mail.com"
 	s = status
 	sn = status -uno
 	si = status --ignored

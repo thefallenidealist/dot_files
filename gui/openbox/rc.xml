@@ -117,25 +117,12 @@
 
 <resize>
 	<drawContents>yes</drawContents>
-	<popupShow>Nonpixel</popupShow>
-		<!-- 'Always', 'Never', or 'Nonpixel' (xterms and such) -->
-	<popupPosition>Center</popupPosition>
-		<!-- 'Center', 'Top', or 'Fixed' -->
-	<popupFixedPosition>
-		<!-- these are used if popupPosition is set to 'Fixed' -->
-	<x>10</x>
-		<!-- positive number for distance from left edge, negative number for
-		distance from right edge, or 'Center' -->
-	<y>10</y>
-		<!-- positive number for distance from top edge, negative number for
-		distance from bottom edge, or 'Center' -->
-	</popupFixedPosition>
+	<popupShow>Always</popupShow>			<!-- 'Always', 'Never', or 'Nonpixel' (xterms and such) -->
+	<popupPosition>Center</popupPosition>	<!-- 'Center', 'Top', or 'Fixed' -->
 </resize>
 
-<!-- You can reserve a portion of your screen where windows will not cover when
-	they are maximized, or when they are initially placed.
-	Many programs reserve space automatically, but you can use this in other
-cases. -->
+<!-- You can reserve a portion of your screen where windows will not cover when they are maximized, or when they are initially placed.
+	Many programs reserve space automatically, but you can use this in other cases. -->
 <margins>
 	<top>0</top>
 	<bottom>0</bottom>
@@ -194,14 +181,18 @@ cases. -->
 	<keybind key="A-F3">	<action name="Iconify"/>			</keybind>
 	<keybind key="A-F4">	<action name="Close"/>				</keybind>
 	<keybind key="A-F5">	<action name="ToggleMaximize"/>		</keybind>
-	<keybind key="W-m">		<action name="ToggleMaximize"/>		</keybind>
-	<keybind key="W-f">		<action name="ToggleFullscreen"/>	</keybind>
+	<!-- <keybind key="A-S-F5">	<action name="Execute"> <command> $HOME/scripts/wm-maximize-multiple-monitors </command> 	</action> </keybind> -->
+	<keybind key="A-S-F5">	<action name="Execute"> <command> ~/scripts/wm-maximize-multiple-monitors </command> 	</action> </keybind>
+
 	<keybind key="A-F6">	<action name="ToggleMaximize">		<direction>horizontal</direction></action></keybind>
 	<keybind key="A-F7">	<action name="ToggleMaximizeVert"/>	</keybind>
+	<keybind key="W-q">		<action name="Close"/>				</keybind>
+	<keybind key="W-f">		<action name="ToggleFullscreen"/>	</keybind>
+	<keybind key="W-m">		<action name="ToggleMaximize"/>		</keybind>
 
 	<keybind key="W-a"><keybind key="g">	<action name="ToggleDecorations"/>	</keybind></keybind>
-	<keybind key="W-a"><keybind key="j">	<action name="Reconfigure"/>		</keybind></keybind>
-	<keybind key="W-a"><keybind key="S-j">	<action name="Restart"/>			</keybind></keybind>
+	<keybind key="W-a"><keybind key="r">	<action name="Reconfigure"/>		</keybind></keybind>
+	<keybind key="W-a"><keybind key="S-r">	<action name="Restart"/>			</keybind></keybind>
 
 	<!-- move window to the other monitor -->
 	<keybind key="W-A-Right">	<action name="MoveResizeTo"> <monitor>next</monitor> </action> </keybind>
@@ -247,7 +238,7 @@ cases. -->
 		<action name="ToggleMaximize"><direction>horizontal</direction></action>
 	</keybind>
 
-	<!-- <keybind key="A-space"> <action name="ShowMenu"> <menu>client-menu</menu> </action> </keybind> -->
+	<keybind key="A-space"> <action name="ShowMenu"> <menu>client-menu</menu> </action> </keybind>
 
 	<!-- Keybindings for window switching -->
 	<keybind key="A-Tab"> <action name="NextWindow"> <finalactions>
@@ -597,429 +588,444 @@ cases. -->
 	<!-- show the manage desktops section in the client-list-(combined-)menu -->
 </menu>
 
+<!-- applications 											{{{-->
+<applications>
+<!--
+	# this is an example with comments through out. use these to make your
+	# own rules, but without the comments of course.
+	# you may use one or more of the name/class/role/title/type rules to specify
+	# windows to match
+
+	<application name="the window's _OB_APP_NAME property (see obxprop)"
+	class="the window's _OB_APP_CLASS property (see obxprop)"
+	groupname="the window's _OB_APP_GROUP_NAME property (see obxprop)"
+	groupclass="the window's _OB_APP_GROUP_CLASS property (see obxprop)"
+	role="the window's _OB_APP_ROLE property (see obxprop)"
+	title="the window's _OB_APP_TITLE property (see obxprop)"
+	type="the window's _OB_APP_TYPE property (see obxprob)..
+	(if unspecified, then it is 'dialog' for child windows)">
+	# you may set only one of name/class/role/title/type, or you may use more
+	# than one together to restrict your matches.
+
+	# the name, class, role, and title use simple wildcard matching such as those
+	# used by a shell. you can use * to match any characters and ? to match
+	# any single character.
+
+	# the type is one of: normal, dialog, splash, utility, menu, toolbar, dock,
+	#    or desktop
+
+	# when multiple rules match a window, they will all be applied, in the
+	# order that they appear in this list
 
 
-	<applications>
-		<!--
-			# this is an example with comments through out. use these to make your
-			# own rules, but without the comments of course.
-			# you may use one or more of the name/class/role/title/type rules to specify
-			# windows to match
+	# each rule element can be left out or set to 'default' to specify to not 
+	# change that attribute of the window
 
-			<application name="the window's _OB_APP_NAME property (see obxprop)"
-			class="the window's _OB_APP_CLASS property (see obxprop)"
-			groupname="the window's _OB_APP_GROUP_NAME property (see obxprop)"
-			groupclass="the window's _OB_APP_GROUP_CLASS property (see obxprop)"
-			role="the window's _OB_APP_ROLE property (see obxprop)"
-			title="the window's _OB_APP_TITLE property (see obxprop)"
-			type="the window's _OB_APP_TYPE property (see obxprob)..
-			(if unspecified, then it is 'dialog' for child windows)">
-			# you may set only one of name/class/role/title/type, or you may use more
-			# than one together to restrict your matches.
+	<decor>yes</decor>
+	# enable or disable window decorations
 
-			# the name, class, role, and title use simple wildcard matching such as those
-			# used by a shell. you can use * to match any characters and ? to match
-			# any single character.
+	<shade>no</shade>
+	# make the window shaded when it appears, or not
 
-			# the type is one of: normal, dialog, splash, utility, menu, toolbar, dock,
-			#    or desktop
+	<position force="no">
+	# the position is only used if both an x and y coordinate are provided
+	# (and not set to 'default')
+	# when force is "yes", then the window will be placed here even if it
+	# says you want it placed elsewhere.  this is to override buggy
+	# applications who refuse to behave
+	<x>center</x>
+	# a number like 50, or 'center' to center on screen. use a negative number
+	# to start from the right (or bottom for <y>), ie -50 is 50 pixels from
+	# the right edge (or bottom). use 'default' to specify using value
+	# provided by the application, or chosen by openbox, instead.
+	<y>200</y>
+	<monitor>1</monitor>
+	# specifies the monitor in a xinerama setup.
+	# 1 is the first head, or 'mouse' for wherever the mouse is
+	</position>
 
-			# when multiple rules match a window, they will all be applied, in the
-			# order that they appear in this list
+	<size>
+	# the size to make the window.
+	<width>20</width>
+	# a number like 20, or 'default' to use the size given by the application.
+	# you can use fractions such as 1/2 or percentages such as 75% in which
+	# case the value is relative to the size of the monitor that the window
+	# appears on.
+	<height>30%</height>
+	</size>
+
+	<focus>yes</focus>
+	# if the window should try be given focus when it appears. if this is set
+	# to yes it doesn't guarantee the window will be given focus. some
+	# restrictions may apply, but Openbox will try to
+
+	<desktop>1</desktop>
+	# 1 is the first desktop, 'all' for all desktops
+
+	<layer>normal</layer>
+	# 'above', 'normal', or 'below'
+
+	<iconic>no</iconic>
+	# make the window iconified when it appears, or not
+
+	<skip_pager>no</skip_pager>
+	# asks to not be shown in pagers
+
+	<skip_taskbar>no</skip_taskbar>
+	# asks to not be shown in taskbars. window cycling actions will also
+	# skip past such windows
+
+	<fullscreen>yes</fullscreen>
+	# make the window in fullscreen mode when it appears
+
+	<maximized>true</maximized>
+	# 'Horizontal', 'Vertical' or boolean (yes/no)
+	</application>
+
+	# end of the example
+-->
 
 
-			# each rule element can be left out or set to 'default' to specify to not 
-			# change that attribute of the window
-
-			<decor>yes</decor>
-			# enable or disable window decorations
-
-			<shade>no</shade>
-			# make the window shaded when it appears, or not
-
-			<position force="no">
-			# the position is only used if both an x and y coordinate are provided
-			# (and not set to 'default')
-			# when force is "yes", then the window will be placed here even if it
-			# says you want it placed elsewhere.  this is to override buggy
-			# applications who refuse to behave
+	<application class="*">	<!-- default for all applications, can be overriden latter -->
+		<decor>yes</decor>
+		<focus>yes</focus>
+		<position force="no">
 			<x>center</x>
-			# a number like 50, or 'center' to center on screen. use a negative number
-			# to start from the right (or bottom for <y>), ie -50 is 50 pixels from
-			# the right edge (or bottom). use 'default' to specify using value
-			# provided by the application, or chosen by openbox, instead.
-			<y>200</y>
-			<monitor>1</monitor>
-			# specifies the monitor in a xinerama setup.
-			# 1 is the first head, or 'mouse' for wherever the mouse is
-			</position>
+			<y>center</y>
+		</position>
+	</application>
 
-			<size>
-			# the size to make the window.
-			<width>20</width>
-			# a number like 20, or 'default' to use the size given by the application.
-			# you can use fractions such as 1/2 or percentages such as 75% in which
-			# case the value is relative to the size of the monitor that the window
-			# appears on.
+	<application title="tint2">
+		<position>
+		<x>center</x>
+		<y>top</y>
+		<y>100</y>
+		<monitor>1</monitor>	<!-- 1 = master/right monitor -->
+		</position>
+	</application>
+
+	<application title="tint2-master">
+		<position>
+			<x>center</x>
+			<y>top</y>
+			<y>100</y>
+			<monitor>1</monitor>	<!-- 1 = master/right monitor -->
+		</position>
+	</application>
+	<!-- 200529: left, non-primary monitor -->
+	<application title="tint2-slave">
+		<position>
+			<x>center</x>
+			<y>top</y>
+			<y>100</y>
+			<monitor>2</monitor>	<!-- 2 = slave/left monitor -->
+		</position>
+	</application>
+
+	<!-- root xtermovi -->
+	<application title="*root">
+		<desktop>5</desktop>
+		<focus>no</focus>
+	</application>
+
+	<!-- obicni xtermovi, primjeni se i za root, gore opisane -->
+	<application name="xterm*">
+		<!-- ako nema decor onda nece imat 100% height, ne pomaze ni rucno postavljanje u pixelima -->
+		<decor>yes</decor>
+		<position>
+			<x>0</x>
+			<y>0</y>
+		</position>
+		<size>
+			<!-- <width>87%</width> T410 -->
+			<width>88%</width>
+			<height>100%</height>
+		</size>	
+		<maximized>vertical</maximized>
+	</application>
+
+	<application class="Konsole">
+		<decor>yes</decor>
+		<position>
+			<x>0</x>
+			<y>0</y>
+		</position>
+		<size>
+			<width>88%</width>
+			<height>100%</height>
+		</size>
+		<maximized>vertical</maximized>
+	</application>
+
+	<application name="lxterminal">
+		<decor>yes</decor>
+		<position>
+			<x>0</x>
+			<y>0</y>
+		</position>
+		<size>
+			<width>88%</width>
+			<height>100%</height>
+		</size>
+		<maximized>vertical</maximized>
+	</application>
+
+	<!-- <application name="Firefox - Choose User Profile"> -->
+	<!-- 	<decor>no</decor> -->
+	<!-- 	<desktop>3</desktop> -->
+	<!-- 	<position> -->
+	<!-- 		<x>0</x> -->
+	<!-- 		<y>0</y> -->
+	<!-- 	</position> -->
+	<!-- </application> -->
+
+
+	<application name="galculator*">
+		<position>
+			<x>center</x>
+			<y>center</y>
+		</position>
+	</application>
+
+	<application name="gsimplecal">
+		<position>
+			<x>-2</x>
+			<y>0</y>
+		</position>
+	</application>
+
+	<application name="yterm"> <!-- special version of xterm for use with tint2 -->
+		<decor>no</decor>
+		<skip_taskbar>yes</skip_taskbar>
+	</application>
+
+	<!-- *********************************************	-->
+	<!--				PcmanFM							-->
+	<!-- *********************************************	-->
+	<application name="pcmanfm*" type="normal*">	<!-- samo standardni pcmanfm, bez dialoga -->
+		<decor>yes</decor>	<!-- PCmanFM i bez dekora ima oke dimenzije -->
+		<position>
+			<x>0</x>
+			<y>0</y>
+		</position>
+		<size>
+			<width>88%</width>
+			<height>100%</height>
+		</size>
+	</application>
+
+	<!-- <application name="pcmanfm*" type="dialog" title="Rename File"> -->
+	<application name="pcmanfm*" type="dialog">
+		<focus>yes</focus>
+	</application>
+
+	<application name="pcmanfm*" type="normal*" title="datasheetovi">	<!-- samo standardni pcmanfm, bez dialoga -->
+		<focus>no</focus>	<!-- da ga potiho pokrene, bez automatskog switchanja desktopa -->
+		<desktop>3</desktop>
+	</application>
+
+	<!-- PCmanFM	net, datasheetovi	INFO multiple title jer nekad ga nazove po prvom tabu, nekad po zadnjem-->
+	<application name="pcmanfm*" type="normal*" title="net">	<!-- samo standardni pcmanfm, bez dialoga -->
+		<focus>no</focus>	<!-- da ga potiho pokrene, bez automatskog switchanja desktopa -->
+		<desktop>3</desktop>
+	</application>
+	<application name="pcmanfm*" type="normal*" title="datasheetovi">	<!-- samo standardni pcmanfm, bez dialoga -->
+		<focus>no</focus>	<!-- da ga potiho pokrene, bez automatskog switchanja desktopa -->
+		<desktop>3</desktop>
+	</application>
+
+	<!-- PCmanFM	video, filmovi -->
+	<application name="pcmanfm*" type="normal*" title="video">	<!-- samo standardni pcmanfm, bez dialoga -->
+		<focus>no</focus>	<!-- da ga potiho pokrene, bez automatskog switchanja desktopa -->
+		<desktop>4</desktop>
+	</application>
+	<application name="pcmanfm*" type="normal*" title="filmovi">	<!-- samo standardni pcmanfm, bez dialoga -->
+		<focus>no</focus>	<!-- da ga potiho pokrene, bez automatskog switchanja desktopa -->
+		<desktop>4</desktop>
+	</application>
+
+	<!-- PCmanFM	music, epic-->
+	<application name="pcmanfm*" type="normal*" title="music">	<!-- samo standardni pcmanfm, bez dialoga -->
+		<focus>no</focus>	<!-- da ga potiho pokrene, bez automatskog switchanja desktopa -->
+		<desktop>4</desktop>
+	</application>
+	<application name="pcmanfm*" type="normal*" title="epic">	<!-- samo standardni pcmanfm, bez dialoga -->
+		<focus>no</focus>	<!-- da ga potiho pokrene, bez automatskog switchanja desktopa -->
+		<desktop>4</desktop>
+	</application>
+
+	<!-- PCmanFM Rename File -->
+	<!-- Da bude na sredini, a ne gore lijevo, defaulte dimenzije su oke -->
+	<application class="Pcmanfm" title="Rename File">
+		<position>
+			<x>center</x>
+			<y>center</y>
+		</position>
+	</application>
+
+	<!-- TODO DeadBeef add dialog
+		WM_CLASS(STRING) = "deadbeef", "Deadbeef"
+		WM_ICON_NAME(STRING) = "Adding files..."
+		_NET_WM_ICON_NAME(UTF8_STRING) = "Adding files..."
+		WM_NAME(STRING) = "Adding files..."
+		_NET_WM_NAME(UTF8_STRING) = "Adding files..."
+	-->
+	<application class="*MPlayer*">
+		<decor>no</decor>
+		<position>
+			<x>center</x>
+			<y>center</y>
+		</position>
+	</application>
+
+	<application class="mpv">
+		<decor>no</decor>
+		<position>
+			<x>center</x>
+			<y>center</y>
+		</position>
+	</application>
+
+	<!-- *********************************************	-->
+	<!--				Leafpad							-->
+	<!-- *********************************************	-->
+	<application name="leafpad*">
+		<decor>yes</decor>
+		<position>
+			<x>0</x>
+			<y>0</y>
+		</position>
+		<size>
+			<width>88%</width>
+			<height>100%</height>
+		</size>
+	</application>
+
+	<!-- *********************************************	-->
+	<!--				Pidgin							-->
+	<!-- *********************************************	-->
+	<application role="buddy_list">
+		<decor>yes</decor>
+		<position>
+			<x>0</x>
+			<y>0</y>
+		</position>
+		<size>
+			<width>18%</width>
+			<height>60%</height>
+		</size>
+	</application>
+
+	<application role="conversation">
+		<!-- TODO -->
+		<decor>yes</decor>
+		<focus>yes</focus>
+		<desktop>1</desktop>
+		<position>
+			<x>0</x>
+			<y>0</y>
+		</position>
+		<size>
+			<width>88%</width>
+				<!-- <height>100%</height> -->
+				<height>100%</height>
+		</size>
+	</application>
+	<application role="statuses">
+		<decor>yes</decor>
+		<focus>yes</focus>
+		<position>
+			<x>0</x>
+			<y>0</y>
+		</position>
+		<size>
+			<width>88%</width>
+			<height>100%</height>
+		</size>
+	</application>
+
+	<!-- *********************************************	-->
+	<!--				GViM							-->
+	<!-- *********************************************	-->
+	<application name="gvim">
+		<decor>yes</decor>
+		<position>
+			<x>0</x>
+			<y>0</y>
+		</position>
+		<size>
+			<width>88%</width>
+			<height>100%</height>
+		</size>
+		<maximized>vertical</maximized>
+	</application>
+
+	<application name="feh">
+		<decor>no</decor>
+	</application>
+
+	<!-- *********************************************	-->
+	<!--				DeadBeef						-->
+	<!-- *********************************************	-->
+	<application name="deadbeef*">
+		<decor>yes</decor>
+		<maximized>no</maximized>
+		<desktop>2</desktop>
+		<!-- <focus>no</focus>	-->
+		<position>
+			<x>0</x>
+			<y>0</y>
+		</position>
+		<size>
+			<width>88%</width>
+			<height>100%</height>
+		</size>
+	</application>
+
+	<application name="gmrun">
+		<decor>no</decor>
+		<position>
+			<x>center</x>
+			<y>center</y>
+		</position>
+	</application>
+
+	<application name="Freerouter">
+		<decor>no</decor>
+		<position>
+			<x>0</x>
+			<y>0</y>
+		</position>
+		<size>
+			<width>20%</width>
 			<height>30%</height>
-			</size>
+		</size>
+	</application>
 
-			<focus>yes</focus>
-			# if the window should try be given focus when it appears. if this is set
-			# to yes it doesn't guarantee the window will be given focus. some
-			# restrictions may apply, but Openbox will try to
+	<application name="kicad" title="Eeschema*">
+		<decor>no</decor>
+		<position>
+			<x>center</x>
+			<y>top</y>
+			<y>100</y>
+			<monitor>2</monitor>	<!-- 2 = slave/left monitor -->
+		</position>
+	</application>
+	<application name="kicad" title="Pcbnew*">
+		<decor>no</decor>
+		<position>
+			<x>center</x>
+			<y>top</y>
+			<y>100</y>
+			<monitor>1</monitor>	<!-- 1 = master/right monitor -->
+		</position>
+	</application>
 
-			<desktop>1</desktop>
-			# 1 is the first desktop, 'all' for all desktops
+	<application name="FreeCAD">
+		<decor>no</decor>
+	</application>
 
-			<layer>normal</layer>
-			# 'above', 'normal', or 'below'
+</applications>
+<!-- }}}-->
 
-			<iconic>no</iconic>
-			# make the window iconified when it appears, or not
-
-			<skip_pager>no</skip_pager>
-			# asks to not be shown in pagers
-
-			<skip_taskbar>no</skip_taskbar>
-			# asks to not be shown in taskbars. window cycling actions will also
-			# skip past such windows
-
-			<fullscreen>yes</fullscreen>
-			# make the window in fullscreen mode when it appears
-
-			<maximized>true</maximized>
-			# 'Horizontal', 'Vertical' or boolean (yes/no)
-			</application>
-
-			# end of the example
-		-->
-
-			<!-- default za sve aplikacije, moze se overridead kasnije dolje -->
-			<application class="*">
-				<decor>yes</decor>
-				<focus>yes</focus>
-				<!-- <position> -->
-				<position force="no">
-					<x>center</x>
-					<y>center</y>
-				</position>
-			</application>
-
-			<!-- da ne razjebe tint2 taskbar -->
-			<application title="tint2">
-				<position>
-				<x>center</x>
-				<y>top</y>
-				<y>100</y>
-				<monitor>1</monitor>
-				</position>
-			</application>
-
-			<application title="tint2-master">
-				<position>
-					<x>center</x>
-					<y>top</y>
-					<y>100</y>
-					<monitor>1</monitor>
-				</position>
-			</application>
-			<!-- 200529: left, non-primary monitor -->
-			<application title="tint2-slave">
-				<position>
-					<x>center</x>
-					<y>top</y>
-					<y>100</y>
-					<monitor>2</monitor>
-				</position>
-			</application>
-
-			<!-- root xtermovi -->
-			<application title="*root">
-				<desktop>5</desktop>
-				<focus>no</focus>
-			</application>
-
-			<!-- obicni xtermovi, primjeni se i za root, gore opisane -->
-			<application name="xterm*">
-				<!-- ako nema decor onda nece imat 100% height, ne pomaze ni rucno postavljanje u pixelima -->
-				<decor>yes</decor>
-				<position>
-					<x>0</x>
-					<y>0</y>
-				</position>
-				<size>
-					<!-- <width>87%</width> T410 -->
-					<width>88%</width>
-					<height>100%</height>
-				</size>	
-				<maximized>vertical</maximized>
-			</application>
-
-			<application class="Konsole">
-				<decor>yes</decor>
-				<position>
-					<x>0</x>
-					<y>0</y>
-				</position>
-				<size>
-					<width>88%</width>
-					<height>100%</height>
-				</size>
-				<maximized>vertical</maximized>
-			</application>
-
-			<application name="lxterminal">
-				<decor>yes</decor>
-				<position>
-					<x>0</x>
-					<y>0</y>
-				</position>
-				<size>
-					<width>88%</width>
-					<height>100%</height>
-				</size>
-				<maximized>vertical</maximized>
-			</application>
-
-			<!-- <application name="Firefox - Choose User Profile"> -->
-			<!-- 	<decor>no</decor> -->
-			<!-- 	<desktop>3</desktop> -->
-			<!-- 	<position> -->
-			<!-- 		<x>0</x> -->
-			<!-- 		<y>0</y> -->
-			<!-- 	</position> -->
-			<!-- </application> -->
-
-
-			<application name="galculator*">
-				<position>
-					<x>center</x>
-					<y>center</y>
-				</position>
-			</application>
-
-			<application name="gsimplecal">
-				<position>
-					<x>-2</x>
-					<y>0</y>
-				</position>
-			</application>
-
-			<application name="yterm"> <!-- special version of xterm for use with tint2 -->
-				<decor>no</decor>
-				<skip_taskbar>yes</skip_taskbar>
-			</application>
-
-			<!-- *********************************************	-->
-			<!--				PcmanFM							-->
-			<!-- *********************************************	-->
-			<application name="pcmanfm*" type="normal*">	<!-- samo standardni pcmanfm, bez dialoga -->
-				<decor>yes</decor>	<!-- PCmanFM i bez dekora ima oke dimenzije -->
-				<position>
-					<x>0</x>
-					<y>0</y>
-				</position>
-				<size>
-					<width>88%</width>
-					<height>100%</height>
-				</size>
-			</application>
-
-			<!-- <application name="pcmanfm*" type="dialog" title="Rename File"> -->
-			<application name="pcmanfm*" type="dialog">
-				<focus>yes</focus>
-			</application>
-
-			<application name="pcmanfm*" type="normal*" title="datasheetovi">	<!-- samo standardni pcmanfm, bez dialoga -->
-				<focus>no</focus>	<!-- da ga potiho pokrene, bez automatskog switchanja desktopa -->
-				<desktop>3</desktop>
-			</application>
-
-			<!-- PCmanFM	net, datasheetovi	INFO multiple title jer nekad ga nazove po prvom tabu, nekad po zadnjem-->
-			<application name="pcmanfm*" type="normal*" title="net">	<!-- samo standardni pcmanfm, bez dialoga -->
-				<focus>no</focus>	<!-- da ga potiho pokrene, bez automatskog switchanja desktopa -->
-				<desktop>3</desktop>
-			</application>
-			<application name="pcmanfm*" type="normal*" title="datasheetovi">	<!-- samo standardni pcmanfm, bez dialoga -->
-				<focus>no</focus>	<!-- da ga potiho pokrene, bez automatskog switchanja desktopa -->
-				<desktop>3</desktop>
-			</application>
-
-				<!-- PCmanFM	video, filmovi -->
-				<application name="pcmanfm*" type="normal*" title="video">	<!-- samo standardni pcmanfm, bez dialoga -->
-					<focus>no</focus>	<!-- da ga potiho pokrene, bez automatskog switchanja desktopa -->
-					<desktop>4</desktop>
-				</application>
-				<application name="pcmanfm*" type="normal*" title="filmovi">	<!-- samo standardni pcmanfm, bez dialoga -->
-					<focus>no</focus>	<!-- da ga potiho pokrene, bez automatskog switchanja desktopa -->
-					<desktop>4</desktop>
-				</application>
-
-				<!-- PCmanFM	music, epic-->
-				<application name="pcmanfm*" type="normal*" title="music">	<!-- samo standardni pcmanfm, bez dialoga -->
-					<focus>no</focus>	<!-- da ga potiho pokrene, bez automatskog switchanja desktopa -->
-					<desktop>4</desktop>
-				</application>
-				<application name="pcmanfm*" type="normal*" title="epic">	<!-- samo standardni pcmanfm, bez dialoga -->
-					<focus>no</focus>	<!-- da ga potiho pokrene, bez automatskog switchanja desktopa -->
-					<desktop>4</desktop>
-				</application>
-
-				<!-- PCmanFM Rename File -->
-				<!-- Da bude na sredini, a ne gore lijevo, defaulte dimenzije su oke -->
-				<application class="Pcmanfm" title="Rename File">
-					<position>
-						<x>center</x>
-						<y>center</y>
-					</position>
-				</application>
-
-				<!-- TODO DeadBeef add dialog
-					WM_CLASS(STRING) = "deadbeef", "Deadbeef"
-					WM_ICON_NAME(STRING) = "Adding files..."
-					_NET_WM_ICON_NAME(UTF8_STRING) = "Adding files..."
-					WM_NAME(STRING) = "Adding files..."
-					_NET_WM_NAME(UTF8_STRING) = "Adding files..."
-				-->
-				<application class="*MPlayer*">
-					<decor>no</decor>
-					<position>
-						<x>center</x>
-						<y>center</y>
-					</position>
-				</application>
-
-				<application class="mpv">
-					<decor>no</decor>
-					<position>
-						<x>center</x>
-						<y>center</y>
-					</position>
-				</application>
-
-				<!-- *********************************************	-->
-				<!--				Leafpad							-->
-				<!-- *********************************************	-->
-				<application name="leafpad*">
-					<decor>yes</decor>
-					<position>
-						<x>0</x>
-						<y>0</y>
-					</position>
-					<size>
-						<width>88%</width>
-						<height>100%</height>
-					</size>
-				</application>
-
-				<!-- *********************************************	-->
-				<!--				Pidgin							-->
-				<!-- *********************************************	-->
-				<application role="buddy_list">
-					<decor>yes</decor>
-					<position>
-						<x>0</x>
-						<y>0</y>
-					</position>
-					<size>
-						<width>18%</width>
-						<height>60%</height>
-					</size>
-				</application>
-				<application role="conversation">
-					<!-- TODO -->
-					<decor>yes</decor>
-					<focus>yes</focus>
-					<desktop>1</desktop>
-					<position>
-						<x>0</x>
-						<y>0</y>
-					</position>
-					<size>
-						<width>88%</width>
-							<!-- <height>100%</height> -->
-							<height>100%</height>
-						</size>
-					</application>
-					<application role="statuses">
-						<decor>yes</decor>
-						<focus>yes</focus>
-						<position>
-							<x>0</x>
-							<y>0</y>
-						</position>
-						<size>
-							<width>88%</width>
-							<height>100%</height>
-						</size>
-					</application>
-
-					<!-- *********************************************	-->
-					<!--				GViM							-->
-					<!-- *********************************************	-->
-					<application name="gvim">
-						<decor>yes</decor>
-						<position>
-							<x>0</x>
-							<y>0</y>
-						</position>
-						<size>
-							<width>88%</width>
-							<height>100%</height>
-						</size>
-						<maximized>vertical</maximized>
-					</application>
-
-					<application name="feh">
-						<decor>no</decor>
-					</application>
-
-						<!-- *********************************************	-->
-						<!--				DeadBeef						-->
-						<!-- *********************************************	-->
-						<application name="deadbeef*">
-							<decor>yes</decor>
-							<maximized>no</maximized>
-							<desktop>2</desktop>
-								<!-- <focus>no</focus>	-->
-								<position>
-									<x>0</x>
-									<y>0</y>
-								</position>
-								<size>
-									<width>88%</width>
-									<height>100%</height>
-								</size>
-							</application>
-
-						<!-- *********************************************	-->
-						<!--					gmrun						-->
-						<!-- *********************************************	-->
-						<application name="gmrun">
-							<decor>no</decor>
-							<position>
-								<x>center</x>
-								<y>center</y>
-							</position>
-						</application>
-
-
-
-		<!-- *********************************************	-->
-		<!--					FreeRouter					-->
-		<!-- *********************************************	-->
-		<!--	eagle control panel -->
-		<application name="Freerouter">
-			<decor>no</decor>
-			<position>
-				<x>0</x>
-				<y>0</y>
-			</position>
-			<size>
-				<width>20%</width>
-				<height>30%</height>
-			</size>
-		</application>
-	</applications>
 </openbox_config>
