@@ -155,12 +155,14 @@ panel_items = TLE:E:E:E:EEBSC
 panel_size = 100% 37
 panel_margin = 1 0
 panel_background_id = 12
-panel_dock = 1
+panel_dock = 0	# must be 0 when WM is used to place docks to left/right monitor
 panel_position = top center horizontal
 panel_layer = top
-panel_monitor = all
+panel_monitor = primary
+# panel_monitor = all
 # strut_policy = none # follow_size
-panel_window_name = tint2-master
+panel_window_name = tint2
+# panel_window_name = tint2-master
 wm_menu = 1		# forward mouse clicks to WM
 disable_transparency = 1
 mouse_effects = 1
@@ -171,8 +173,8 @@ mouse_pressed_icon_asb = 100 0 0
 #
 # Taskbar																	{{{
 # -----------------------------------------------------------------------------
-# taskbar_mode = single_desktop
-taskbar_mode = multiple_desktop
+taskbar_mode = single_desktop
+# taskbar_mode = multiple_desktop
 taskbar_background_id = 1
 taskbar_padding = 1 2 2		# H V spacing
 taskbar_sort_order = application	# group by application XXX 181110
@@ -286,7 +288,8 @@ systray_background_id = 0
 systray_sort = right2left
 # systray_icon_size = 32
 # systray_icon_asb = 100 0 0
-systray_monitor = primary	# 1 or 2 or primary
+# systray_monitor = primary	# 1 or 2 or primary
+systray_monitor = all
 # ------------------------------------------------------------------------- }}}
 # Separators																{{{
 # -----------------------------------------------------------------------------

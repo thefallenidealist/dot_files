@@ -74,8 +74,11 @@
 "~/scripts/monitor.sh e"
 	mod4 + F2
 
-"~/scripts/monitor.sh s"
+"~/scripts/monitor.sh a"
 	mod4 + F3
+
+"~/scripts/monitor.sh e1"
+	mod4 + F4
 
 "mixer vol +5"
 	XF86AudioRaiseVolume
