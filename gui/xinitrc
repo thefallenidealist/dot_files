@@ -11,9 +11,11 @@ xrdb .xdefaults&
 xbindkeys&
 tint2&
 xset r rate 250 30&
+xinput set-prop "TPPS/2 IBM TrackPoint" "libinput Accel Speed" -0.35		# using libinput instead of xf86-input-mouse
+xinput disable "SynPS/2 Synaptics TouchPad"
 
 # fix for T430s with fuck-up keyboard layout:
-xmodmap -e "keycode 111 = Super_R"  # "PrtSc" key between Alt and Ctrl
+xmodmap -e "keycode 107 = Super_R"  # "PrtSc" key between Alt and Ctrl
 
 unclutter --timeout 1&		# hide mouse pointer - no problem when hiding cursor on mpv
 # hhpc -i 1&		# unclutter alterntive, works also on hw accelated videos XXX 181126: freezes mouse under cwm

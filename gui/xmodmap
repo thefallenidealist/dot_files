@@ -21,15 +21,7 @@ keycode   9 = Escape Escape Escape Escape
 keycode  49 = Escape asciitilde grave grave
 keycode  78 = Scroll_Lock NoSymbol Scroll_Lock
 
-! INFO Mode switch is modern ISO_Level3_Shift
-! 113 was Alt_R
-keycode 113 = Mode_switch Mode_switch
-! 117 was Menu (mouse right click) key
-keycode 117 = Super_R Super_R
-! INFO 190730: Linux:
-! !keycode 113 = Mode_switch Mode_switch
-! keycode 108 = Mode_switch Mode_switch
-! !keycode 117 = Super_R Super_R
+keycode 108 = Mode_switch Mode_switch
 
 ! defaults ---------------------------------------------------------------------
 !! default keys on us layout
@@ -127,19 +119,10 @@ keycode  65 = space NoSymbol space
 ! cursor, delete cluster													{{{
 !------------------------------------------------------------------------------
 ! cursor keys -----------------------------------------------------------------
-keycode  98 = Up NoSymbol uparrow
-keycode 100 = Left NoSymbol leftarrow
-keycode 102 = Right NoSymbol rightarrow
-keycode 104 = Down NoSymbol downarrow
-! delete/home/end cluster	---------------------------------------------------
-!keycode 107 = Delete BackSpace Delete
-!keycode  97 = Home NoSymbol Home
-!keycode 103 = End NoSymbol End
-! PageUp
-!keycode  99 = Prior NoSymbol Prior
-! PageDown
-!keycode 105 = Next NoSymbol Next
-!keycode 106 = Insert NoSymbol Insert
+keycode 111 = Up NoSymbol uparrow
+keycode 113 = Left NoSymbol leftarrow
+keycode 114 = Right NoSymbol rightarrow
+keycode 116 = Down NoSymbol downarrow
 !---------------------------------------------------------------------------}}}
 ! ThinkPad keys																{{{
 !------------------------------------------------------------------------------
@@ -157,8 +140,8 @@ keycode 150 = F15 F15 F15
 !keycode 176 = XF86AudioRaiseVolume NoSymbol XF86AudioRaiseVolume
 
 ! ThinkPad keys (on 7 row keyboards, T410/T420)
-keycode 233 = F22
-keycode 234 = F21
+! keycode 233 = F22
+! keycode 234 = F21
 !---------------------------------------------------------------------------}}}
 !-------------------------------------------------------------------------------
 !agrave		 à

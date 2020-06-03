@@ -1,0 +1,9 @@
+! Created 191103
+! only keys specific to internal (ThinkPad T430s keyboard)
+!  vim: set ft=xmodmap ts=4 sw=4 tw=0 fdm=marker noet :
+
+! T430s with shitty keyboard layout:
+keycode 112 = F21 NoSymbol Prior
+keycode 117 = F22 NoSymbol Next
+! "PrtSc" key between Alt and Ctrl
+keycode 107 = Super_R

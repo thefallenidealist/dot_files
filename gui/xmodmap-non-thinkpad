@@ -1,0 +1,8 @@
+! Created 191103
+! only keys specific to internal (ThinkPad T430s keyboard)
+!  vim: set ft=xmodmap ts=4 sw=4 tw=0 fdm=marker noet :
+
+! when not using T430s with shitty keyboard layout:
+keycode 112 = Prior NoSymbol Prior
+keycode 117 = Next NoSymbol Next
+keycode 107 = Print

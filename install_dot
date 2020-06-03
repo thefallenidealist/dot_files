@@ -69,6 +69,8 @@ remove_files()
 		$HOME/.Xdefaults \
 		$HOME/.config/nvim \
 		$HOME/.xmodmap \
+		$HOME/.xmodmap-thinkpad-t430s \
+		$HOME/.xmodmap-non-thinkpad \
 		$HOME/.xinitrc \
 		$HOME/.config/openbox \
 		$HOME/.config/tint2 \
@@ -123,6 +125,8 @@ install_gui()
 	if [ "$USER_ID" != "0" ]; then
 		ln -sf $BASEDIR/gui/Xdefaults	$HOME/.Xdefaults
 		ln -sf $BASEDIR/gui/xmodmap		$HOME/.xmodmap		# TODO 190730: Linux needs patched xmodmap
+		ln -sf $BASEDIR/gui/xmodmap-thinkpad-t430s	$HOME/.xmodmap-thinkpad-t430s
+		ln -sf $BASEDIR/gui/xmodmap-non-thinkpad	$HOME/.xmodmap-non-thinkpad
 		ln -sf $BASEDIR/gui/xinitrc		$HOME/.xinitrc
 		ln -sf $BASEDIR/gui/xbindkeysrc	$HOME/.xbindkeysrc
 		mkdir -p $HOME/.config
