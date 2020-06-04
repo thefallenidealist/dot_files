@@ -350,7 +350,7 @@ separator_padding = 4 8
 # -----------------------------------------------------------------------------
 # Display CPU temperature and current frequency
 execp = new
-execp_command = ~/scripts/tint2-cpu1.sh
+execp_command = ~/scripts/tint2-cpu1
 execp_interval = 1
 execp_lclick_command = xterm -e htop
 
@@ -361,7 +361,7 @@ execp_font_color = #aaffaa 100
 # -----------------------------------------------------------------------------
 # Display CPU usage
 execp = new
-execp_command = ~/scripts/tint2-cpu2.sh
+execp_command = ~/scripts/tint2-cpu2
 execp_interval = 1
 execp_lclick_command = xterm -e htop
 
@@ -372,7 +372,7 @@ execp_font_color = #aaffaa 100
 # -----------------------------------------------------------------------------
 # Display free RAM in percentage and MB
 execp = new
-execp_command = ~/scripts/free-memory.sh
+execp_command = ~/scripts/free-memory
 execp_interval = 1
 
 execp_font = sans 9

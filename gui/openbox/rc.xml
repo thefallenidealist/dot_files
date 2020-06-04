@@ -197,6 +197,8 @@
 	<!-- move window to the other monitor -->
 	<keybind key="W-A-Right">	<action name="MoveResizeTo"> <monitor>next</monitor> </action> </keybind>
 	<keybind key="W-A-Left">	<action name="MoveResizeTo"> <monitor>prev</monitor> </action> </keybind>
+	<keybind key="W-A-l">	<action name="MoveResizeTo"> <monitor>next</monitor> </action> </keybind>
+	<keybind key="W-A-h">	<action name="MoveResizeTo"> <monitor>prev</monitor> </action> </keybind>
 
 	<!-- poor mans tiling -->
 	<keybind key="A-Left">
