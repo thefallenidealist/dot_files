@@ -1,11 +1,18 @@
 " created 200510
 " vim: set ft=vim ts=4 sw=4 tw=78 fdm=marker noet :
+" install the native messenger (:installnative in Tridactyl). Run :source to
+" get it in the browser, or just restart.
 
 " :viewconfig
 
 colors dark
 
-" set newtab about:newtab	" XXX 200510
+" enable this (and other addons) on forbidden sites like mozilla.org
+command fixamo_quiet jsb tri.excmds.setpref("privacy.resistFingerprinting.block_mozAddonManager", "true").then(tri.excmds.setpref("extensions.webextensions.restrictedDomains", '""'))
+command fixamo js tri.excmds.setpref("privacy.resistFingerprinting.block_mozAddonManager", "true").then(tri.excmds.setpref("extensions.webextensions.restrictedDomains", '""').then(tri.excmds.fillcmdline_tmp(3000, "Permissions added to user.js. Please restart Firefox to make them take affect.")))
+fixamo_quiet
+
+" set newtab about:newtab	" INFO 200510 not yet supported
 set newtab about:blank
 
 " key bindings																{{{
@@ -15,11 +22,14 @@ unbind <C-d>
 unbind <C-u>
 bind <C-[> tabprev
 bind <C-]> tabnext
+" needs native messenger
+bind --mode=insert <C-]> !s xdotool key ctrl+Next
+bind --mode=insert <C-[> !s xdotool key ctrl+Prior
 bind h tabprev
 bind l tabnext
 
 bind d tabclose
-bind u undo
+bind u undo tab
 
 bind H back
 bind L forward
