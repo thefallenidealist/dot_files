@@ -629,10 +629,10 @@ endif
 """"""""""""""""""""""""""""""""""""""""}}}
 "		hardko mode															{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-nnoremap <Left>		:echoe "Use h"<cr>
-nnoremap <Right>	:echoe "Use l"<cr>
-nnoremap <Up>		:echoe "Use k"<cr>
-nnoremap <Down>		:echoe "Use j"<cr>
+" nnoremap <Left>		:echoe "Use h"<cr>
+" nnoremap <Right>	:echoe "Use l"<cr>
+" nnoremap <Up>		:echoe "Use k"<cr>
+" nnoremap <Down>		:echoe "Use j"<cr>
 
 " Fix for cursors keys when Esc is remapped
 nnoremap <esc>[ <esc>[
@@ -699,7 +699,7 @@ nnoremap yW yw
 if has('clipboard')	" not really needed for all options under this
 	" copy filepath to X11 clipboard
 	nnoremap <leader>FP  :let @* = expand("%")<cr>:echo   "relative path of the file copied to the X11 1st clipboard"<CR>
-	nnoremap <leader>fp  :let @+ = expand("%")<cr>:echo   "relative path of the file copied to the X11 2nd clipboard"<CR>
+	nnoremap <leader>fp  :let @+ = expand("%")<cr>:let @" = expand("%")<cr>:echo   "relative path of the file copied to the X11 2nd clipboard and vim register"<CR>
 	nnoremap <leader>FD  :let @* = expand("%:h")<cr>:echo "relative path of the dir copied to the X11 1st clipboard"<CR>
 	nnoremap <leader>fd  :let @+ = expand("%:h")<cr>:echo "relative path of the dir copied to the X11 2nd clipboard"<CR>
 	nnoremap <leader>FFP :let @* = expand("%:p")<cr>:echo "full path of the file copied to the X11 1st clipboard"<CR>
@@ -1168,23 +1168,14 @@ endif
 " ------------------------------------------------------------------------- }}}
 call plug#begin('~/.vim/plugged')
 
-Plug 'prabirshrestha/vim-lsp'
-Plug 'prabirshrestha/async.vim'
-" autocomplete
-Plug 'prabirshrestha/asyncomplete.vim'
-Plug 'prabirshrestha/asyncomplete-lsp.vim'
-Plug 'tsufeki/asyncomplete-fuzzy-match', { 'do': 'cargo build --release', }
-Plug 'Shougo/neco-vim'							" autocomplete .vim
-Plug 'prabirshrestha/asyncomplete-necovim.vim'	" autocomplete .vim
-" autocomplete snippets:
-if has('python3')
-	Plug 'SirVer/ultisnips'
-	" Plug 'honza/vim-snippets'
-	" Plug 'prabirshrestha/asyncomplete-ultisnips.vim'
-	Plug 'thomasfaingnaert/vim-lsp-ultisnips'
-endif
-" Plug 'prabirshrestha/asyncomplete-buffer.vim'	" autocomplete buffer
-" Plug 'prabirshrestha/asyncomplete-file.vim'		" autocomplete file XXX
+Plug 'neovim/nvim-lsp'			" LSP core, nvim 0.5+
+Plug 'nvim-lua/completion-nvim'	" LSP autocomplete, nvim 0.5+
+Plug 'nvim-lua/diagnostic-nvim'	" LSP better showing of errors, nvim 0.5+
+Plug 'nvim-treesitter/nvim-treesitter', { 'for': 'c,cpp,rust' }			" nvim 0.5+
+Plug 'nvim-treesitter/completion-treesitter', { 'for': 'c,cpp,rust' }	" nvim 0.5+
+
+Plug 'SirVer/ultisnips'
+Plug 'thomasfaingnaert/vim-lsp-ultisnips'
 
 if executable('ctags')
 	Plug 'ludovicchabant/vim-gutentags', { 'for': 'c,cpp,rust' }
@@ -1310,129 +1301,97 @@ colorscheme molokai
 set iskeyword+=:
 set completeopt=menu,menuone,noinsert,noselect
 
-" LSP - vim-lsp																{{{
+" LSP nvim																	{{{
 " -----------------------------------------------------------------------------
-" 200506
+" 200723 builtin nvim (v0.5) LSP
 
-" if executable('clangd90')
-" 	au User lsp_setup call lsp#register_server({
-" 				\ 'name': 'clangd',
-" 				\ 'cmd': {server_info->['clangd90']},
-" 				\ 'whitelist': ['c', 'cpp'],
-" 				\ })
-" endif
-if executable('ccls')
-	au User lsp_setup call lsp#register_server({
-				\ 'name': 'ccls',
-				\ 'cmd': {server_info->['ccls']},
-				\ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
-				\ 'initialization_options': {},
-				\ 'whitelist': ['c', 'cpp'],
-				\ })
-endif
+" https://github.com/neovim/nvim-lsp#clangd
+" lua require'nvim_lsp'.clangd.setup{}	" defined below, in autocomplete part
 
- " 'cmd': {server_info->['clangd90', '-background-index']},
-			 " \ 'cmd': {server_info->['clangd90', '-cross-file-rename']},
+autocmd Filetype rust setlocal omnifunc=v:lua.vim.lsp.omnifunc
+autocmd Filetype cpp  setlocal omnifunc=v:lua.vim.lsp.omnifunc
+setlocal omnifunc=v:lua.vim.lsp.omnifunc
 
- " Close preview window with <esc>
-autocmd User lsp_float_opened nmap <buffer> <silent> <esc>
-			 \ <Plug>(lsp-preview-close)
-autocmd User lsp_float_closed nunmap <buffer> <esc>
+nnoremap <silent> <buffer> gd			<cmd>lua vim.lsp.buf.declaration()<CR>
+nnoremap <silent> <buffer> <c-]>		<cmd>lua vim.lsp.buf.definition()<CR>
+nnoremap <silent> <buffer> K			<cmd>lua vim.lsp.buf.hover()<CR>
+nnoremap <silent> <buffer> gD			<cmd>lua vim.lsp.buf.implementation()<CR>
+nnoremap <silent> <buffer> <c-k>		<cmd>lua vim.lsp.buf.signature_help()<CR>
+nnoremap <silent> <buffer> 1gD			<cmd>lua vim.lsp.buf.type_definition()<CR>
+nnoremap <silent> <buffer> <leader>d	<cmd>lua vim.lsp.buf.type_definition()<CR>
+nnoremap <silent> <buffer> <leader>rn	<cmd>lua vim.lsp.buf.rename()<CR>
+nnoremap <silent> <buffer> gr			<cmd>lua vim.lsp.buf.references()<CR>
+nnoremap <silent> g0					<cmd>lua vim.lsp.buf.document_symbol()<CR>
+nnoremap <silent> gW					<cmd>lua vim.lsp.buf.workspace_symbol()<CR>
+" nnoremap <silent> <buffer> <leader><space> <cmd>lua vim.lsp.util.show_line_diagnostics()<CR>
 
-let g:lsp_signs_enabled = 1				" enable signs
-let g:lsp_diagnostics_echo_cursor = 0	" enable echo under cursor when in normal mode
-let airline#extensions#lsp#show_line_numbers = 0	" won't show E:L17, show just E
-let g:airline#extensions#lsp#show_line_numbers = 0	" won't show E:L17, show just E
-" draw warning&error signs over git gutter symbols
-let g:lsp_signs_priority = 11	" draw over git-gutter which has priority 10
-let g:lsp_virtual_text_prefix = " ‣ "
-let g:lsp_virtual_text_enabled = 0	" don't show messages in current line
-
-call SetupCommandAlias("lspdd", "LspDocumentDiagnostics")
-nnoremap <C-'> :LspDocumentDiagnostics<cr>
-nnoremap <leader>d :LspDocumentDiagnostics<cr>
-
-let g:lsp_signs_error   = {'text': '✗'}
-let g:lsp_signs_warning = {'text': 'w'}
-let g:lsp_signs_hint    = {'text': '𝓱'}
-
-nnoremap <silent>]e :LspNextError<cr>
-nnoremap <silent>[e :LspPreviousError<cr>
-nnoremap <silent>]w :LspNextDiagnostic<cr>
-nnoremap <silent>[w :LspPreviousDiagnostic<cr>
-nnoremap <silent>gd :LspDefinition<cr>
-nnoremap <silent><C-]> :LspDefinition<cr>
-nnoremap <silent><C-\> :LspPeekDefinition<cr>
-nnoremap <silent>K :LspHover<cr>
-
-highlight LspWarningHighlight cterm=bold ctermbg=238 ctermfg=202
-highlight LspWarningText      cterm=bold ctermbg=238 ctermfg=202
-highlight LspErrorHighlight   cterm=bold ctermbg=238 ctermfg=196
-highlight LspErrorText        cterm=bold ctermbg=238 ctermfg=196
-
-" debug
-" let g:lsp_log_verbose = 1
-" let g:lsp_log_file = expand('/tmp/vim-lsp.log')
-" let g:asyncomplete_log_file = expand('/tmp/vim-asyncomplete.log')
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
-" autocomplete LSP															{{{
+highlight LspDiagnosticsError	ctermfg=red		ctermbg=black
+highlight LspDiagnosticsWarning	ctermfg=208		ctermbg=black
+highlight LspDiagnosticsHint	ctermfg=105		ctermbg=black
+" ------------------------------------------------------------------------- }}}
+" LSP complete nvim 														{{{
 " -----------------------------------------------------------------------------
-" LSP part of autocomplete (LSP provides only omnifunc)
-let g:lsp_async_completion = 1
+" completion-nvim:
+lua require'nvim_lsp'.pyls.setup{on_attach=require'completion'.on_attach}
+lua require'nvim_lsp'.clangd.setup{on_attach=require'completion'.on_attach}
 
-" asyncomplete
+" Use completion-nvim in every buffer
+autocmd BufEnter * lua require'completion'.on_attach()
 
-if exists('g:asyncomplete_loaded')
-" filename autocomplete for all files
-au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#file#get_source_options({
-			\ 'name': 'file',
-			\ 'whitelist': ['*'],
-			\ 'priority': 10,
-			\ 'completor': function('asyncomplete#sources#file#completor')
-			\ }))
-
-" autocomplete .vim
-au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#necovim#get_source_options({
-		\ 'name': 'necovim',
-		\ 'whitelist': ['vim'],
-		\ 'completor': function('asyncomplete#sources#necovim#completor'),
-		\ }))
-
-" autocomplete snippets
-if has('python3')
-	let g:UltiSnipsExpandTrigger="<c-y>"
-	call asyncomplete#register_source(asyncomplete#sources#ultisnips#get_source_options({
-		\ 'name': 'ultisnips',
-		\ 'whitelist': ['*'],
-		\ 'completor': function('asyncomplete#sources#ultisnips#completor'),
-		\ }))
-endif
-
-" autocomplete buffer
-call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options({
-		\ 'name': 'buffer',
-		\ 'whitelist': ['*'],
-		\ 'blacklist': ['go'],
-		\ 'completor': function('asyncomplete#sources#buffer#completor'),
-		\ 'config': {
-		\	'max_buffer_size': 5000000,
-		\ },
-		\ }))
-
-" autocomplete file
-au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#file#get_source_options({
-		\ 'name': 'file',
-		\ 'whitelist': ['*'],
-		\ 'priority': 10,
-		\ 'completor': function('asyncomplete#sources#file#completor')
-		\ }))
-endif
-
+" Use <Tab> and <S-Tab> to navigate through popup menu
 inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-inoremap <expr> <cr>    pumvisible() ? "\<C-y>" : "\<cr>"
-imap <c-space> <Plug>(asyncomplete_force_refresh)
+
+" Set completeopt to have a better completion experience
+set completeopt=menuone,noinsert,noselect
+
+" Avoid showing message extra message when using completion
+set shortmess+=c
+
+let g:completion_chain_complete_list = {
+			\'default': {
+			\'comment': [
+			\{'complete_items': ['snippet', 'file', 'path']},
+			\{'mode': '<c-p>'},
+			\{'mode': '<c-n>'}
+			\],
+			\'default': [
+			\{'complete_items': ['lsp', 'snippet', 'file']},
+			\{'mode': '<c-p>'},
+			\{'mode': '<c-n>'}
+			\],
+			\'c' : [
+			\ {'complete_items': ['ts']}
+			\ ],
+			\}
+			\}
+
+let g:completion_matching_ignore_case = 1
+let g:completion_matching_strategy_list = ['exact', 'substring', 'fuzzy']
+let g:completion_trigger_character = ['.', '::']
+let g:completion_trigger_on_delete = 1
+
+" snippets
+let g:completion_enable_snippet = 'UltiSnips'
+" disable <tab> key in snippets (so it can be used with completion-nvim)
+let g:UltiSnipsExpandTrigger =			"<C-y>"		" default was <tab>
 " ------------------------------------------------------------------------- }}}
+" LSP diagnostic nvim 														{{{
+" -----------------------------------------------------------------------------
+lua require'nvim_lsp'.clangd.setup{on_attach=require'diagnostic'.on_attach}
+
+nnoremap <silent> ]e :NextDiagnosticCycle<cr>
+nnoremap <silent> [e :PrevDiagnosticCycle<cr>
+" no jump to warning for now
+nnoremap <silent> ]w :NextDiagnosticCycle<cr>
+nnoremap <silent> [w :PrevDiagnosticCycle<cr>
+nnoremap <silent> <leader><space> :OpenDiagnostic<cr>
+
+let g:diagnostic_enable_virtual_text = 1	" inline diagnostic
+let g:diagnostic_virtual_text_prefix = '↣ [LSP] '
+let g:space_before_virtual_text = 5
+" ------------------------------------------------------------------------- }}}
+
 " open header																{{{
 " -----------------------------------------------------------------------------
 nnoremap <Leader>h :call HeaderToggle()<CR>
@@ -1548,45 +1507,84 @@ let g:airline_mode_map['ic'] = 'INSERT'
 "set guioptions-=e
 "set laststatus=2
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+" tree-sitter																{{{
+"-----------------------------------------------------------------------------
+" 200722
+if exists(":TSBufEnable")
+lua <<EOF
+require'nvim-treesitter.configs'.setup {
+highlight = {
+		enable = true,                    -- false will disable the whole extension
+		disable = { 'c', 'rust' },        -- list of language that will be disabled
+		custom_captures = {               -- mapping of user defined captures to highlight groups
+		-- ["foo.bar"] = "Identifier"   -- highlight own capture @foo.bar with highlight group "Identifier", see :h nvim-treesitter-query-extensions
+		},            
+		},
+		incremental_selection = {
+	enable = true,
+	disable = { 'cpp', 'lua' },
+	keymaps = {                       -- mappings for incremental selection (visual mappings)
+	init_selection = 'gnn',         -- maps in normal mode to init the node/scope selection
+	node_incremental = "grn",       -- increment to the upper named parent
+	scope_incremental = "grc",      -- increment to the upper scope (as defined in locals.scm)
+	node_decremental = "grm",       -- decrement to the previous node
+	}
+	},
+	refactor = {
+	highlight_definitions = {
+enable = true
+},
+highlight_current_scope = {
+		enable = false
+		},
+		smart_rename = {
+	enable = true,
+	keymaps = {
+	smart_rename = "grr"            -- mapping to rename reference under cursor
+	}
+	},
+	navigation = {
+enable = true,
+keymaps = {
+goto_definition = "gnd",        -- mapping to go to definition of symbol under cursor
+list_definitions = "gnD"        -- mapping to list all definitions in current file
+}
+}
+},
+textobjects = { -- syntax-aware textobjects
+	enable = true,
+	disable = {},
+	keymaps = {
+	["iL"] = { -- you can define your own textobjects directly here
+	python = "(function_definition) @function",
+	cpp = "(function_definition) @function",
+	c = "(function_definition) @function",
+	java = "(method_declaration) @function"
+	},
+	-- or you use the queries from supported languages with textobjects.scm
+	["af"] = "@function.outer",
+	["if"] = "@function.inner",
+	["aC"] = "@class.outer",
+	["iC"] = "@class.inner",
+	["ac"] = "@conditional.outer",
+	["ic"] = "@conditional.inner",
+	["ae"] = "@block.outer",
+	["ie"] = "@block.inner",
+	["al"] = "@loop.outer",
+	["il"] = "@loop.inner",
+	["is"] = "@statement.inner",
+	["as"] = "@statement.outer",
+	["ad"] = "@comment.outer",
+	["am"] = "@call.outer",
+	["im"] = "@call.inner"
+	}
+	},
+ensure_installed = 'all' -- one of 'all', 'language', or a list of languages
+}
+EOF
+endif
+"------------------------------------------------------------------------- }}}
 
-"" snippets																	{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"let g:UltiSnipsExpandTrigger       = "<C-y>"
-"let g:UltiSnipsJumpForwardTrigger  = "<C-j>"
-"let g:UltiSnipsJumpBackwardTrigger = "<C-k>"
-
-"inoremap <silent> <C-y> <C-r>=LoadUltiSnipsAndExpand()<CR>
-
-"function! LoadUltiSnipsAndExpand()
-"	let l:curpos = getcurpos()
-"	execute plug#load('ultisnips')
-"	call cursor(l:curpos[1], l:curpos[2])
-"	call UltiSnips#ExpandSnippet()
-"	return ""
-"endfunction
-
-"" let g:UltiSnipsRemoveSelectModeMappings = 0
-"let g:UltiSnipsEnableSnipMate       = 0 " no need to look for SnipMate snippets
-
-"" author variable used in licence snippets, remove NULL (^@) char:
-"let g:snips_author=substitute(strtrans(system('git config user.name')), '\^@','','g')
-"let g:snips_mail=substitute(strtrans(system('git config user.email')), '\^@','','g')
-
-"let g:UltiSnipsEditSplit="vertical"
-"call SetupCommandAlias("snipe", "UltiSnipsEdit")
-
-"" don't search for directory, use only tihs:
-"" let g:UltiSnipsSnippetDirectories=$HOME.'/.vim/UltiSnips'
-"" set runtimepath+=~/.vim/my-snippets/	" radi, ali unutar tog foldera mora bit subfolder "snippets" ili "UltiSnips""
-"" let g:UltiSnipsSnippetsDir = "~/.vim/my-snippets/UltiSnips"	" CP s neta, njima radi, meni ne
-""
-"" Where user snippets can be found (cannot be named "snippets")
-"set runtimepath+=~/.vim/snippets
-"" for :UltiSnipsEdit command
-"let g:UltiSnipsSnippetsDir = "~/.vim/snippets/UltiSnips"
-"" Where snippets can be found, subfolder in "runtimepath" above
-"let g:UltiSnipsSnippetDirectories = ["UltiSnips"]
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " Commenter                                                                  {{{
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " for tpope commenter, muscle memory from NERDcommenter
@@ -1670,6 +1668,9 @@ function! FloatingFZF()
 
 	call nvim_open_win(buf, v:true, opts)
 endfunction
+
+" FZFMru - don't sort, show most recent first
+let g:fzf_mru_no_sort = 1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 " vim orgmode																{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""

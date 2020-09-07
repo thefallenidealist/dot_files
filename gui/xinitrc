@@ -2,17 +2,17 @@
 export LC_ALL=en_US.UTF-8
 export RESOLUTION_X=$(xdpyinfo | awk '/dimensions:/ { print $2; exit }' | cut -d 'x' -f 1)
 export RESOLUTION_Y=$(xdpyinfo | awk '/dimensions:/ { print $2; exit }' | cut -d 'x' -f 2)
+# INFO 200907: use '&' at the end if program will be ran longer and it is not a daemon (tint2, picom, ...)
 
-#xterm&
-xsetroot -solid black&
-setxkbmap -option "terminate:ctrl_alt_bksp"
-xmodmap .xmodmap&
+hsetroot -solid '#000000'& #	x11 compositors cannot use xsetroot
+setxkbmap -option "terminate:ctrl_alt_bksp"&
 xrdb .xdefaults&
 xbindkeys&
 tint2&
 xset r rate 250 30&
-xinput set-prop "TPPS/2 IBM TrackPoint" "libinput Accel Speed" -0.35		# using libinput instead of xf86-input-mouse
-xinput disable "SynPS/2 Synaptics TouchPad"
+xinput set-prop "TPPS/2 IBM TrackPoint" "libinput Accel Speed" -0.35&		# using libinput instead of xf86-input-mouse
+xinput disable "SynPS/2 Synaptics TouchPad"&
+xmodmap .xmodmap&	# INFO 200907: must be after xinput commands (otherwise CapsLock and other remaps won't work)
 
 # fix for T430s with fuck-up keyboard layout:
 xmodmap -e "keycode 107 = Super_R"  # "PrtSc" key between Alt and Ctrl
@@ -26,14 +26,8 @@ volumeicon&
 # sh ~/.opt/conky.sh&
 # pcmanfm -n /mnt/local/video/music &
 
-# start compton compositor (slows down dwm, but gives great video
-# playback, no shadows, no frills)
-#--no-fading-openclose
-# compton --backend=glx --no-dock-shadow \
-#   --no-dnd-shadow --shadow-opacity=0 --menu-opacity=1 \
-#   --glx-no-stencil --fade-delta=3 --daemon
-
-hsetroot -solid '#000000' #	compton cannot use xsetroot
+# start X11 compositor
+picom --backend glx --vsync --inactive-dim 0.02 --fade-delta 3 --unredir-if-possible --menu-opacity=1.0 --frame-opacity=0.98 --inactive-opacity=0.98 --daemon
 
 # fancy Alt-Tab program (window chooser)
 skippy-xd --start-daemon&
