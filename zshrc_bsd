@@ -1,5 +1,6 @@
 # Created 181024
 # per OS specific config (linked to right ~/.zshrc_local via install_dot script)
+#  vim: set ft=zsh ts=4 sw=4 tw=0 fdm=marker noet :
 
 PS1="$(print '%{\e[0;34m%}%M%{\e[0m%}%{\e[0;31m%}%#%{\e[0m%}') "
 alias ls='ls -IGh'
@@ -8,3 +9,39 @@ alias msg="grc cat /var/log/messages | grep -v 'wpa_supplicant\|dhclient\|wlan0:
 # alias w='fetch'
 alias w='wget'
 alias whereis="whereis -a"
+alias ls='exa  --time-style long-iso --classify'
+# TODO 190428: set custom date format
+alias llg='ls -l --git'
+alias llgg='ls -l --grid'
+alias la='ls -a'
+# TODO 190317: equivalent of ls -ltr
+alias lltr='ls -l --sort newest'
+# TODO 190428: exa tree view
+# alias ltr 
+export EXA_COLORS="da=36"	# timestamp in cyan
+
+# ------------------ alias - pkg ------------------------------------------- {{{
+alias pkgI='pkg info -f'
+alias pkgl='pkg info -l'
+alias pkgq='pkg which'
+alias pkgd='pkg delete'
+alias pkgdd='pkg info -d'
+alias pkgD='pkg info -r'	# which packages depends on that package
+alias pkga='pkg info -a'	# all installed packages
+alias pkgi='pkg info'
+alias pkgs='pkg info -as | sort -k 2 -hr | column -t'
+
+#alias bup0='portaudit -Faq'
+alias bup0='pkg audit -Fq'
+alias bup1o='portsnap fetch update'
+alias bup1='cd /usr/ports ; git fetch && git rebase origin/master ; make fetchindex ; cd -'
+alias bup2="pkg version -v | grep -v '='"
+alias bup3='portmaster -dHa'
+alias bup3f='portmaster -Fa'
+# -------------------------------------------------------------------------- }}}
+
+# pkg install zsh-syntax-highlighting
+source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fpath=($HOME/.zsh-completions $fpath)
+
+source /home/johnny/.config/broot/launcher/bash/br

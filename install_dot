@@ -8,21 +8,32 @@
 # TODO 181023: To find out ThinkPad name (and patch for bad keyboard layout): dmidecode -s system-version: ThinkPad T430s
 				# patch ~/.xmodmap or include/append ~/.xmodmap.t430s?
 
+RED='\033[0;31m'
+YELLOW='\033[0;33m'
+NC='\033[0m' # No Color
+
 OS=$(uname)
 if [ "$OS" = "FreeBSD" ] ; then
 	PIP="pip-3.6"
 	FILE_ZSH_LOCAL=zshrc_bsd
 elif [ "$OS" = "Linux" ] ; then
-	PIP="pip"
+	PIP="pip3"
 	FILE_ZSH_LOCAL=zshrc_linux
 fi
-PROGRAMS="zsh tmux nvim xrdb xmodmap git"
+
+PROGRAMS="zsh tmux nvim git $PIP"
+if [ ! "$USER_ID" = "0" ]; then
+	PROGRAMS="$PROGRAMS xrdb xmodmap"
+fi
+
 # Linux: apt-get install curl fonts-powerline
 
 IS_WORK_PC=$(is_work_pc 2>/dev/null)
 
 if [ "$IS_WORK_PC" != "1" ] ; then
-	echo "nije work PC"
+	printf "${YELLOW}"
+	echo "Not work PC"
+	printf "${NC}"
 	FILE_GITCONFIG_LOCAL="gitconfig_github"
 fi
 
@@ -74,7 +85,8 @@ remove_files()
 		$HOME/.xinitrc \
 		$HOME/.config/openbox \
 		$HOME/.config/tint2 \
-		$HOME/.config/mpv
+		$HOME/.config/mpv \
+		$HOME/.config/youtube-dl
 	# rm -rf $HOME/.local
 }
 # ------------------------------------------------------------------------- }}}
@@ -92,7 +104,7 @@ install_vim()
 	ln -sf $BASEDIR/vimrc		$HOME/.config/nvim/init.vim
 	ln -sf $BASEDIR/snippets	$HOME/.vim
 	if [ "$FAST" != "y" ] ; then
-		$PIP install --user neovim
+		$PIP install --user pynvim
 		nvim +PlugInstall +qall
 	fi
 }
@@ -109,8 +121,19 @@ install_dot()
 	ln -sf $BASEDIR/ripgreprc				$HOME/.ripgreprc
 	ln -sf $BASEDIR/lesskey					$HOME/.lesskey
 	lesskey									$HOME/.lesskey	# generate ~/.less which is binary representation used by less(1)
+	mkdir -p $HOME/.config/youtube-dl
+	ln -sf $BASEDIR/youtube-dl				$HOME/.config/youtube-dl/config
+
 	# install tmux plugin:
-	git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+	TPM_DIR=$HOME/.tmux/plugins/tpm
+	if [ ! -d $TPM_DIR ] ; then
+		git clone https://github.com/tmux-plugins/tpm $TPM_DIR
+	else
+		printf "${YELLOW}"
+		echo "tmux plugins dir $TPM_DIR already exists"
+		printf "${NC}"
+		cd $TPM_DIR && git pull
+	fi
 }
 # ------------------------------------------------------------------------- }}}
 # GUI config                                                                {{{
@@ -136,13 +159,21 @@ install_gui()
 		# TODO 191124: how to install mpv scripts?
 		ln -sf $BASEDIR/gui/gtkrc-2.0	$HOME/.gtkrc-2.0
 		ln -sf $BASEDIR/gui/gtkrc.mine	$HOME/.gtkrc.mine
+		mkdir -p $HOME/.config/gtk-3.0
 		ln -sf $BASEDIR/gui/gtk3.ini	$HOME/.config/gtk-3.0/settings.ini
+		mkdir -p $HOME/.config/zathura/
 		ln -sf $BASEDIR/gui/zathurarc	$HOME/.config/zathura/
 		ln -sf $BASEDIR/gui/tridactylrc	$HOME/.tridactylrc
 
-		xrdb		$HOME/.Xdefaults
-		xmodmap		$HOME/.xmodmap
-		xbindkeys	$HOME/.xbindkeysrc
+		if [ -n "$DISPLAY" ] ; then
+			xrdb		$HOME/.Xdefaults
+			xmodmap		$HOME/.xmodmap
+			xbindkeys	$HOME/.xbindkeysrc
+		else
+			printf "${YELLOW}"
+			echo "X11 server is not running"
+			printf "${NC}"
+		fi
 	else
 		echo "This is root, no X11 conf needed"
 	fi
@@ -156,10 +187,10 @@ check_programs()
 	for i in $PROGRAMS ; do
 		command -v $i > /dev/null;
 		ret=$?
-		if [ "$ret" = "0" ]; then
-			echo "Command \"$i\" found"
-		else
+		if [ "$ret" != "0" ]; then
+			printf "${RED}"
 			echo "Command \"$i\" not found!"
+			printf "${NC}"
 		fi
 	done
 }

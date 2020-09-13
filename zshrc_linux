@@ -6,3 +6,5 @@ alias ls='ls -h --color'
 alias gmake='make'
 alias msg="grc cat /var/log/syslog"
 alias w='wget'
+
+# 200719

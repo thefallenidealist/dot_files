@@ -115,17 +115,17 @@ PS2="$(print '%{\e[0;31m%}>%{\e[0m%}') "
 RPS1="$(print '%{\e[0;33m%}[%~]%{\e[0;32m%}[%y]%{\e[0;31m%}%{\e[0;31m%}[%D{%y.%m.%d. %H:%M:%S}]%{\e[0m%}')"
 # -------------------------------------------------------------------------- }}}
 
-# export DISPLAY=:0
+if [ "$UID" -eq "0" ] ; then export DISPLAY=:0 ; fi	# enable X11 clipboard for root's vim
 export EDITOR=`which nvim`
 export PAGER='less -XMr'
-export MANPAGER='less -s -M +Gg' # don't export +G to LESS because it will hang when reading large files
+export MANPAGER='less -s -M +Gg -i' # don't export +G to LESS because it will hang when reading large files
 
 export LANG=POSIX				# date(1) is in english
 export LC_ALL=en_US.UTF-8
 
 # Don't expand files matching:
-fignore=(.c~ .old)
-export TOP="-CHP"	# flags for top(1)
+# fignore=(.c~ .old)
+export TOP="-CH"	# flags for top(1)
 export XDG_CONFIG_HOME="$HOME/.config"
 
 # ------------------ key bindings ------------------------------------------ {{{
@@ -141,6 +141,9 @@ bindkey "[3~"					delete-char		# xterm*deleteIsDEL: false
 # <S-Tab> for reverse menu completition
 # INFO 171229: my xterm + tmux + zsh won't recognize Alt-S-h, but I prefer to use C-w anyway
 bindkey '^[[Z' reverse-menu-complete
+
+bindkey '^U' backward-kill-line
+bindkey "^[t" fzf-file-widget	# default was Ctrl-T
 
 # Ctrl-W: delete word backword up to slash char (not the whole line)
 autoload -U select-word-style
@@ -178,11 +181,12 @@ alias -g T='| tail'
 alias -g G='| grep --color'
 alias -g C='| wc -l'
 alias -g S='> /dev/null 2>&1'
+alias -g Z='| fzf'
 # -------------------------------------------------------------------------- }}}
 # ------------------ alias - system utils----------------------------------- {{{
-# alias cpu='top -HS'
-alias cpu="ps aux | sort -nrk 3,3 | head -n 5"
-alias mem='top -b -o res'
+alias cpu="ps auxr"
+# alias cputime="ps aux "
+alias mem='TOP= top -b -o res'
 alias iotopw="top -m io -o write -s 1"
 alias iotopr="top -m io -o read -s 1"
 alias iotop="top -m io -o total"
@@ -199,13 +203,13 @@ alias sw2='sw0; sw1'
 alias zsnap_used="zfs get -o name,value used |grep @"
 alias zsnap_destroy_all="zfs list -H -o name -t snapshot | xargs -n1 zfs destroy"
 alias beadm=bectl	# 12.0 has beadm tool in base system as bectl
-alias zdf="zpool list -o name,size,allocated,capacity"
+alias zdf="zpool list -o name,size,allocated,capacity"	# INFO 200731: better use zfs list to get free space
 alias jkill="service jail stop"
 alias jrun="service jail start"
 
 # ------------------ 3rd party system utils --------------------------------
 alias freec='freecolor -mt'
-alias rsync="rsync -avshu --exclude .zfs"
+alias rsync="rsync -avshu --exclude .zfs"	# even '--exclude=/something' is relative to current path!
 alias rssh="rsync -P -e ssh"
 alias sshr="rsync -P -e ssh"
 alias port="nmap -p N hostname | grep open"
@@ -219,25 +223,13 @@ alias llt='ls -lt'
 alias lltr='ls -ltr'
 alias la='ls -A'
 
-# TODO 190428: set custom date format
-alias ls='exa  --time-style long-iso --classify'
-alias l=ls
-alias ll='ls -l'
-alias llg='ls -l --git'
-alias llgg='ls -l --grid'
-alias la='ls -a'
-# TODO 190317: equivalent of ls -ltr
-alias lltr='ls -l --sort newest'
-# TODO 190428: exa tree view
-# alias ltr 
-export EXA_COLORS="da=36"	# timestamp in cyan
-
 alias cp='cp -ia'
 alias mv='mv -i'
 alias less='less -XMr'
 
 alias df='df -Th'
-alias dfs='df -h | sort -h -k 4'
+alias dff='/opt/df'
+alias dfs='df -h | sort -h -k 4'	# sort by size
 alias du='du -h'
 
 #alias grep='grep --color -i'
@@ -255,7 +247,7 @@ alias h='/bin/date +'%H:%M''
 alias p='/bin/pwd'
 alias pp='echo `/usr/bin/whoami`@$HOST"["$TTY"]":`/bin/pwd`'
 
-alias mnt='mount | column -t'
+alias mount='mount | column -t'
 alias mnt="mount | sed 's/on//g' | sed -e 's/([^()]*)//g' | column -t"
 
 alias newfs.ntfs='mkntfs'
@@ -279,23 +271,7 @@ alias unzip='/usr/local/bin/unzip'
 alias unrar='unrar -idc'
 # -------------------------------------------------------------------------- }}}
 # ------------------ alias - pkg ------------------------------------------- {{{
-alias pkgI='pkg info -f'
-alias pkgl='pkg info -l'
-alias pkgq='pkg which'
-alias pkgd='pkg delete'
-alias pkgdd='pkg info -d'
-alias pkgD='pkg info -r'	# which packages depends on that package
-alias pkga='pkg info -a'	# all installed packages
-alias pkgi='pkg info'
-alias pkgs='pkg info -as | sort -k 2 -hr | column -t'
-
-#alias bup0='portaudit -Faq'
-alias bup0='pkg audit -Fq'
-alias bup1o='portsnap fetch update'
-alias bup1='cd /usr/ports ; git pull ; make fetchindex ; cd -'
-alias bup2="pkg version -v | grep -v '='"
-alias bup3='portmaster -dHa'
-alias bup3f='portmaster -Fa'
+# INFO 200913: moved to zshrc_local
 # -------------------------------------------------------------------------- }}}
 # ------------------ alias - network --------------------------------------- {{{
 alias pg='ping www.opendns.org'
@@ -341,7 +317,7 @@ alias fkomanda='find . -type f -exec chmod 644 {} +'
 alias dkomanda='find . -type d -exec chmod 755 {} +'
 alias makni20="for i in *20*; do n=`echo $i|sed 's/%20/\ /g'`; mv $i $n; done"
 
-alias mpa='mpv -vo null'
+alias mpa='mpv -vo=null'
 alias video2audio="mplayer -vc null -vo null -ao pcm "
 alias avi2wav="mplayer -ao pcm:fast:file=audio.wav -vo null -vc null video.avi"
 alias wav2mp3="lame -b 320 audio.wav"
@@ -371,7 +347,9 @@ alias ggu='gmake clean && gmake -j4 && gmake upload'
 alias weather='curl wttr.in/Osijek\?F'
 
 alias zathura-tabbed="tabbed -c zathura -e"		# XXX 200315 don't work as expected
+alias mupdf=zathura
 alias rgf="rg --no-ignore --files | grep "
+alias gp='WINEPREFIX=/mnt/vm/wine/gp6 wine start /unix "/mnt/vm/wine/gp6/drive_c/Program Files/Guitar Pro 6/GuitarPro.exe"'
 # -------------------------------------------------------------------------- }}}
 
 # ------------------ custom function - ssh --------------------------------- {{{
@@ -439,11 +417,8 @@ function mm() {
 # setopt correctall # spelling correction for arguments
 # lookup functions from here # https://zanshin.net/2013/02/02/zsh-configuration-from-the-ground-up/
 
-# pkg install zsh-syntax-highlighting
-source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-fpath=($HOME/.zsh-completions $fpath)
-
 # 191207
 QT_QPA_PLATFORMTHEME=qt5c
 
-source /home/johnny/.config/broot/launcher/bash/br
+# 200625 QT5 dark theme
+export QT_QPA_PLATFORMTHEME=qt5ct
