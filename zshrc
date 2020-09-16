@@ -112,7 +112,7 @@ case $(whoami) in
 esac
 PS2="$(print '%{\e[0;31m%}>%{\e[0m%}') "
 # right
-RPS1="$(print '%{\e[0;33m%}[%~]%{\e[0;32m%}[%y]%{\e[0;31m%}%{\e[0;31m%}[%D{%y.%m.%d. %H:%M:%S}]%{\e[0m%}')"
+RPS1="$(print '%{\e[0;33m%}[%~]%{\e[0;34m%}[%?]%{\e[0;32m%}[%y]%{\e[0;31m%}%{\e[0;31m%}[%D{%y.%m.%d. %H:%M:%S}]%{\e[0m%}')"
 # -------------------------------------------------------------------------- }}}
 
 if [ "$UID" -eq "0" ] ; then export DISPLAY=:0 ; fi	# enable X11 clipboard for root's vim
@@ -178,7 +178,8 @@ alias -g Vim='~/.vimrc'
 alias -g Tmux='~/.tmux.conf'
 alias -g H='| head'
 alias -g T='| tail'
-alias -g G='| grep --color'
+# alias -g G='| grep --color'
+alias -g G='| rg --no-line-number'
 alias -g C='| wc -l'
 alias -g S='> /dev/null 2>&1'
 alias -g Z='| fzf'
@@ -220,20 +221,17 @@ alias pstree='pstree -g 2'
 alias l='ls'
 alias ll='ls -l'
 alias llt='ls -lt'
-alias lltr='ls -ltr'
 alias la='ls -A'
 
 alias cp='cp -ia'
 alias mv='mv -i'
 alias less='less -XMr'
 
-alias df='df -Th'
+alias df='df -h'
 alias dff='/opt/df'
 alias dfs='df -h | sort -h -k 4'	# sort by size
 alias du='du -h'
 
-#alias grep='grep --color -i'
-alias grep='grep --color --exclude=tags'
 alias which='which -a'
 
 #override shell built-in commands
@@ -247,7 +245,7 @@ alias h='/bin/date +'%H:%M''
 alias p='/bin/pwd'
 alias pp='echo `/usr/bin/whoami`@$HOST"["$TTY"]":`/bin/pwd`'
 
-alias mount='mount | column -t'
+# alias mount='mount | column -t'
 alias mnt="mount | sed 's/on//g' | sed -e 's/([^()]*)//g' | column -t"
 
 alias newfs.ntfs='mkntfs'

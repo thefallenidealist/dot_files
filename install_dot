@@ -14,11 +14,14 @@ NC='\033[0m' # No Color
 
 OS=$(uname)
 if [ "$OS" = "FreeBSD" ] ; then
-	PIP="pip-3.6"
-	FILE_ZSH_LOCAL=zshrc_bsd
+	PIP="pip"
+	FILE_ZSH_LOCAL=zshrc_freebsd
 elif [ "$OS" = "Linux" ] ; then
 	PIP="pip3"
 	FILE_ZSH_LOCAL=zshrc_linux
+elif [ "$OS" = "OpenBSD" ] ; then
+	PIP="pip3.8"
+	FILE_ZSH_LOCAL=zshrc_openbsd
 fi
 
 PROGRAMS="zsh tmux nvim git $PIP"

@@ -1,0 +1,30 @@
+# 200915 created for OpenBSD arm64
+# per OS specific config (linked to right ~/.zshrc_local via install_dot script)
+#  vim: set ft=zsh ts=4 sw=4 tw=0 fdm=marker noet :
+
+PS1="$(print '%{\e[0;34m%}%m%{\e[0m%}%{\e[0;31m%}%#%{\e[0m%}') "
+
+# ------------------ alias - global -------------------------------------------
+# alias -g G='| grep'
+
+# ------------------ alias - system utils--------------------------------------
+alias disklabel="disklabel -h"
+alias poweroff="halt -p"
+alias lsblk='for i in $(for i in {1..$(sysctl -n hw.diskcount)} ; do  sysctl -n hw.disknames | cut -d , -f $i | cut -d : -f 1 ; done) ; do echo "--------------------------------------------------------------------------------" ; disklabel -h $i ; done'
+
+# ------------------ alias - unix tools ---------------------------------------
+alias ls='colorls -Gh'
+alias grep="grep"
+alias man="TERMINFO=~/.terminfo/ LESS=C TERM=mostlike PAGER=less man"
+alias msg="less -f /var/log/messages"
+
+# ------------------ alias - pkg ----------------------------------------------
+alias pkgs="pkg_info -Q"	# search
+alias pkgl="pkg_info -L"	# list files installed by package
+
+# ------------------ alias - network ------------------------------------------
+
+# ------------------ alias - user programs ------------------------------------
+
+# -----------------------------------------------------------------------------
+[ -f ~/.fzf/shell/key-bindings.zsh ] && source ~/.fzf/shell/key-bindings.zsh
