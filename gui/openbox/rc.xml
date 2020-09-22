@@ -5,7 +5,7 @@
 
 <resistance>
 	<strength>10</strength>
-	<screen_edge_strength>20</screen_edge_strength>
+	<screen_edge_strength>100</screen_edge_strength>
 </resistance>
 
 <focus>
@@ -189,6 +189,7 @@
 	<keybind key="W-q">		<action name="Close"/>				</keybind>
 	<keybind key="W-f">		<action name="ToggleFullscreen"/>	</keybind>
 	<keybind key="W-m">		<action name="ToggleMaximize"/>		</keybind>
+	<keybind key="W-n">		<action name="Iconify"/>			</keybind>
 
 	<keybind key="W-a"><keybind key="g">	<action name="ToggleDecorations"/>	</keybind></keybind>
 	<keybind key="W-a"><keybind key="r">	<action name="Reconfigure"/>		</keybind></keybind>
@@ -199,6 +200,8 @@
 	<keybind key="W-A-Left">	<action name="MoveResizeTo"> <monitor>prev</monitor> </action> </keybind>
 	<keybind key="W-A-l">	<action name="MoveResizeTo"> <monitor>next</monitor> </action> </keybind>
 	<keybind key="W-A-h">	<action name="MoveResizeTo"> <monitor>prev</monitor> </action> </keybind>
+	<keybind key="W-BackSpace">	<action name="MoveResizeTo"> <monitor>next</monitor> </action> </keybind>
+	<keybind key="W-S-Tab">		<action name="MoveResizeTo"> <monitor>next</monitor> </action> </keybind>
 
 	<!-- poor mans tiling -->
 	<keybind key="A-Left">
@@ -466,6 +469,16 @@
 		</mousebind>
 	</context>
 	<context name="Desktop">
+		<mousebind button="Up" action="Click">
+			<action name="GoToDesktop">
+				<to>previous</to>
+			</action>
+		</mousebind>
+		<mousebind button="Down" action="Click">
+			<action name="GoToDesktop">
+				<to>next</to>
+			</action>
+		</mousebind>
 		<mousebind button="Left" action="Press">
 			<action name="Focus"/>
 			<action name="Raise"/>
@@ -868,7 +881,7 @@
 		</size>
 	</application>
 
-	<application role="conversation">
+<application role="conversation">
 		<!-- TODO -->
 		<decor>yes</decor>
 		<focus>yes</focus>
@@ -954,6 +967,11 @@
 		</size>
 	</application>
 
+	<application name="kicad" title="KiCAD *">
+		<position>
+			<monitor>1</monitor>	<!-- 1 = master/right monitor -->
+		</position>
+	</application>
 	<application name="kicad" title="Eeschema*">
 		<decor>no</decor>
 		<position>
@@ -972,9 +990,41 @@
 			<monitor>1</monitor>	<!-- 1 = master/right monitor -->
 		</position>
 	</application>
+	<!-- name: kicad OR pcbnew (depends if started from kicad or from terminal) -->
+	<application title="3D Viewer">
+		<position>
+			<monitor>2</monitor>	<!-- 1 = master/right monitor -->
+		</position>
+	</application>
 
 	<application name="FreeCAD">
 		<decor>no</decor>
+	</application>
+
+	<application class="FreeCAD" title="Open document">
+		<position force="yes">
+			<x>center</x>
+			<y>center</y>
+		</position>
+		<size>
+			<width>70%</width>
+			<height>90%</height>
+		</size>
+	</application>
+
+	<application class="FreeCAD" title="Combo View">
+		<position force="yes">
+			<monitor>2</monitor>
+		</position>
+		<size>
+			<width>30%</width>
+			<height>100%</height>
+		</size>
+	</application>
+
+	<application class="Zathura">
+		<decor>yes</decor>
+		<maximized>true</maximized>
 	</application>
 
 </applications>

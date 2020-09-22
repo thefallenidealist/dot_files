@@ -25,6 +25,7 @@ alias lltr='ls -l --sort newest'
 # TODO 190428: exa tree view
 # alias ltr 
 export EXA_COLORS="da=36"	# timestamp in cyan
+alias lsof='fstat | grep -i '
 
 # ------------------ alias - pkg ------------------------------------------- {{{
 alias pkgI='pkg info -f'
@@ -54,5 +55,3 @@ alias bup3f='portmaster -Fa'
 # pkg install zsh-syntax-highlighting
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fpath=($HOME/.zsh-completions $fpath)
-
-source /home/johnny/.config/broot/launcher/bash/br

@@ -174,12 +174,13 @@ zstyle ':completion:*:options' list-colors '=^(-- *)=34'
 # only for zsh
 alias -g L='| less -XMr'
 alias -g Zsh='~/.zshrc'
+alias -g Zshl='~/.zshrc_local'
 alias -g Vim='~/.vimrc'
 alias -g Tmux='~/.tmux.conf'
 alias -g H='| head'
 alias -g T='| tail'
 # alias -g G='| grep --color'
-alias -g G='| rg --no-line-number'
+alias -g G='| rg --no-line-number --case-sensitive'
 alias -g C='| wc -l'
 alias -g S='> /dev/null 2>&1'
 alias -g Z='| fzf'
@@ -221,7 +222,7 @@ alias pstree='pstree -g 2'
 alias l='ls'
 alias ll='ls -l'
 alias llt='ls -lt'
-alias la='ls -A'
+alias la='ls -a'
 
 alias cp='cp -ia'
 alias mv='mv -i'
@@ -232,6 +233,8 @@ alias dff='/opt/df'
 alias dfs='df -h | sort -h -k 4'	# sort by size
 alias du='du -h'
 
+# alias w='fetch'
+alias w='wget'
 alias which='which -a'
 
 #override shell built-in commands
@@ -250,7 +253,6 @@ alias mnt="mount | sed 's/on//g' | sed -e 's/([^()]*)//g' | column -t"
 
 alias newfs.ntfs='mkntfs'
 
-alias lsof='fstat | grep -i '
 alias u='(date && uname -a && uptime)'
 alias uu='(date && uname -a && uptime) > `uname -r | cut -b 1-3`.`/bin/date +'%y%m%d'`'
 alias xxd="hexdump -C"		# xxd is part of vim package
@@ -420,3 +422,6 @@ QT_QPA_PLATFORMTHEME=qt5c
 
 # 200625 QT5 dark theme
 export QT_QPA_PLATFORMTHEME=qt5ct
+
+# 200919 hello again slrn, after so many years/decade
+NNTPSERVER='news.gmane.io'; export NNTPSERVER

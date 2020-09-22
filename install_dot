@@ -19,6 +19,7 @@ if [ "$OS" = "FreeBSD" ] ; then
 elif [ "$OS" = "Linux" ] ; then
 	PIP="pip3"
 	FILE_ZSH_LOCAL=zshrc_linux
+	INSTALL_FONTS="YES"
 elif [ "$OS" = "OpenBSD" ] ; then
 	PIP="pip3.8"
 	FILE_ZSH_LOCAL=zshrc_openbsd
@@ -176,6 +177,18 @@ install_gui()
 			printf "${YELLOW}"
 			echo "X11 server is not running"
 			printf "${NC}"
+		fi
+
+		if [ "$INSTALL_FONTS" = "YES" ]; then
+			# 200922 install fonts (Linux arm64) - installing packaged fonts-{powerline,inconsolata} won't help
+			echo "Installing powerline fonts for local user"
+			cd /tmp
+			git clone https://github.com/powerline/fonts.git --depth=1
+			cd fonts
+			./install.sh
+			cd -
+			rm -rf /tmp/fonts
+			echo "Fonts installed in ~/.local/share/fonts/"
 		fi
 	else
 		echo "This is root, no X11 conf needed"

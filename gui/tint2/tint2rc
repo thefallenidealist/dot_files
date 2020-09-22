@@ -151,7 +151,8 @@ border_color_pressed = #555555 80
 # E - executor
 # C - clock
 # : - separator
-panel_items = TLE:E:E:E:EEBSC
+panel_items = TLE:E:E:E:E:E:EBSC
+panel_items = TLE:E:E:E:E:E:ESC
 panel_size = 100% 37
 panel_margin = 1 0
 panel_background_id = 12
@@ -389,32 +390,6 @@ execp_lclick_command = doas wifimgr
 execp_font = sans 9
 execp_font_color = #aaffaa 100
 # ------------------------------------------------------------------------- }}}
-# Executor 5 - example														{{{
-# -----------------------------------------------------------------------------
-execp = new
-# execp_command =
-execp_interval = 1
-execp_has_icon = 0
-execp_cache_icon = 0
-execp_continuous = 0
-execp_markup = 1
-
-execp_lclick_command = zenity --info --title "tint2 example" --text "Mouse left click"
-execp_rclick_command = zenity --info --title "tint2 example" --text "Mouse right click"
-execp_mclick_command = zenity --info --title "tint2 example" --text "Mouse middle click"
-execp_uwheel_command = zenity --info --title "tint2 example" --text "Mouse wheel up"
-execp_dwheel_command = zenity --info --title "tint2 example" --text "Mouse wheel down"
-
-# execp_font = sans 9
-# execp_font_color = #aaffaa 100
-execp_font = Liberation Mono 8
-execp_font_color = #000000 100
-execp_padding = 0 0
-execp_background_id = 0
-execp_centered = 1
-execp_icon_w = 0
-execp_icon_h = 0
-# ------------------------------------------------------------------------- }}}
 # Executor 5 - weather														{{{
 # -----------------------------------------------------------------------------
 execp = new
@@ -426,6 +401,17 @@ execp_tooltip =
 
 execp_font = sans 9
 execp_font_color = #aaffaa 100
+# ------------------------------------------------------------------------- }}}
+# Executor 6 - battery														{{{
+# -----------------------------------------------------------------------------
+execp = new
+execp_command = ~/scripts/battery
+execp_interval = 1
+
+execp_font = sans 10
+execp_font_color = #aaffaa 100
+
+execp_lclick_command = ~/scripts/weather-xterm.sh
 # ------------------------------------------------------------------------- }}}
 # applet (FS, net, RAM, CPU) for systray
 # python2.7 ~/scripts/phwmon/phwmon.py --bg 000000
