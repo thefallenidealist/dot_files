@@ -1,14 +1,16 @@
 " 170812
 " 1.0 - created 160729, again
 " 0.1 - 160512 - vim as IDE at work
+"		150612	started experimenting with plugin managers and autocomplete
 " 0.0 - 2006. probably
 " vim: set ft=vim ts=4 sw=4 tw=78 fdm=marker noet :
 
 " TODO 2017-09-02 Windows libclang
 let s:work_pc = 0
+let s:lsp_enabled = 0
 
-"				Generic Vim settings 										{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Generic Vim settings														{{{
+" -----------------------------------------------------------------------------
 if !has('nvim')
 	" these are already default in nvim
 	set nocompatible
@@ -162,9 +164,9 @@ set sessionoptions=buffers,curdir,folds,help,winpos
 " XXX 181128: won't restore full help window: status will be 'Normal', not
 " 'Help' s so <C-]> won't work as expected
 set foldmethod=marker
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		OS specific															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ------------------------------------------------------------------------- }}}
+" OS specific																{{{
+" -----------------------------------------------------------------------------
 if has('unix')
 	let s:uname = substitute(system("uname"), '\n', '', '')
 
@@ -180,6 +182,8 @@ if has('unix')
 
 	elseif s:uname == "Linux"
 		let g:ctags_exe='/usr/bin/ctags-exuberant'
+	else
+		let g:ctags_exe=''
 	endif " uname
 elseif has('win32')
 	" INFO 190516: /c/python3_x64/python.exe -m pip install --upgrade pip pywin
@@ -194,17 +198,17 @@ elseif has('win32')
 	endif
 	cabbrev rm del
 endif
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		build/programming			{{{
-"""""""""""""""""""""""""""""""""""""""
-" for 'gf' command: open stdio.h and similar
-let &path.="src/include,/usr/include/AL,"
+" ------------------------------------------------------------------------- }}}
+" build/programming															{{{
+" -----------------------------------------------------------------------------
+" for 'gf' command: search in standard includes and in all subdirs in PWD
+let &path.="src/include,/usr/include/AL,.,**"
 
 " search for $CWD/tags, $CWD/.tags and go level up until $HOME
-set tags=tags,.tags;$HOME
-""""""""""""""""""""""""""""""""""""}}}
-"		cmd aliases															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" set tags=tags,.tags;$HOME
+" ------------------------------------------------------------------------- }}}
+" cmd aliases																{{{
+" -----------------------------------------------------------------------------
 " INFO all abbrev commands are non recursive
 
 " alias only triggered if it's on the start of the line
@@ -217,7 +221,7 @@ function! SetupCommandAlias(from, to)									" {{{
 				\ .' ((getcmdtype() is# ":" && getcmdline() is# "'.a:from.'")'
 				\ .'? ("'.a:to.'") : ("'.a:from.'"))'
 endfun
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" ------------------------------------------------------------------------- }}}
 " annoying misspell:
 call SetupCommandAlias("W", "w")
 call SetupCommandAlias("Q", "q")
@@ -297,9 +301,9 @@ call SetupCommandAlias("dt", "diffthis")
 call SetupCommandAlias("do", "diffoff")
 call SetupCommandAlias("sig", "call AppendModeline()")
 call SetupCommandAlias("mode", "call AppendModeline()")
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		generic mappings													{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ------------------------------------------------------------------------- }}}
+" generic mappings															{{{
+" -----------------------------------------------------------------------------
 " patch moving one char left when leavig Insert mode
 inoremap <silent> <Esc> <Esc>`^
 " disable ed mode:
@@ -368,9 +372,9 @@ nnoremap <F4> :set paste!<cr>
 " jump to next misspell (<leader>z and z= are already used for spelling)
 nnoremap ]z ]s
 nnoremap [z [s
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		autocmd																{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ------------------------------------------------------------------------- }}}
+" autocmd																	{{{
+" -----------------------------------------------------------------------------
 augroup autocmd_qf
 	autocmd!
 	autocmd FileType qf set nolist norelativenumber number
@@ -391,7 +395,9 @@ augroup my_group_with_a_very_uniq_name
 	autocmd FileType help nnoremap <buffer> q :wincmd c<cr>
 	autocmd FileType qf,quickfix,netrw nnoremap <buffer> q :q<cr>
 	autocmd FileType help,man nnoremap <buffer> <cr> <C-]>
-	autocmd FileType help,man,qf :NumbersDisable	" Disable Numbers plugin in help or man
+	if exists(":NumbersDisable")
+		autocmd FileType help,man,qf :NumbersDisable	" Disable Numbers plugin in help or man
+	endif
 
 	" force Vim to threat .md files as markdown and not Modula
 	" or use tpope/vim-markdown plugin
@@ -423,8 +429,11 @@ augroup my_group_with_a_very_uniq_name
 	" maps in git messenger floating window
 	autocmd FileType gitmessengerpopup map <buffer> <esc> q
 
-	au InsertEnter * set norelativenumber
-	au InsertLeave * set relativenumber
+	" au InsertEnter * set norelativenumber
+	" au InsertLeave * set relativenumber
+
+	" autocmd BufType fzf set nonumber norelativenumber
+	autocmd WinEnter * if &buftype == 'nofile' | set nonumber norelativenumber | endif
 augroup END
 
 " setup when in diff mode:
@@ -437,7 +446,7 @@ if &diff
 	nnoremap dg :diffget<cr>
 	call SetupCommandAlias("du", "diffupdate")
 endif
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" ------------------------------------------------------------------------- }}}
 "		buffers/windows/tabs keymaps										{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nnoremap tn :tabnew<cr>
@@ -574,8 +583,8 @@ nnoremap <C-w>J :call TmuxResize('j', 1)<CR>
 nnoremap <C-w>K :call TmuxResize('k', 1)<CR>
 nnoremap <C-w>L :call TmuxResize('l', 1)<CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		Emacs shortcuts														{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Emacs shortcuts															{{{
+" -----------------------------------------------------------------------------
 " blasphemy, Emacs shortcuts in Vim
 " INFO C-BS won't work in xterm
 inoremap <C-a> <Home>
@@ -626,9 +635,9 @@ if has('nvim')
 	cnoremap <A-b> <S-Left>
 	cnoremap <A-f> <S-Right>
 endif
-""""""""""""""""""""""""""""""""""""""""}}}
-"		hardko mode															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ------------------------------------------------------------------------- }}}
+" hardko mode																{{{
+" -----------------------------------------------------------------------------
 " nnoremap <Left>		:echoe "Use h"<cr>
 " nnoremap <Right>	:echoe "Use l"<cr>
 " nnoremap <Up>		:echoe "Use k"<cr>
@@ -639,11 +648,11 @@ nnoremap <esc>[ <esc>[
 
 " breaking the habit
 imap <C-c> <C-o>:echoe "Use esc, bogajebo"<cr>
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" ------------------------------------------------------------------------- }}}
 " TODO better, check if highlight is active (HOW?):
 nnoremap <silent><Esc><Esc> <Esc>:nohlsearch<CR><Esc>:echo "hlsearch disabled"<cr>
-"		leader mappings														{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" leader mappings															{{{
+" -----------------------------------------------------------------------------
 " another leader keys:
 " nmap ; <leader>
 " nmap , <leader>
@@ -660,14 +669,14 @@ nnoremap <leader>n :set relativenumber!<cr>
 nnoremap <leader>N :set number!<cr>
 nnoremap <leader>r :so $MYVIMRC<cr>:echo "vimrc reloaded"<CR>
 nnoremap <leader>e :e $MYVIMRC<cr>
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		copy paste mappings													{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ------------------------------------------------------------------------- }}}
+" copy paste mappings														{{{
+" -----------------------------------------------------------------------------
 " paste and adjuste indent
 nnoremap p ]p
 nnoremap P ]P
-nnoremap p p=`]
-nnoremap P P=`]
+" nnoremap p p=`]
+" nnoremap P P=`]
 
 " delete to the black hole (_) register
 nnoremap dd "_dd
@@ -695,7 +704,8 @@ nnoremap yw yiw
 " in case that old behaviour is needed:
 nnoremap yW yw
 
-"	clipboard																{{{
+" clipboard																	{{{
+" -----------------------------------------------------------------------------
 if has('clipboard')	" not really needed for all options under this
 	" copy filepath to X11 clipboard
 	nnoremap <leader>FP  :let @* = expand("%")<cr>:echo   "relative path of the file copied to the X11 1st clipboard"<CR>
@@ -754,24 +764,24 @@ if has('clipboard')	" not really needed for all options under this
 	" needed for nvim-qt.exe
 	cnoremap <S-Insert> <C-r>+
 endif
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" ------------------------------------------------------------------------- }}}
 nnoremap <leader>ff  :let @" = expand("%")<cr>:echo   "relative path of the file copied to the unnamed register"<CR>
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		mouse mappings														{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ------------------------------------------------------------------------- }}}
+" mouse mappings															{{{
+" -----------------------------------------------------------------------------
 " double click select all occurrences
 nnoremap <2-LeftMouse> *N:call RemoveBrackets()<cr>:ShowSearchIndex<cr>
 inoremap <2-LeftMouse> <c-o>*N:call RemoveBrackets()<cr>:ShowSearchIndex<cr>
 vnoremap <2-LeftMouse> *N:call RemoveBrackets()<cr>:ShowSearchIndex<cr>
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"				custom functions											{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-function! AppendModeline() " {{{
+" ------------------------------------------------------------------------- }}}
+" custom functions															{{{
+" -----------------------------------------------------------------------------
+function! AppendModeline()	"												{{{
 	let l:modeline = printf(" vim: set ft=%s ts=%d sw=%d tw=%d fdm=%s %set :", &filetype, &tabstop, &shiftwidth, &textwidth, &foldmethod, &expandtab ? '' : 'no')
 	let l:modeline = substitute(&commentstring, "%s", l:modeline, "")
 	call append(line("$"), l:modeline)
 endfunction
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" ------------------------------------------------------------------------- }}}
 function! s:VSetSearch() "													{{{
 	" visual mode */#
 	let temp = @@
@@ -782,7 +792,7 @@ endfunction
 
 vnoremap * :<C-u>call <SID>VSetSearch()<CR>//<CR>
 vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR>
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" ------------------------------------------------------------------------- }}}
 function! ZeroMove() "														{{{
 	" INFO toggle between ^ and 0
 	let l:column_old = col('.')
@@ -797,7 +807,7 @@ function! ZeroMove() "														{{{
 		execute "normal! 0"
 	endif
 endfunction
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" ------------------------------------------------------------------------- }}}
 function! NeatFoldText() "													{{{
 	" http://dhruvasagar.com/2013/03/28/vim-better-foldtext
 	let line = ' ' . substitute(getline(v:foldstart), '^\s*"\?\s*\|\s*"\?\s*{{' . '{\d*\s*', '', 'g') . ' '
@@ -813,7 +823,7 @@ function! NeatFoldText() "													{{{
 	return foldtextstart . repeat(foldchar, &textwidth+10-foldtextlength) . foldtextend " XXX ugly
 endfunction
 set foldtext=NeatFoldText()
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" ------------------------------------------------------------------------- }}}
 " toggle ColorColumn														{{{
 
 " check if highlight group exists and is it highlighed
@@ -841,7 +851,7 @@ function! ToggleColorColumn()
 		execute "highlight ColorColumn ctermbg=".g:color_ColorColumn." guibg=".g:color_ColorColumnGUI
 	endif
 endfunction
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" ------------------------------------------------------------------------- }}}
 " Tmux-like window resizing													{{{
 " INFO still need to press multiple time <C-w>hjkl, not really like tmux, but better than Vims default
 " TODO link for sauce of this
@@ -898,8 +908,8 @@ function! TmuxResize(direction, amount)
 	let l:action = GetAction(a:direction)
 	exec l:action.a:amount
 endfunction
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-function! PreviewWindowOpened()											"{{{
+" ------------------------------------------------------------------------- }}}
+function! PreviewWindowOpened()	"											{{{
 	" from: https://stackoverflow.com/a/14300184/8078624
 	for nr in range(1, winnr('$'))
 		if getwinvar(nr, "&pvw") == 1
@@ -909,8 +919,8 @@ function! PreviewWindowOpened()											"{{{
 	endfor
 	return 0
 endfun
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-function! s:HelpTag(reverse)											" {{{
+" ------------------------------------------------------------------------- }}}
+function! s:HelpTag(reverse)	"											{{{
 	" INFO 170817: jumps to next/previous help tag
 	"http://sillybytes.net/2015/02/vim-jump-to-nextprevious-help-file-tags.html
 	call search('|\S\+|', a:reverse ? 'bW' : 'W')
@@ -924,15 +934,15 @@ nmap ]h <Plug>HelpTagNext
 
 nnoremap <silent> <Plug>HelpTagPrevious :call <SID>HelpTag(1)<CR>
 nnoremap <silent> <Plug>HelpTagNext     :call <SID>HelpTag(0)<CR>
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" ------------------------------------------------------------------------- }}}
 function! RemoveBrackets()                                                " {{{
 	" removes '\<' and '\>' in '/' register
 	" INFO created 171022, used for <C-R>/ after */#
 	let @/ = substitute(@/, "\\\\\<", "", "")
 	let @/ = substitute(@/, "\\\\\>", "", "")
 endfunction
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-function! HeaderToggle()                                                   " {{{
+" ------------------------------------------------------------------------- }}}
+function! HeaderToggle()	"												{{{
 	" bang for overwrite when saving vimrc
 	" from https://stackoverflow.com/questions/17170902/in-vim-how-to-switch-quickly-between-h-and-cpp-files-with-the-same-name
 	let file_path = expand("%")
@@ -974,14 +984,14 @@ function! HeaderToggle()                                                   " {{{
 		endif
 	endif
 endfunction
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-function! SetupVerilogEnvironment()                                        " {{{
+" ------------------------------------------------------------------------- }}}
+function! SetupVerilogEnvironment()		"									{{{
 	" https://github.com/albertxie/iverilog-tutorial
 	" TODO 180617: Incorporate this into <F5> mapping for C/C++/Rust
 	" (depending on filetype)
 	map <F5> :! iverilog -o %:r.vvp %:r.v %:r_tb.v && vvp %:r.vvp && gtkwave %:r.vcd <ENTER>
 endfunction
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" ------------------------------------------------------------------------- }}}
 " register clear															{{{
 " -----------------------------------------------------------------------------
 function! RegisterClear()
@@ -992,7 +1002,7 @@ function! RegisterClear()
 endfunction
 call SetupCommandAlias("regc",  "call RegisterClear()")
 " ------------------------------------------------------------------------- }}}
-function! HeaderToggle()                                                   " {{{
+function! HeaderToggle()	"												{{{
 	" bang for overwrite when saving vimrc
 	" from https://stackoverflow.com/questions/17170902/in-vim-how-to-switch-quickly-between-h-and-cpp-files-with-the-same-name
 	let file_path = expand("%")
@@ -1046,8 +1056,8 @@ function! HeaderToggle()                                                   " {{{
 		endif
 	endif
 endfunction
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-function! SwitchWindow()												"  {{{
+" ------------------------------------------------------------------------- }}}
+function! SwitchWindow()	"												{{{
 " -----------------------------------------------------------------------------
 " created by me on 190524
 " - switch to previous window if available
@@ -1069,17 +1079,17 @@ function! SwitchWindow()												"  {{{
 		wincmd p
 	endif
 endfunction
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-function! Line(...)														" {{{
-" ---------------------------------------------------------------------------
+" ------------------------------------------------------------------------- }}}
+function! Line(...)	"														{{{
+" -----------------------------------------------------------------------------
 " created by me on 190520
 	let l:arg_num=a:0
 	let s:line1 = "											{{{"
 	" fold mark just to make it in synch with printf() bellow	{{{
 
 	if &commentstring == "// %s"
-		let s:line2 = printf("----------------------------------------------------------------------------")
-		let s:line3 = printf("------------------------------------------------------------------------ }}}")
+		let s:line2 = printf("-----------------------------------------------------------------------------")
+		let s:line3 = printf("------------------------------------------------------------------------- }}}")
 	else
 		let s:line2 = printf("-----------------------------------------------------------------------------")
 		let s:line3 = printf("------------------------------------------------------------------------- }}}")
@@ -1116,7 +1126,7 @@ call SetupCommandAlias("line1", "call Line(1)")
 call SetupCommandAlias("line2", "call Line(2)")
 call SetupCommandAlias("line3", "call Line(3)")
 " ------------------------------------------------------------------------- }}}
-function! LastWindow()													"   {{{
+function! LastWindow()	"													{{{
 " -----------------------------------------------------------------------------
 " 200509 moved from augroup to separate function
 " close current tab if only remaining buffers are quickfix/nerdtree/tagbar
@@ -1150,36 +1160,36 @@ function! LastWindow()													"   {{{
 	endif
 endfunction
 " ------------------------------------------------------------------------- }}}
-" function! placeholder()												"   {{{
-" -----------------------------------------------------------------------------
 " ------------------------------------------------------------------------- }}}
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
 
 " Plugins																	{{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Auto install plug.vim doesn't exists                                      {{{
+" -----------------------------------------------------------------------------
+" Auto install plug.vim doesn't exists										{{{
 " -----------------------------------------------------------------------------
 if empty(glob('~/.vim/autoload/plug.vim'))
 	silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
 				\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 	autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
-" -----------------------------------------------------------------------------
 " ------------------------------------------------------------------------- }}}
 call plug#begin('~/.vim/plugged')
 
+if has('nvim-0.5')
+if (s:lsp_enabled == 1)
 Plug 'neovim/nvim-lsp'			" LSP core, nvim 0.5+
 Plug 'nvim-lua/completion-nvim'	" LSP autocomplete, nvim 0.5+
 Plug 'nvim-lua/diagnostic-nvim'	" LSP better showing of errors, nvim 0.5+
 Plug 'nvim-treesitter/nvim-treesitter', { 'for': 'c,cpp,rust' }			" nvim 0.5+
 Plug 'nvim-treesitter/completion-treesitter', { 'for': 'c,cpp,rust' }	" nvim 0.5+
+endif
+endif
 
 Plug 'SirVer/ultisnips'
 Plug 'thomasfaingnaert/vim-lsp-ultisnips'
 
-if executable('ctags')
-	Plug 'ludovicchabant/vim-gutentags', { 'for': 'c,cpp,rust' }
-endif
+" if executable('ctags')
+" 	Plug 'ludovicchabant/vim-gutentags', { 'for': 'c,cpp,rust' }
+" endif
 
 " python3 -m pip install pynvim
 Plug 'liuchengxu/vim-clap'
@@ -1208,6 +1218,7 @@ Plug 'dietsche/vim-lastplace'		" Open file at last edit position
 Plug 'bogado/file-line'				" open file.txt:123
 Plug 'scrooloose/nerdtree', {'on': ['NERDTreeToggle', 'NERDTreeFind']}	" lazy loading saves 300 ms on startup
 Plug 'Xuyuanp/nerdtree-git-plugin', {'on': ['NERDTreeToggle']}
+" Plug 'ms-jpq/chadtree', {'branch': 'chad', 'do': ':UpdateRemotePlugins'}
 
 Plug 'vim-airline/vim-airline'
 " Plug 'rbong/vim-crystalline'
@@ -1266,15 +1277,16 @@ Plug 'godlygeek/tabular'	" Tabularize/align
 Plug 'qpkorr/vim-bufkill'			" kill buffer without killing split :BD :BW
 " Plug 'easymotion/vim-easymotion'	" leader leader and magic begins
 " Plug 'justinmk/vim-sneak'       " lightweight easymotion
-Plug 'myusuf3/numbers.vim'		" disable relative numbers in insert mode and non-active windows
+" Plug 'myusuf3/numbers.vim'		" disable relative numbers in insert mode and non-active windows, INFO 200826: breaks floating window hover
 " Plug 'hyiltiz/vim-plugins-profile'
 " Plug 'matze/vim-move'
 " Plug 'tpope/vim-markdown'
 " Plug 'plasticboy/vim-markdown'
+" Plug 'mzlogin/vim-markdown-toc'		" autogenerate markdown ToC (:GenTocGFM)
 " Plug 'vim-scripts/tinymode.vim'
 " Plug 'kien/rainbow_parentheses.vim'
 
-Plug 'Carpetsmoker/auto_autoread.vim'
+" Plug 'Carpetsmoker/auto_autoread.vim'
 Plug 'wesQ3/vim-windowswap'		" Easier window swap: <leader>ww
 
 Plug 'machakann/vim-highlightedyank'	" temporary highlight yanked text/selection
@@ -1286,9 +1298,9 @@ Plug 'chrisbra/vim-diff-enhanced'
 
 " Initialize plugin system
 call plug#end()
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+" ------------------------------------------------------------------------- }}}
 " Plugin configuration
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" -----------------------------------------------------------------------------
 " put this after the theme plugin is installed, but before custom "highlight"
 " overrides
 colorscheme molokai
@@ -1301,6 +1313,8 @@ colorscheme molokai
 set iskeyword+=:
 set completeopt=menu,menuone,noinsert,noselect
 
+if has('nvim-0.5')
+if (s:lsp_enabled == 1)
 " LSP nvim																	{{{
 " -----------------------------------------------------------------------------
 " 200723 builtin nvim (v0.5) LSP
@@ -1310,20 +1324,37 @@ set completeopt=menu,menuone,noinsert,noselect
 
 autocmd Filetype rust setlocal omnifunc=v:lua.vim.lsp.omnifunc
 autocmd Filetype cpp  setlocal omnifunc=v:lua.vim.lsp.omnifunc
+autocmd Filetype c    setlocal omnifunc=v:lua.vim.lsp.omnifunc
 setlocal omnifunc=v:lua.vim.lsp.omnifunc
 
-nnoremap <silent> <buffer> gd			<cmd>lua vim.lsp.buf.declaration()<CR>
-nnoremap <silent> <buffer> <c-]>		<cmd>lua vim.lsp.buf.definition()<CR>
-nnoremap <silent> <buffer> K			<cmd>lua vim.lsp.buf.hover()<CR>
-nnoremap <silent> <buffer> gD			<cmd>lua vim.lsp.buf.implementation()<CR>
-nnoremap <silent> <buffer> <c-k>		<cmd>lua vim.lsp.buf.signature_help()<CR>
-nnoremap <silent> <buffer> 1gD			<cmd>lua vim.lsp.buf.type_definition()<CR>
-nnoremap <silent> <buffer> <leader>d	<cmd>lua vim.lsp.buf.type_definition()<CR>
-nnoremap <silent> <buffer> <leader>rn	<cmd>lua vim.lsp.buf.rename()<CR>
-nnoremap <silent> <buffer> gr			<cmd>lua vim.lsp.buf.references()<CR>
-nnoremap <silent> g0					<cmd>lua vim.lsp.buf.document_symbol()<CR>
-nnoremap <silent> gW					<cmd>lua vim.lsp.buf.workspace_symbol()<CR>
+nnoremap <silent> gd			<cmd>lua vim.lsp.buf.declaration()<CR>
+nnoremap <silent> <c-]>		<cmd>lua vim.lsp.buf.definition()<CR>
+nnoremap <silent> K			<cmd>lua vim.lsp.buf.hover()<CR>
+nnoremap <silent> gD			<cmd>lua vim.lsp.buf.implementation()<CR>
+nnoremap <silent> <c-k>		<cmd>lua vim.lsp.buf.signature_help()<CR>
+nnoremap <silent> 1gD			<cmd>lua vim.lsp.buf.type_definition()<CR>
+nnoremap <silent> <leader>d	<cmd>lua vim.lsp.buf.type_definition()<CR>
+nnoremap <silent> <leader>rn	<cmd>lua vim.lsp.buf.rename()<CR>
+nnoremap <silent> gr			<cmd>lua vim.lsp.buf.references()<CR>
+nnoremap <silent> g0			<cmd>lua vim.lsp.buf.document_symbol()<CR>
+nnoremap <silent> gW			<cmd>lua vim.lsp.buf.workspace_symbol()<CR>
 " nnoremap <silent> <buffer> <leader><space> <cmd>lua vim.lsp.util.show_line_diagnostics()<CR>
+
+
+" command! LspDeclaration2 lua require'jumpLoc'.jumpNextLocationCycle()
+" command! LspDeclaration lua vim.lsp.buf.declaration()
+command! LspDefinition		lua vim.lsp.buf.definition()
+command! LspHover			lua vim.lsp.buf.hover()
+command! LspImplementation	lua vim.lsp.buf.implementation()
+command! LspSignatureHelp	lua vim.lsp.buf.signature_help()
+command! LspTypeDefinition	lua vim.lsp.buf.type_definition()
+command! LspRename			lua vim.lsp.buf.rename()
+command! LspReferences		lua vim.lsp.buf.references()
+command! LspDocumentSymbol	lua vim.lsp.buf.document_symbol()
+command! LspWorkspaceSymbol	lua vim.lsp.buf.workspace_symbol()
+
+" open folds on jump
+set foldopen+=tag
 
 highlight LspDiagnosticsError	ctermfg=red		ctermbg=black
 highlight LspDiagnosticsWarning	ctermfg=208		ctermbg=black
@@ -1332,15 +1363,37 @@ highlight LspDiagnosticsHint	ctermfg=105		ctermbg=black
 " LSP complete nvim 														{{{
 " -----------------------------------------------------------------------------
 " completion-nvim:
-lua require'nvim_lsp'.pyls.setup{on_attach=require'completion'.on_attach}
-lua require'nvim_lsp'.clangd.setup{on_attach=require'completion'.on_attach}
+" lua require'nvim_lsp'.pyls.setup{on_attach=require'completion'.on_attach}
+" lua require'nvim_lsp'.clangd.setup{on_attach=require'completion'.on_attach}
 
 " Use completion-nvim in every buffer
 autocmd BufEnter * lua require'completion'.on_attach()
 
-" Use <Tab> and <S-Tab> to navigate through popup menu
+" triggering autocompletition												{{{
+" -----------------------------------------------------------------------------
+" manual with Ctrl-P
+" -----------------------------------------------------------------------------
+" let g:completion_enable_auto_popup = 0
+" inoremap <silent><expr> <c-p> completion#trigger_completion()	" map <c-p> to manually trigger completion
+
+" auto, select with Tab/Shift-tab and expand with Enter
+" -----------------------------------------------------------------------------
 inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+" - semiworks for snippets
+
+" auto, expand with Tab
+" -----------------------------------------------------------------------------
+" function! s:check_back_space() abort
+"     let col = col('.') - 1
+"     return !col || getline('.')[col - 1]  =~ '\s'
+" endfunction
+" ------------------------------------------------------------------------- }}}
+
+" inoremap <silent><expr> <TAB>
+"   \ pumvisible() ? "\<C-n>" :
+"   \ <SID>check_back_space() ? "\<TAB>" :
+"   \ completion#trigger_completion()
 
 " Set completeopt to have a better completion experience
 set completeopt=menuone,noinsert,noselect
@@ -1356,15 +1409,19 @@ let g:completion_chain_complete_list = {
 			\{'mode': '<c-n>'}
 			\],
 			\'default': [
-			\{'complete_items': ['lsp', 'snippet', 'file']},
+			\{'complete_items': ['snippet', 'file', 'path']},
 			\{'mode': '<c-p>'},
 			\{'mode': '<c-n>'}
 			\],
 			\'c' : [
-			\ {'complete_items': ['ts']}
+			\ {'complete_items': ['snippet', 'lsp', 'ts', 'file']}
+			\ ],
+			\'cpp' : [
+			\ {'complete_items': ['snippet', 'lsp', 'ts', 'file']}
 			\ ],
 			\}
 			\}
+
 
 let g:completion_matching_ignore_case = 1
 let g:completion_matching_strategy_list = ['exact', 'substring', 'fuzzy']
@@ -1388,25 +1445,37 @@ nnoremap <silent> [w :PrevDiagnosticCycle<cr>
 nnoremap <silent> <leader><space> :OpenDiagnostic<cr>
 
 let g:diagnostic_enable_virtual_text = 1	" inline diagnostic
+let g:diagnostic_insert_delay = 1			" don't show it in insert mode
 let g:diagnostic_virtual_text_prefix = '↣ [LSP] '
 let g:space_before_virtual_text = 5
+let g:diagnostic_auto_popup_while_jump = 1	" auto open diagnostic popup
 " ------------------------------------------------------------------------- }}}
+" tree-sitter																{{{
+" -----------------------------------------------------------------------------
+" 200722
+if exists(":TSBufEnable")
+	" moved to ~/.config/nvim/treesitter.lua
+	" TODO 200828
+endif
+" ------------------------------------------------------------------------- }}}
+endif
+endif
 
 " open header																{{{
 " -----------------------------------------------------------------------------
 nnoremap <Leader>h :call HeaderToggle()<CR>
 " ------------------------------------------------------------------------- }}}
-" Rust																	{{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Rust																		{{{
+" -----------------------------------------------------------------------------
 " don't expand tab (and other things)
 let g:rust_recommended_style = 0
 let g:ftplugin_rust_source_path = $HOME.'~/src/rust-src/rust'
 
 " 180805 RustFmt:
 " TODO 180805
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+" ------------------------------------------------------------------------- }}}
 " Airline																	{{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" -----------------------------------------------------------------------------
 let g:airline_powerline_fonts = 1
 " Automatically displays all buffers when there's only one tab open.
 let g:airline#extensions#tabline#enabled = 1
@@ -1463,8 +1532,8 @@ let g:airline#extensions#hunks#enabled = 0
 let g:airline_mode_map = {}
 let g:airline_mode_map['ic'] = 'INSERT'
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
-"" Airline - crystalline															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"" Airline - crystalline													{{{
+" -----------------------------------------------------------------------------
 "" 191210
 "function! StatusLine(current, width)
 "	let l:s = ''
@@ -1506,87 +1575,10 @@ let g:airline_mode_map['ic'] = 'INSERT'
 "set showtabline=2
 "set guioptions-=e
 "set laststatus=2
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
-" tree-sitter																{{{
-"-----------------------------------------------------------------------------
-" 200722
-if exists(":TSBufEnable")
-lua <<EOF
-require'nvim-treesitter.configs'.setup {
-highlight = {
-		enable = true,                    -- false will disable the whole extension
-		disable = { 'c', 'rust' },        -- list of language that will be disabled
-		custom_captures = {               -- mapping of user defined captures to highlight groups
-		-- ["foo.bar"] = "Identifier"   -- highlight own capture @foo.bar with highlight group "Identifier", see :h nvim-treesitter-query-extensions
-		},            
-		},
-		incremental_selection = {
-	enable = true,
-	disable = { 'cpp', 'lua' },
-	keymaps = {                       -- mappings for incremental selection (visual mappings)
-	init_selection = 'gnn',         -- maps in normal mode to init the node/scope selection
-	node_incremental = "grn",       -- increment to the upper named parent
-	scope_incremental = "grc",      -- increment to the upper scope (as defined in locals.scm)
-	node_decremental = "grm",       -- decrement to the previous node
-	}
-	},
-	refactor = {
-	highlight_definitions = {
-enable = true
-},
-highlight_current_scope = {
-		enable = false
-		},
-		smart_rename = {
-	enable = true,
-	keymaps = {
-	smart_rename = "grr"            -- mapping to rename reference under cursor
-	}
-	},
-	navigation = {
-enable = true,
-keymaps = {
-goto_definition = "gnd",        -- mapping to go to definition of symbol under cursor
-list_definitions = "gnD"        -- mapping to list all definitions in current file
-}
-}
-},
-textobjects = { -- syntax-aware textobjects
-	enable = true,
-	disable = {},
-	keymaps = {
-	["iL"] = { -- you can define your own textobjects directly here
-	python = "(function_definition) @function",
-	cpp = "(function_definition) @function",
-	c = "(function_definition) @function",
-	java = "(method_declaration) @function"
-	},
-	-- or you use the queries from supported languages with textobjects.scm
-	["af"] = "@function.outer",
-	["if"] = "@function.inner",
-	["aC"] = "@class.outer",
-	["iC"] = "@class.inner",
-	["ac"] = "@conditional.outer",
-	["ic"] = "@conditional.inner",
-	["ae"] = "@block.outer",
-	["ie"] = "@block.inner",
-	["al"] = "@loop.outer",
-	["il"] = "@loop.inner",
-	["is"] = "@statement.inner",
-	["as"] = "@statement.outer",
-	["ad"] = "@comment.outer",
-	["am"] = "@call.outer",
-	["im"] = "@call.inner"
-	}
-	},
-ensure_installed = 'all' -- one of 'all', 'language', or a list of languages
-}
-EOF
-endif
-"------------------------------------------------------------------------- }}}
+" ------------------------------------------------------------------------- }}}
 
-" Commenter                                                                  {{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Commenter																	{{{
+" -----------------------------------------------------------------------------
 " for tpope commenter, muscle memory from NERDcommenter
 " INFO 170812: Yes, nmap, not nnoremap
 nmap <leader>c<space>   <Plug>CommentaryLine
@@ -1595,9 +1587,9 @@ nmap <leader>cc         <Plug>CommentaryLine
 vmap <leader>cc         <Plug>Commentary
 nmap <leader>cy       yy<Plug>CommentaryLine
 vmap <leader>cy      ygv<Plug>Commentary
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
-" fuzzy open                                                                 {{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ------------------------------------------------------------------------- }}}
+" fuzzy open																{{{
+" -----------------------------------------------------------------------------
 " :Files, :Commits, :Windows, :Tags, :BTags
 nnoremap <leader>o :Files<CR>
 nnoremap <leader>m :FZFMru<CR>
@@ -1671,13 +1663,13 @@ endfunction
 
 " FZFMru - don't sort, show most recent first
 let g:fzf_mru_no_sort = 1
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+" ------------------------------------------------------------------------- }}}
 " vim orgmode																{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" -----------------------------------------------------------------------------
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+" ------------------------------------------------------------------------- }}}
 " calendar																	{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" -----------------------------------------------------------------------------
 " Change Month & Day names
 let g:calendar_mruler = '1 Jan,2 Feb,3 Mar,4 Apr,5 May,6 Jun,7 Jul,8 Aug,9 Sep,10 Oct,11 Nov,12 Dec'
 " let g:calendar_wruler = '7Su 1Mo 2Tu 3We 4Th 5Fr 6Sa'
@@ -1689,9 +1681,9 @@ augroup calendar
 	" autocmd FileType calendar :vertical resize 50
 	autocmd BufWinEnter calendar set winwidth=50 " TODO 190514
 augroup END
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
-" File managers                                                              {{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ------------------------------------------------------------------------- }}}
+" File managers																{{{
+" -----------------------------------------------------------------------------
 nnoremap <leader>f :NERDTreeToggle<cr>
 nnoremap <leader>F :NERDTreeFind<cr>
 
@@ -1711,9 +1703,9 @@ let g:NERDTreeIndicatorMapCustom = {
     \ 'Ignored'   : '☒',
     \ "Unknown"   : "?"
     \ }
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+" ------------------------------------------------------------------------- }}}
 " git plugins																{{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" -----------------------------------------------------------------------------
 " GitGutter
 " - shows +-m in sign column
 " - shortcuts: [c ]c
@@ -1760,9 +1752,9 @@ nnoremap <leader>gg :GitMessenger<cr>
 
 let g:magit_discard_hunk_mapping="X"   " discard hunk
 let g:git_messenger_include_diff="current"	" auto show dif (whiout pressing 'd' key)
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+" ------------------------------------------------------------------------- }}}
 " searching																	{{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" -----------------------------------------------------------------------------
 " 180217 Grepper
 let g:grepper = {}            " initialize g:grepper with empty dictionary
 runtime plugin/grepper.vim    " initialize g:grepper with default values
@@ -1777,22 +1769,23 @@ if has('win32')
 else
 	nnoremap <leader>a :Grepper -tool rg -query <C-r><C-w><CR>
 endif
-nnoremap <leader>A :Grepper<cr>
-nnoremap <leader>s :Grepper -tool rg -buffers -query <C-r><c-w><cr>
+nnoremap <leader>a :Grepper -tool rg -cword -query<CR>
+nnoremap <leader>A :Grepper -tool rg<cr>
+nnoremap <leader>s :Grepper -tool rg -buffers -cword -query<cr>
 nnoremap <leader>S :Grepper -tool rg -buffers <cr>
 
 call SetupCommandAlias("Gbuf",  "Grepper -tool rg -buffer -query")
 call SetupCommandAlias("Gbufs", "Grepper -tool rg -buffers -query")
 call SetupCommandAlias("G",     "Grepper -tool rg -query")
 " call SetupCommandAlias("Gadd",  "Grepper -tool rg -append -query") " XXX 180218
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+" ------------------------------------------------------------------------- }}}
 " toggle quickfix and location list											{{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" -----------------------------------------------------------------------------
 let g:lt_location_list_toggle_map = '<leader>l'
 let g:lt_quickfix_list_toggle_map = '<leader>q'
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+" ------------------------------------------------------------------------- }}}
 " easymotion																{{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" -----------------------------------------------------------------------------
 " easymotion original {{{
 " press <leader><leader>X where X is char for modes (it can be f,w,...)
 " <Leader>f{char} to move to {char}
@@ -1820,10 +1813,10 @@ nmap <Leader>w <Plug>(easymotion-overwin-w)
 " let g:sneak#label = 1
 " nmap \\ <Plug>SneakLabel_s
 " INFO 180218: complicated to me, not working as expected, remaps <tab> and s
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+" ------------------------------------------------------------------------- }}}
 
 " ctags																		{{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" -----------------------------------------------------------------------------
 " INFO will auto create tags, auto update on save (incremental update)
 " it will generate a new tag file if there is none (but it needs time, it will report "no tags file found")
 let g:gutentags_ctags_executable = g:ctags_exe
@@ -1845,11 +1838,10 @@ call SetupCommandAlias("tagu!","GutentagsUpdate!")
 " noremap <C-\|>:PreviewSignature!<cr>
 
 " uctags -R --sort=foldcase --c++-kinds=+p --fields=+ianS --extras=+q -f ~/.vim/tags/libc.tags /usr/include
-set tags+=~/.vim/tags/libc.tags
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" set tags+=~/.vim/tags/libc.tags
+" ------------------------------------------------------------------------- }}}
 "		tagbar																{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" -----------------------------------------------------------------------------
 " INFO shows tags (variables, enums, typedes, functions on the windows on the right)
 " :TagbarToggle
 " :TagbarOpenAutoClose - useful for jumping to the function (with preview window)
@@ -1878,19 +1870,19 @@ nnoremap <leader>t :TagbarToggle<CR>
 "             \'i:impls,trait implementations',
 "             \]
 "             \}
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" ------------------------------------------------------------------------- }}}
 " C/C++ highlighter															{{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" -----------------------------------------------------------------------------
 " INFO 170818: works for C also
 " let g:cpp_class_scope_highlight = 1
 let g:cpp_member_variable_highlight = 1		" object.*var1*
 " let g:cpp_class_decl_highlight = 1
 let g:cpp_concepts_highlight = 1
 " XXX 170818: won't highlight object name, nor typedefed variable/type
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" ------------------------------------------------------------------------- }}}
 
 " undoquit 																	{{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" -----------------------------------------------------------------------------
 " undo quit window/split/tab/buffer
 
 let g:undoquit_mapping = '<C-w>u'
@@ -1900,9 +1892,9 @@ nnoremap <C-w>c :call undoquit#SaveWindowQuitHistory()<cr><C-w>c
 " go to left tab after closing
 " TODO 171210: skip going to left tab if we are closing the last tab
 " nnoremap <C-w>c :call undoquit#SaveWindowQuitHistory()<cr><C-w>c:tabprev<cr>
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
-"		taboo																{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ------------------------------------------------------------------------- }}}
+" taboo																		{{{
+" -----------------------------------------------------------------------------
 " rename current tab
 set sessionoptions+=tabpages,globals	" nedded for taboo plugin (used to rename tabs)
 let g:airline#extensions#taboo#enabled = 1	" enable
@@ -1911,9 +1903,9 @@ let g:taboo_tabline = 0						" leave drawing tabline to Airline
 " FIX: manually merge:
 " https://github.com/gcmt/taboo.vim/pull/25
 nnoremap tr :TabooRename<space>
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		zoom-win															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ------------------------------------------------------------------------- }}}
+" zoom-win																	{{{
+" -----------------------------------------------------------------------------
 " temporary put current split (window) as maximized window
 " default shortcut would report error about unsupported vim options which will be preserved after switching
 " copied s:localoptlist from help and removed parameters that would cause error (key, oft, sn, tx)
@@ -1933,12 +1925,12 @@ let g:zoomwin_localoptlist   = [
 			\ "tw"  , "udf" , "wm"]
 " after calling this, tabbar (Airline included) would be hidden
 let g:zoomwintab_hidetabbar = 0
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" ------------------------------------------------------------------------- }}}
 
 " sessions																	{{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" -----------------------------------------------------------------------------
 " Obsession - autosave session (":mksession")
-""""""""""""""""""""""""""""""""""""""""
+" -----------------------------------------------------------------------------
 " INFO: will track and autosave session, but only in current folder
 
 " INFO usage:
@@ -1953,7 +1945,7 @@ call SetupCommandAlias("css", ":Obsession .")	" muscle memory
 
 
 " vim-session
-""""""""""""""""""""""""""""""""""""""""
+" -----------------------------------------------------------------------------
 " - doesn't have support for vim-startify
 " - neat - save session in one folder, tab completition, later remembers the session name
 
@@ -1975,9 +1967,9 @@ call SetupCommandAlias("ss", ":SaveSession")
 call SetupCommandAlias("sl", ":OpenSession")	" 'ls' is used
 call SetupCommandAlias("os", ":OpenSession")
 " TODO 170926: Autosave sessions but only if session is loaded/named (don't save session which are not saved by :SaveSession)
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
-" vim-startify						{{{
-" ----------------------------------------------------------------------------
+" ------------------------------------------------------------------------- }}}
+" vim-startify																{{{
+" -----------------------------------------------------------------------------
 " Fancy Vim startup screen (shows MRU, session, ...)
 " n/k/l - goto next file/list item
 
@@ -1995,14 +1987,18 @@ let g:startify_commands = [
 	\ {'v': ['vimrc', 'e $MYVIMRC']},
 	\ {'z': ['zshrc', 'e ~/.zshrc']},
 	\ ]
+let g:startify_fortune_use_unicode = 1
+" Sort sessions by modification time rather than alphabetically.
+let g:startify_session_sort = 0
+
 
 " :SSave[!] [session]
 " :SDelete[!] [session]
 " :SLoad[!] [session]
 " :SClose
-" ------------------------------------------------------------------------ }}}
-" marks																	{{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ------------------------------------------------------------------------- }}}
+" marks																		{{{
+" -----------------------------------------------------------------------------
 " :SignatureList{Buffer,Global, }Markers
 let g:SignatureMap = {
 			\ 'Leader'             :  "m",
@@ -2030,9 +2026,9 @@ let g:SignatureMap = {
 " old defaults:
 " \ 'GotoNextLineByPos'  :  "]'",
 " \ 'GotoPrevLineByPos'  :  "['",
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
-" quickfix preview                                                           {{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ------------------------------------------------------------------------- }}}
+" quickfix preview															{{{
+" -----------------------------------------------------------------------------
 " preview the result in detail without spoiling the buffer list.
 " Everything is automatically clened up once quickfix window is closed.
 
@@ -2048,13 +2044,12 @@ augroup plugin_qf_preview
 augroup END
 
 let g:quickr_preview_exit_on_enter = 1	" 1 = auto-close on enter XXX 190515
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
-" autopairs {{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ------------------------------------------------------------------------- }}}
+" autopairs																	{{{
+" -----------------------------------------------------------------------------
 " Plugin to autoclose branckets ()
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
-
+" ------------------------------------------------------------------------- }}}
 " tmux - tbone.vim															{{{
 " -----------------------------------------------------------------------------
 "  cmds: :Tmux Tyank Tput Twrite Tattach
@@ -2063,24 +2058,23 @@ let g:quickr_preview_exit_on_enter = 1	" 1 = auto-close on enter XXX 190515
 vnoremap <leader>yt :Tyank<cr>:echo "copied to tmux paste buffer"<cr>
 nnoremap <leader>yt :Tyank<cr>:echo "copied to tmux paste buffer"<cr>
 " ------------------------------------------------------------------------- }}}
-
-"		lastplace															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" lastplace																	{{{
+" -----------------------------------------------------------------------------
 " INFO reopen files where you left off
 let g:lastplace_open_folds = 1 " auto open folder, default: 1 XXX don't work for nested folds
 let g:lastplace_ignore = "gitcommit,gitrebase,svn,hgcommit"
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		WhiteSpace															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ------------------------------------------------------------------------- }}}
+" WhiteSpace																{{{
+" -----------------------------------------------------------------------------
 " INFO highlight trailing spaces in red
 " :ToggleWhitespace
-let g:better_whitespace_filetypes_blacklist = ['help', 'Help', 'quickfix', 'vim-plug', 'man', 'diff', 'location']
+let g:better_whitespace_filetypes_blacklist = ['help', 'Help', 'quickfix', 'vim-plug', 'man', 'diff', 'location', 'markdown']
 
 command! FixWhiteSpace StripWhitespace	" function from 'better white space' plugin
 call SetupCommandAlias("fws", "StripWhitespace")	" function from 'better white space' plugin
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		indexed search														{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ------------------------------------------------------------------------- }}}
+" indexed search															{{{
+" -----------------------------------------------------------------------------
 " INFO shows search 1 of 123
 let g:indexed_search_center = 1			" center the screen, default 0
 let g:indexed_search_max_lines = 10000	" default 3000
@@ -2100,17 +2094,17 @@ nnoremap n nzz
 nnoremap N Nzz
 nmap n <Plug>(anzu-n)
 nmap N <Plug>(anzu-N)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		bufkill																{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ------------------------------------------------------------------------- }}}
+" bufkill																	{{{
+" -----------------------------------------------------------------------------
 " INFO used for :BD
 " don't create various <leader>b* mapping (which will slowdown <leader>b for CtrlPBuffer)
 let g:BufKillCreateMappings = 0
 " let g:BufKillOverrideCtrlCaret = 1
 " To move backwards/forwards through recently accessed buffers, use: :BB/:BF
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		Tabularize															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ------------------------------------------------------------------------- }}}
+" Tabularize																{{{
+" -----------------------------------------------------------------------------
 " INFO
 " :Tabularize /,		tabularize at the commas
 " :Tabularize /,/l0r2	tabularize at the commas, left of comma 0 space, right 1
@@ -2130,22 +2124,22 @@ endif
 " gL - lef-align operator
 " gl= - align around =
 " gLi(	- align inside ()
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"		window swap															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ------------------------------------------------------------------------- }}}
+" window swap																{{{
+" -----------------------------------------------------------------------------
 " Navigate to the window you'd like to move
 " Press <leader>ww
 " Navigate to the window you'd like to swap with
 " Press <leader>ww again
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-" highlighted yank {{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ------------------------------------------------------------------------- }}}
+" highlighted yank															{{{
+" -----------------------------------------------------------------------------
 " temporary highlight the text which is yanked
 let g:highlightedyank_highlight_duration = 1000 " [ms]
 highlight HighlightedyankRegion gui=reverse ctermbg=130 ctermfg=15
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+" ------------------------------------------------------------------------- }}}
 " diff enhanced																{{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" -----------------------------------------------------------------------------
 " Patience diff algorithm
 " :PatienceDiff - Use the Patience Diff algorithm for the next diff mode
 " :EnhancedDiff <algorithm> - Use <algorithm> to generate the diff.
@@ -2160,10 +2154,9 @@ endif
 if has("patch-8.1.0360")	" Vim 8.1+
     set diffopt+=internal,algorithm:patience
 endif
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ------------------------------------------------------------------------- }}}
 " NeoVim terminal															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" -----------------------------------------------------------------------------
 " example: :vsplit term://htop
 " 			:terminal htop		:te htop
 
@@ -2177,7 +2170,7 @@ endif
 " auto-insert when in terminal window
 " INFO match buffer name (term://)
 autocmd BufWinEnter,WinEnter term://* startinsert
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" ------------------------------------------------------------------------- }}}
 
 " Easier way to jump to alternate file
 " nnoremap <BS> <C-^>
@@ -2187,8 +2180,8 @@ autocmd BufWinEnter,WinEnter term://* startinsert
 nmap <leader>hr :set binary<CR> :%!xxd<CR> :set filetype=xxd<CR>
 nmap <leader>hw :%!xxd -r<CR> :set binary<CR> :set filetype=<CR> :set fileencoding=<CR> :w<CR> :set nobinary<CR>
 
-" 					colors and TERM setup									{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" colors and TERM setup														{{{
+" -----------------------------------------------------------------------------
 " highlight Normal		ctermbg=233	" XXX change in theme file
 highlight Normal		ctermbg=232
 " ~/.vim/plugged/molokai/colors/molokai.vim
@@ -2267,9 +2260,9 @@ highlight SignColumn			ctermfg=118 ctermbg=0 guifg=#A6E22E guibg=#232526
 " brighter, easier to read line numbers (column left)
 " INFO line column is the same for numbers, git marks, vim marks, linter,...
 highlight LineNr	ctermfg=253 ctermbg=234
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-"				GUI settings												{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ------------------------------------------------------------------------- }}}
+" GUI settings																{{{
+" -----------------------------------------------------------------------------
 if has("gui_running")
 	" Windows and Unix gVim:
 	" set encoding=utf-8
@@ -2301,9 +2294,9 @@ if has("gui_running")
 	"Invisible character colors
 	highlight NonText guifg=#2a4a59
 endif
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-" " work specific stuff														{{{
-" """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ------------------------------------------------------------------------- }}}
+" work specific stuff														{{{
+" -----------------------------------------------------------------------------
 if filereadable("$HOME\posao.vim")
 	echo "subvimrc2 has been found"
 elseif filereadable("$HOME\AppData\Local\nvim\posao.vim")
@@ -2326,12 +2319,12 @@ if (s:work_pc == 1)
 	set diffopt+=iwhite	" ignore whitespace changes and also newlines (^M)
 	autocmd FileType c setlocal commentstring=/*%s*/
 endif
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" INFO {{{
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ------------------------------------------------------------------------- }}}
+
+" INFO																		{{{
+" -----------------------------------------------------------------------------
 " programmers vim 															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" -----------------------------------------------------------------------------
 " @: repeat last : command
 " @@ for next repeat
 " Just type & to repeat the last substitution on the current line. You can repeat it on all lines by typing g&.
@@ -2355,13 +2348,14 @@ set isfname+=32	" <space> is part of filename
 " if not tag, check if declaration: gd, then gD
 " check if www link
 " execute("e ".mycurf) opens the file saved in mycurf
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
-" searching																{{{
+" ------------------------------------------------------------------------- }}}
+" searching																	{{{
+" -----------------------------------------------------------------------------
 ":%!/usr/local/bin/zsh!/opt/bin/zsh		-> ! as delimiter (# also works)
 "/some_text.*							-> '.' and wild wildcard starts working
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""}}}
+" ------------------------------------------------------------------------- }}}
 " moving		 															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" -----------------------------------------------------------------------------
 " '[ '] jump to the beggining or end of last change
 " ]s [s jump to next/prev spell mistake
 " {} goto prev/next empty line
@@ -2388,9 +2382,9 @@ set isfname+=32	" <space> is part of filename
 
 " :ccl	close QuickFix window
 
-"##########################################################################}}}
+" ------------------------------------------------------------------------- }}}
 " tips and tricks 															{{{
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" -----------------------------------------------------------------------------
 " db	delete word backwars
 " profiling: http://stackoverflow.com/questions/12213597/how-to-see-which-plugins-are-making-vim-slow
 " :profile start profile.log
@@ -2433,15 +2427,16 @@ set isfname+=32	" <space> is part of filename
 " U/u/~ in visual mode to upper/lower/toggle case
 
 " startup profiling:  vim --startuptime startup.log, visuasilation: https://github.com/hyiltiz/vim-plugins-profile
-"##########################################################################}}}
-" vimL misc							{{{
+" ------------------------------------------------------------------------- }}}
+" vimL misc																	{{{
+" -----------------------------------------------------------------------------
 " number of tabs: tabpagenr('$')
 " let l:buffers = range(1, bufnr('$'))
 " let l:currentTab = tabpagenr()
 " current buffer number: bufnr('$')
 " current buffer number: bufnr('%')
 " get line under the cursors: getline('.')
-"									}}}
+" ------------------------------------------------------------------------- }}}
 
 " TODO :h pattern-atoms
 " Vim debug:
@@ -2455,22 +2450,17 @@ set isfname+=32	" <space> is part of filename
 " vim -U ~/vim_ide/vimrc
 
 " Unicode characters can be inserted by typing ctrl-vu followed by the 4 digit hexadecimal code.
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
+" ------------------------------------------------------------------------- }}}
 " TODO 16xxxx <enter> - if it's link under cursor then "gx", if it's tag under cursor then :tag... othervise "o"
 " TODO 170717: tmux <C-j>p -> enter/exit paste mode before/after that command
 " INFO: remmaping Esc will fuckup scroll (scrolling will start to insert chars)
 "
-let g:startify_fortune_use_unicode = 1
-" Sort sessions by modification time rather than alphabetically.
-let g:startify_session_sort = 0
-
 cmap w!! w !sudo tee %
 
 " 180106 - useful when reading man pages
 nnoremap <Home> gg
 nnoremap <End> G
 
-" TODO 181128: chane all lines with multiple " to ------
 " TODO 190514: quit QF windows before calling :Files or :FZFMru (otherwise
 " that file will be open in (miniature) QF window split)
 " TODO 190515: disable <C-w>v/s/d commands in location list

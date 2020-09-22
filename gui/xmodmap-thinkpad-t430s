@@ -6,4 +6,7 @@
 keycode 112 = F21 NoSymbol Prior
 keycode 117 = F22 NoSymbol Next
 ! "PrtSc" key between Alt and Ctrl
-keycode 107 = Super_R
+add mod4 = Super_R
+! keycode 107 = Super_R
+keycode 107 = a
+keycode 218 = Super_R

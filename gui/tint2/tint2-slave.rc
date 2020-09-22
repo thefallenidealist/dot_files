@@ -175,7 +175,7 @@ taskbar_mode = single_desktop
 taskbar_hide_different_monitor = 1
 taskbar_background_id = 1
 taskbar_padding = 1 2 2		# H V spacing
-taskbar_sort_order = application
+taskbar_sort_order = none	# mru/lru/application/none
 
 taskbar_name = 1	# show virtual desktop names
 taskbar_name_padding = 6 2

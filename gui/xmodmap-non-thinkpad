@@ -6,3 +6,5 @@
 keycode 112 = Prior NoSymbol Prior
 keycode 117 = Next NoSymbol Next
 keycode 107 = Print
+! Menu/RightClick key:
+keycode 135 = Super_R

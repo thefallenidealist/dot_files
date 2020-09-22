@@ -33,3 +33,5 @@ set incremental-search true
 # don't show full path in window title and status bar
 set window-title-basename true
 set statusbar-basename false
+
+set show-scrollbars true

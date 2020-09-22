@@ -4,7 +4,7 @@
 
 ! 190106 FHD LCD: tune a value so Firefox/pcmanfm menus and text are not too small nor too big
 ! default for FHD 14 is 157 dpi
-! larger dpi -> larger font, needs restart after change, xrandr --dpi NNN won't have efect
+! larger dpi -> larger font, needs restart after change, xrandr --dpi NNN will not have efect
 Xft.dpi: 120
 
 ! 190915 increase cursor
@@ -26,9 +26,20 @@ Xcursor.theme: whiteglass
 !XTerm*faceName:		xft:bitstream vera sans mono:pixelsize=12
 ! XTerm*faceName:		xft:bitstream vera sans mono:pixelsize=13
 ! 190106 14 FHD LCD change from 12 to 13:
-XTerm*faceName:			xft:Literation Mono Powerline:pixelsize=16
+! XTerm*faceName:			xft:Literation Mono Powerline:pixelsize=16
+! XTerm*faceName:			xft:Ubuntu Mono derivative Powerline:pixelsize=18
+! XTerm*faceName:			xft:Roboto Mono Medium Italic for Powerline:pixelsize=16
+!
+! XTerm*faceName:			xft:Source Code Pro Powerline:pixelsize=16
+
+! termius does not have powerline smybols, spleen is OpenBSD replacement, still no powerline fonts
+! XTerm*faceName:			xft:TerminusTTF:pixelsize=16
+! XTerm*faceName:			spleen:pixelsize=16:antialias=false
+! XTerm*faceName:			xft:Terminus:size=10:style=bold
+XTerm*faceName:			xft:Inconsolata for Powerline:size=12
+
 ! but tmux bar (with current font size) closer to end of xterm window
-xterm*internalBorder:	6 
+xterm*internalBorder:	6
 ! XTerm*termName:			screen-256color
 XTerm*termName:			xterm-256color
 

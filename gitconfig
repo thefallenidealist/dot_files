@@ -78,7 +78,7 @@
 	# decorate = short	# 181127 posao
 [color]
 	ui = auto
-	# ui = true	# 181127 work PC
+	# ui = always	# INFO 200824: don't use it, it will break redirection to file and git diff plugins (GitMessenger)
 [color "branch"]
 	current = yellow reverse
 	local = yellow
@@ -96,6 +96,10 @@
 
 [apply]
 	whitespace = nowarn
+
+[diff]
+	submodule=diff
+
 
 # examples
 # change remote:

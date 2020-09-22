@@ -54,5 +54,3 @@ alias bup3f='portmaster -Fa'
 # pkg install zsh-syntax-highlighting
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fpath=($HOME/.zsh-completions $fpath)
-
-source /home/johnny/.config/broot/launcher/bash/br
