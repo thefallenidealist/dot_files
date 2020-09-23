@@ -87,6 +87,7 @@ remove_files()
 		$HOME/.xmodmap-thinkpad-t430s \
 		$HOME/.xmodmap-non-thinkpad \
 		$HOME/.xinitrc \
+		$HOME/.xsession \
 		$HOME/.config/openbox \
 		$HOME/.config/tint2 \
 		$HOME/.config/mpv \
@@ -155,6 +156,7 @@ install_gui()
 		ln -sf $BASEDIR/gui/xmodmap-thinkpad-t430s	$HOME/.xmodmap-thinkpad-t430s
 		ln -sf $BASEDIR/gui/xmodmap-non-thinkpad	$HOME/.xmodmap-non-thinkpad
 		ln -sf $BASEDIR/gui/xinitrc		$HOME/.xinitrc
+		ln -sf $BASEDIR/gui/xinitrc		$HOME/.xsession		# INFO 200923: needed for Armbians' slim
 		ln -sf $BASEDIR/gui/xbindkeysrc	$HOME/.xbindkeysrc
 		mkdir -p $HOME/.config
 		ln -sf $BASEDIR/gui/openbox		$HOME/.config
