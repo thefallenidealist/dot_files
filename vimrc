@@ -7,7 +7,7 @@
 
 " TODO 2017-09-02 Windows libclang
 let s:work_pc = 0
-let s:lsp_enabled = 0
+let s:lsp_enabled = 1
 
 " Generic Vim settings														{{{
 " -----------------------------------------------------------------------------
@@ -254,9 +254,9 @@ command! WE write | edit
 call SetupCommandAlias("we", "WE")
 call SetupCommandAlias("We", "WE")
 
-command! PU PlugUpdate | PlugUpgrade
-command! PI write | so $MYVIMRC | PlugInstall
-command! PD write | so $MYVIMRC | PlugClean
+command! PU so $MYVIMRC | PlugUpgrade
+command! PI so $MYVIMRC | PlugInstall
+command! PD so $MYVIMRC | PlugClean
 
 " open help in vertical split right
 cabbrev h vert leftabove help
@@ -393,7 +393,7 @@ augroup my_group_with_a_very_uniq_name
 
 	" easier quit from this windows
 	autocmd FileType help nnoremap <buffer> q :wincmd c<cr>
-	autocmd FileType qf,quickfix,netrw nnoremap <buffer> q :q<cr>
+	autocmd FileType qf,quickfix,netrw,fugitive nnoremap <buffer> q :q<cr>
 	autocmd FileType help,man nnoremap <buffer> <cr> <C-]>
 	if exists(":NumbersDisable")
 		autocmd FileType help,man,qf :NumbersDisable	" Disable Numbers plugin in help or man
@@ -1179,8 +1179,10 @@ if (s:lsp_enabled == 1)
 Plug 'neovim/nvim-lsp'			" LSP core, nvim 0.5+
 Plug 'nvim-lua/completion-nvim'	" LSP autocomplete, nvim 0.5+
 Plug 'nvim-lua/diagnostic-nvim'	" LSP better showing of errors, nvim 0.5+
-Plug 'nvim-treesitter/nvim-treesitter', { 'for': 'c,cpp,rust' }			" nvim 0.5+
-Plug 'nvim-treesitter/completion-treesitter', { 'for': 'c,cpp,rust' }	" nvim 0.5+
+" Plug 'nvim-treesitter/nvim-treesitter', { 'for': 'c,cpp,rust' }			" nvim 0.5+
+" Plug 'nvim-treesitter/completion-treesitter', { 'for': 'c,cpp,rust' }	" nvim 0.5+
+Plug 'neovim/nvim-lspconfig'
+" Plug 'tjdevries/lsp_extensions.nvim'	" inlay hints for Rust
 endif
 endif
 
@@ -1212,6 +1214,7 @@ Plug 'octol/vim-cpp-enhanced-highlight'	" simpler works out-of-the box, but not 
 
 " ******************** files
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'pbogut/fzf-mru.vim'
 Plug 'dietsche/vim-lastplace'		" Open file at last edit position
@@ -1224,7 +1227,6 @@ Plug 'vim-airline/vim-airline'
 " Plug 'rbong/vim-crystalline'
 " Plug 'mkitt/tabline.vim'
 Plug 'gcmt/taboo.vim'				" Rename tabs
-Plug 'skywind3000/vim-preview'		" preview ctags in vsplit
 
 " ******************** basics
 Plug 'ciaranm/securemodelines'
@@ -1259,6 +1261,7 @@ Plug 'airblade/vim-gitgutter'	" git: show +-m in sign column, shortcuts [c ]c
 Plug 'tpope/vim-fugitive'		" Git commands for Vim
 Plug 'jreybert/vimagit'			" Git
 Plug 'rhysd/git-messenger.vim'	" fancy git blame
+Plug 'rhysd/conflict-marker.vim'	" git conflicts
 
 Plug 'tpope/vim-tbone'			" Tmux under Vim (copy/paste)
 
@@ -1275,13 +1278,13 @@ Plug 'godlygeek/tabular'	" Tabularize/align
 " TODO 170813: check one day
 " Plug 'timonv/vim-cargo'		" simple plugin, cmds: Cargo{Build, Run, Test, Bench}
 Plug 'qpkorr/vim-bufkill'			" kill buffer without killing split :BD :BW
-" Plug 'easymotion/vim-easymotion'	" leader leader and magic begins
+Plug 'easymotion/vim-easymotion'	" leader leader and magic begins
 " Plug 'justinmk/vim-sneak'       " lightweight easymotion
 " Plug 'myusuf3/numbers.vim'		" disable relative numbers in insert mode and non-active windows, INFO 200826: breaks floating window hover
 " Plug 'hyiltiz/vim-plugins-profile'
 " Plug 'matze/vim-move'
 " Plug 'tpope/vim-markdown'
-" Plug 'plasticboy/vim-markdown'
+Plug 'plasticboy/vim-markdown'
 " Plug 'mzlogin/vim-markdown-toc'		" autogenerate markdown ToC (:GenTocGFM)
 " Plug 'vim-scripts/tinymode.vim'
 " Plug 'kien/rainbow_parentheses.vim'
@@ -1328,12 +1331,12 @@ autocmd Filetype c    setlocal omnifunc=v:lua.vim.lsp.omnifunc
 setlocal omnifunc=v:lua.vim.lsp.omnifunc
 
 nnoremap <silent> gd			<cmd>lua vim.lsp.buf.declaration()<CR>
-nnoremap <silent> <c-]>		<cmd>lua vim.lsp.buf.definition()<CR>
-nnoremap <silent> K			<cmd>lua vim.lsp.buf.hover()<CR>
+nnoremap <silent> <c-]>			<cmd>lua vim.lsp.buf.definition()<CR>
+nnoremap <silent> K				<cmd>lua vim.lsp.buf.hover()<CR>
 nnoremap <silent> gD			<cmd>lua vim.lsp.buf.implementation()<CR>
-nnoremap <silent> <c-k>		<cmd>lua vim.lsp.buf.signature_help()<CR>
+nnoremap <silent> <c-k>			<cmd>lua vim.lsp.buf.signature_help()<CR>
 nnoremap <silent> 1gD			<cmd>lua vim.lsp.buf.type_definition()<CR>
-nnoremap <silent> <leader>d	<cmd>lua vim.lsp.buf.type_definition()<CR>
+nnoremap <silent> <leader>d		<cmd>lua vim.lsp.buf.type_definition()<CR>
 nnoremap <silent> <leader>rn	<cmd>lua vim.lsp.buf.rename()<CR>
 nnoremap <silent> gr			<cmd>lua vim.lsp.buf.references()<CR>
 nnoremap <silent> g0			<cmd>lua vim.lsp.buf.document_symbol()<CR>
@@ -1352,9 +1355,14 @@ command! LspRename			lua vim.lsp.buf.rename()
 command! LspReferences		lua vim.lsp.buf.references()
 command! LspDocumentSymbol	lua vim.lsp.buf.document_symbol()
 command! LspWorkspaceSymbol	lua vim.lsp.buf.workspace_symbol()
+command! LspAction			lua vim.lsp.buf.code_action()
+command! LspCodeAction		lua vim.lsp.buf.code_action()
+command! LspLineDiagnostics	lua vim.lsp.util.show_line_diagnostics()<CR>
 
 " open folds on jump
 set foldopen+=tag
+" CursorHold event after 300 ms
+set updatetime=300
 
 highlight LspDiagnosticsError	ctermfg=red		ctermbg=black
 highlight LspDiagnosticsWarning	ctermfg=208		ctermbg=black
@@ -1606,6 +1614,7 @@ nnoremap tT :-tabnew<cr>:Tags<cr>
 nnoremap ; :Buffers<CR>
 
 imap <c-x><c-l> <plug>(fzf-complete-line)
+imap <c-x><c-l> <plug>(fzf-complete-buffer-line)
 
 function! s:build_quickfix_list(lines)
 	" - <tab> to select multiple files
@@ -1620,8 +1629,6 @@ let g:fzf_action = {
 			\ 'ctrl-y': 'tab split',
 			\ 'ctrl-x': 'split',
 			\ 'ctrl-v': 'vsplit' }
-
-let g:fzf_layout = { 'down': '~40%' }
 
 " [Buffers] Jump to the existing window if possible
 let g:fzf_buffers_jump = 0
@@ -1641,28 +1648,54 @@ end
 
 " 191124 use floating window for FZF
 let $FZF_DEFAULT_OPTS='--layout=reverse'	" show hints at top of the screen not bottom
-let g:fzf_layout = { 'window': 'call FloatingFZF()' }
-function! FloatingFZF()
-	let buf = nvim_create_buf(v:false, v:true)
-	call setbufvar(buf, '&signcolumn', 'no')
-
-	let height = &lines - 8
-	let width = float2nr(&columns - (&columns * 2 / 10))
-	let col = float2nr((&columns - width) / 2)
-
-	let opts = {
-				\ 'relative': 'editor',
-				\ 'row': 4,
-				\ 'col': col,
-				\ 'width': width,
-				\ 'height': height
-				\ }
-
-	call nvim_open_win(buf, v:true, opts)
-endfunction
 
 " FZFMru - don't sort, show most recent first
 let g:fzf_mru_no_sort = 1
+
+" 201012
+" Fuzzy search all files in CWD:
+command! -bang -nargs=* RgFiles call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case --glob !.git ".shellescape(<q-args>), 1, {'options': '--delimiter : --nth 4..'}, <bang>0)
+" ------------------------------------------------------------------------- }}}
+
+" fuzzy fzf																	{{{
+" -----------------------------------------------------------------------------
+" 201012
+highlight FzfNormal		ctermbg=234 ctermfg=252
+" inner and outer border
+" highlight FzfBorder1	ctermbg=NONE ctermfg=196
+" highlight FzfBorder2	ctermbg=NONE ctermfg=160
+highlight FzfBorder1	ctermbg=234 ctermfg=196
+highlight FzfBorder2	ctermbg=234 ctermfg=160
+highlight FzfHl			ctermbg=NONE ctermfg=82
+highlight FzfCurrent	ctermbg=232 ctermfg=232
+
+let g:fzf_layout = {
+	\ 'window': {
+		\'width': 0.8,
+		\'height': 0.9,
+		\'highlight': 'FzfBorder1'
+	\ }
+\ }
+
+let g:fzf_colors =
+\ { 'fg':      ['fg', 'FzfNormal'],
+  \ 'bg':      ['bg', 'FzfNormal'],
+  \ 'hl':      ['fg', 'FzfHl'],
+  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':     ['bg', 'FzfCurrent', 'CursorColumn'],
+  \ 'hl+':     ['fg', 'Statement'],
+  \ 'info':    ['fg', 'PreProc'],
+  \ 'border':  ['fg', 'FzfBorder2'],
+  \ 'prompt':  ['fg', 'Conditional'],
+  \ 'pointer': ['fg', 'Exception'],
+  \ 'marker':  ['fg', 'Keyword'],
+  \ 'spinner': ['fg', 'Label'],
+  \ 'header':  ['fg', 'Comment'] }
+
+" let g:fzf_history_dir = '~/.history-fzf'
+
+" 201029 don't auto change cwd:
+" let g:rg_derive_root='true'
 " ------------------------------------------------------------------------- }}}
 " vim orgmode																{{{
 " -----------------------------------------------------------------------------
@@ -1752,6 +1785,11 @@ nnoremap <leader>gg :GitMessenger<cr>
 
 let g:magit_discard_hunk_mapping="X"   " discard hunk
 let g:git_messenger_include_diff="current"	" auto show dif (whiout pressing 'd' key)
+
+" Conflict-Marker	201005
+" ]x/[x - jump to next/prev conflict marker
+" %		- jump to beginning/middle/end conflict markers
+" :ConflictMarker* functions
 " ------------------------------------------------------------------------- }}}
 " searching																	{{{
 " -----------------------------------------------------------------------------
