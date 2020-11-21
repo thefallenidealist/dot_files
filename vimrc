@@ -393,7 +393,7 @@ augroup my_group_with_a_very_uniq_name
 
 	" easier quit from this windows
 	autocmd FileType help nnoremap <buffer> q :wincmd c<cr>
-	autocmd FileType qf,quickfix,netrw,fugitive nnoremap <buffer> q :q<cr>
+	autocmd FileType qf,quickfix,netrw,fugitive,fugitiveblame nnoremap <buffer> q :q<cr>
 	autocmd FileType help,man nnoremap <buffer> <cr> <C-]>
 	if exists(":NumbersDisable")
 		autocmd FileType help,man,qf :NumbersDisable	" Disable Numbers plugin in help or man
@@ -1178,7 +1178,7 @@ if has('nvim-0.5')
 if (s:lsp_enabled == 1)
 Plug 'neovim/nvim-lsp'			" LSP core, nvim 0.5+
 Plug 'nvim-lua/completion-nvim'	" LSP autocomplete, nvim 0.5+
-Plug 'nvim-lua/diagnostic-nvim'	" LSP better showing of errors, nvim 0.5+
+Plug 'steelsojka/completion-buffers'
 " Plug 'nvim-treesitter/nvim-treesitter', { 'for': 'c,cpp,rust' }			" nvim 0.5+
 " Plug 'nvim-treesitter/completion-treesitter', { 'for': 'c,cpp,rust' }	" nvim 0.5+
 Plug 'neovim/nvim-lspconfig'
@@ -1205,9 +1205,10 @@ Plug 'Valloric/ListToggle'	" toggle quickfix and location list
 Plug 'stefandtw/quickfix-reflector.vim'		" editable quickfix
 Plug 'Houl/repmo-vim'		" repeat motions (repeat f/F/t/T with .)
 
-Plug 'majutsushi/tagbar', {'on': ['TagbarToggle']}	" show tags (func, vars) in window right
+" Plug 'majutsushi/tagbar', {'on': ['TagbarToggle']}	" show tags (func, vars) in window right
 " Plug 'vim-scripts/TagHighlight'	" color typedefs as variables, needs
 " :UpdateTypesFile
+Plug 'liuchengxu/vista.vim'		" LSP tagbar
 Plug 'octol/vim-cpp-enhanced-highlight'	" simpler works out-of-the box, but not as good as TagHighlight
 										" INFO 180525: This line must be here, otherwise C functions won't be highlighted
 " Plug 'jeaye/color_coded'	" semantic highlighter INFO 170818: doesn't work in nvim
@@ -1317,14 +1318,14 @@ set iskeyword+=:
 set completeopt=menu,menuone,noinsert,noselect
 
 if has('nvim-0.5')
+luafile ~/.config/nvim/init.lua
 if (s:lsp_enabled == 1)
 " LSP nvim																	{{{
 " -----------------------------------------------------------------------------
 " 200723 builtin nvim (v0.5) LSP
 
-" https://github.com/neovim/nvim-lsp#clangd
-" lua require'nvim_lsp'.clangd.setup{}	" defined below, in autocomplete part
-
+" Rust: only in cargo projects, otherwise rust-project.json needs to be
+" provided
 autocmd Filetype rust setlocal omnifunc=v:lua.vim.lsp.omnifunc
 autocmd Filetype cpp  setlocal omnifunc=v:lua.vim.lsp.omnifunc
 autocmd Filetype c    setlocal omnifunc=v:lua.vim.lsp.omnifunc
@@ -1341,11 +1342,9 @@ nnoremap <silent> <leader>rn	<cmd>lua vim.lsp.buf.rename()<CR>
 nnoremap <silent> gr			<cmd>lua vim.lsp.buf.references()<CR>
 nnoremap <silent> g0			<cmd>lua vim.lsp.buf.document_symbol()<CR>
 nnoremap <silent> gW			<cmd>lua vim.lsp.buf.workspace_symbol()<CR>
-" nnoremap <silent> <buffer> <leader><space> <cmd>lua vim.lsp.util.show_line_diagnostics()<CR>
+nnoremap <silent><leader>la		<cmd>lua vim.lsp.buf.code_action()<CR>
+autocmd CursorHold * lua  vim.lsp.diagnostic.show_line_diagnostics()
 
-
-" command! LspDeclaration2 lua require'jumpLoc'.jumpNextLocationCycle()
-" command! LspDeclaration lua vim.lsp.buf.declaration()
 command! LspDefinition		lua vim.lsp.buf.definition()
 command! LspHover			lua vim.lsp.buf.hover()
 command! LspImplementation	lua vim.lsp.buf.implementation()
@@ -1357,104 +1356,79 @@ command! LspDocumentSymbol	lua vim.lsp.buf.document_symbol()
 command! LspWorkspaceSymbol	lua vim.lsp.buf.workspace_symbol()
 command! LspAction			lua vim.lsp.buf.code_action()
 command! LspCodeAction		lua vim.lsp.buf.code_action()
-command! LspLineDiagnostics	lua vim.lsp.util.show_line_diagnostics()<CR>
+command! LspLineDiagnostics	lua vim.lsp.util.show_line_diagnostics()
 
 " open folds on jump
 set foldopen+=tag
 " CursorHold event after 300 ms
 set updatetime=300
 
-highlight LspDiagnosticsError	ctermfg=red		ctermbg=black
-highlight LspDiagnosticsWarning	ctermfg=208		ctermbg=black
-highlight LspDiagnosticsHint	ctermfg=105		ctermbg=black
+highlight LspDiagnosticsVirtualTextError	ctermfg=red		ctermbg=black
+highlight LspDiagnosticsVirtualTextWarning	ctermfg=208		ctermbg=black
+highlight LspDiagnosticsVirtualTextHint		ctermfg=105		ctermbg=black
 " ------------------------------------------------------------------------- }}}
 " LSP complete nvim 														{{{
 " -----------------------------------------------------------------------------
-" completion-nvim:
-" lua require'nvim_lsp'.pyls.setup{on_attach=require'completion'.on_attach}
-" lua require'nvim_lsp'.clangd.setup{on_attach=require'completion'.on_attach}
-
 " Use completion-nvim in every buffer
 autocmd BufEnter * lua require'completion'.on_attach()
 
-" triggering autocompletition												{{{
-" -----------------------------------------------------------------------------
-" manual with Ctrl-P
-" -----------------------------------------------------------------------------
-" let g:completion_enable_auto_popup = 0
-" inoremap <silent><expr> <c-p> completion#trigger_completion()	" map <c-p> to manually trigger completion
-
-" auto, select with Tab/Shift-tab and expand with Enter
-" -----------------------------------------------------------------------------
-inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-" - semiworks for snippets
-
-" auto, expand with Tab
-" -----------------------------------------------------------------------------
-" function! s:check_back_space() abort
-"     let col = col('.') - 1
-"     return !col || getline('.')[col - 1]  =~ '\s'
-" endfunction
-" ------------------------------------------------------------------------- }}}
-
-" inoremap <silent><expr> <TAB>
-"   \ pumvisible() ? "\<C-n>" :
-"   \ <SID>check_back_space() ? "\<TAB>" :
-"   \ completion#trigger_completion()
-
-" Set completeopt to have a better completion experience
-set completeopt=menuone,noinsert,noselect
-
-" Avoid showing message extra message when using completion
-set shortmess+=c
-
-let g:completion_chain_complete_list = {
-			\'default': {
-			\'comment': [
-			\{'complete_items': ['snippet', 'file', 'path']},
-			\{'mode': '<c-p>'},
-			\{'mode': '<c-n>'}
-			\],
-			\'default': [
-			\{'complete_items': ['snippet', 'file', 'path']},
-			\{'mode': '<c-p>'},
-			\{'mode': '<c-n>'}
-			\],
-			\'c' : [
-			\ {'complete_items': ['snippet', 'lsp', 'ts', 'file']}
-			\ ],
-			\'cpp' : [
-			\ {'complete_items': ['snippet', 'lsp', 'ts', 'file']}
-			\ ],
-			\}
-			\}
-
-
-let g:completion_matching_ignore_case = 1
-let g:completion_matching_strategy_list = ['exact', 'substring', 'fuzzy']
-let g:completion_trigger_character = ['.', '::']
-let g:completion_trigger_on_delete = 1
-
-" snippets
+let g:completion_enable_auto_popup = 1
 let g:completion_enable_snippet = 'UltiSnips'
 " disable <tab> key in snippets (so it can be used with completion-nvim)
 let g:UltiSnipsExpandTrigger =			"<C-y>"		" default was <tab>
+let g:completion_confirm_key = ""
+imap <expr> <cr>  pumvisible() ? complete_info()["selected"] != "-1" ?
+		\ "\<Plug>(completion_confirm_completion)"  :
+		\ "\<c-e>\<CR>" : "\<CR>"
+let g:completion_enable_auto_hover = 1
+let g:completion_enable_auto_signature = 1
+let g:completion_enable_auto_paren = 1
+augroup CompletionTriggerCharacter
+	autocmd!
+	autocmd BufEnter * let g:completion_trigger_character = ['.']
+	autocmd BufEnter *.c,*.cpp let g:completion_trigger_character = ['.', '->', '::']
+augroup end
+let g:completion_trigger_keyword_length = 2
+let g:completion_chain_complete_list = {
+\ 'default' : {
+\   'default': [
+\       {'complete_items': ['lsp', 'snippet', 'buffers']},
+\       {'complete_items': ['path'], 'triggered_only': ['/']},
+\       {'mode': '<c-p>'},
+\       {'mode': '<c-n>'}]
+\   }
+\}
+" let g:completion_matching_strategy_list = ['exact', 'substring', 'fuzzy']
+let g:completion_matching_strategy_list = ['exact', 'fuzzy']
+let g:completion_matching_ignore_case = 1
+let g:completion_matching_smart_case = 1
+let g:completion_trigger_on_delete = 1
+" sort according to complete_items[]:
+let g:completion_sorting = 'none'
+
+" triggering autocompletition
+" manual: <C-x><C-o>
+imap <tab> <Plug>(completion_smart_tab)
+imap <s-tab> <Plug>(completion_smart_s_tab)
+
+" Set completeopt to have a better completion experience
+set completeopt=menuone,noinsert,noselect
+" Avoid showing message extra message when using completion
+set shortmess+=c
 " ------------------------------------------------------------------------- }}}
 " LSP diagnostic nvim 														{{{
 " -----------------------------------------------------------------------------
-lua require'nvim_lsp'.clangd.setup{on_attach=require'diagnostic'.on_attach}
-
-nnoremap <silent> ]e :NextDiagnosticCycle<cr>
-nnoremap <silent> [e :PrevDiagnosticCycle<cr>
+nnoremap <silent> ]e :lua vim.lsp.diagnostic.goto_next()<cr>
+nnoremap <silent> [e :lua vim.lsp.diagnostic.goto_prev()<cr>
 " no jump to warning for now
-nnoremap <silent> ]w :NextDiagnosticCycle<cr>
-nnoremap <silent> [w :PrevDiagnosticCycle<cr>
-nnoremap <silent> <leader><space> :OpenDiagnostic<cr>
+nnoremap <silent> ]w :lua vim.lsp.diagnostic.goto_next()<cr>
+nnoremap <silent> [w :lua vim.lsp.diagnostic.goto_prev()<cr>
+nnoremap <silent> <leader><space> :lua vim.lsp.diagnostic.set_loclist()<cr>
+command! LspAll		lua vim.lsp.diagnostic.set_loclist()<cr>
 
 let g:diagnostic_enable_virtual_text = 1	" inline diagnostic
 let g:diagnostic_insert_delay = 1			" don't show it in insert mode
-let g:diagnostic_virtual_text_prefix = '↣ [LSP] '
+let g:diagnostic_virtual_text_prefix = '[LSP] '
 let g:space_before_virtual_text = 5
 let g:diagnostic_auto_popup_while_jump = 1	" auto open diagnostic popup
 " ------------------------------------------------------------------------- }}}
@@ -1472,6 +1446,7 @@ endif
 " open header																{{{
 " -----------------------------------------------------------------------------
 nnoremap <Leader>h :call HeaderToggle()<CR>
+nnoremap <Leader>h :ClangdSwitchSourceHeader<CR>
 " ------------------------------------------------------------------------- }}}
 " Rust																		{{{
 " -----------------------------------------------------------------------------
@@ -1736,6 +1711,7 @@ let g:NERDTreeIndicatorMapCustom = {
     \ 'Ignored'   : '☒',
     \ "Unknown"   : "?"
     \ }
+let g:NERDTreeIgnore=['\~$', '.o$']
 " ------------------------------------------------------------------------- }}}
 " git plugins																{{{
 " -----------------------------------------------------------------------------
@@ -1878,36 +1854,20 @@ call SetupCommandAlias("tagu!","GutentagsUpdate!")
 " uctags -R --sort=foldcase --c++-kinds=+p --fields=+ianS --extras=+q -f ~/.vim/tags/libc.tags /usr/include
 " set tags+=~/.vim/tags/libc.tags
 " ------------------------------------------------------------------------- }}}
-"		tagbar																{{{
+"	Tagbar - LSP															{{{
 " -----------------------------------------------------------------------------
-" INFO shows tags (variables, enums, typedes, functions on the windows on the right)
-" :TagbarToggle
-" :TagbarOpenAutoClose - useful for jumping to the function (with preview window)
-let g:tagbar_width = 50		" default: 40
-"let g:tagbar_zoomwidth = 0	" default: 0 (Use the width of the longest currently visible tag)
-"let g:tagbar_autoclose = 1	" default: 0
-let g:tagbar_autofocus = 1	" auto jump to the Tagbar	default: 0
-let g:tagbar_sort = 0		" default: 1
-let g:tagbar_show_linenumbers = 0   " 2 - show relative
-"let g:tagbar_singleclick = 1
-let g:tagbar_iconchars = ['►', '▼']		" changed first symbol because powerline font
-let g:tagbar_previewwin_pos = "aboveleft"
-let g:tagbar_autopreview = 0
+" 201120
+let g:vista_default_executive = 'nvim_lsp'
+" toggle tagbar
+nnoremap <leader>t :Vista!!<CR>
 
-nnoremap <leader>t :TagbarToggle<CR>
-" let g:tagbar_type_rust = {
-"             \ 'ctagstype' : 'rust',
-"             \ 'kinds' : [
-"             \'T:types,type definitions',
-"             \'f:functions,function definitions',
-"             \'g:enum,enumeration names',
-"             \'s:structure names',
-"             \'m:modules,module names',
-"             \'c:consts,static constants',
-"             \'t:traits',
-"             \'i:impls,trait implementations',
-"             \]
-"             \}
+" nnoremap tt :tabnew<cr>:Tags<cr>
+" nnoremap tT :-tabnew<cr>:Tags<cr>
+
+" show tags from current buffer in floating window
+command! Tags		Vista finder
+
+let g:airline#extensions#vista#enabled = 1
 " ------------------------------------------------------------------------- }}}
 " C/C++ highlighter															{{{
 " -----------------------------------------------------------------------------
