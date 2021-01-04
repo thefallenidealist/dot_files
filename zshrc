@@ -409,6 +409,9 @@ function mm() {
     mpv --no-video --ytdl-format=bestaudio ytdl://ytsearch10:"$@"
 }
 
+# 201029 should be faster than grep:
+export FZF_DEFAULT_COMMAND="rg --files --hidden --follow --glob '!.git' --no-ignore"
+
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # zsh TODO check one day

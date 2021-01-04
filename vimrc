@@ -1293,7 +1293,6 @@ Plug 'plasticboy/vim-markdown'
 " Plug 'Carpetsmoker/auto_autoread.vim'
 Plug 'wesQ3/vim-windowswap'		" Easier window swap: <leader>ww
 
-Plug 'machakann/vim-highlightedyank'	" temporary highlight yanked text/selection
 " Plug 'luochen1990/rainbow'             " colored brackets
 
 " Plug 'arakashic/chromatica.nvim'
@@ -2132,9 +2131,14 @@ endif
 " ------------------------------------------------------------------------- }}}
 " highlighted yank															{{{
 " -----------------------------------------------------------------------------
+" 210104 highlight yanked text - replacement for plugin
 " temporary highlight the text which is yanked
-let g:highlightedyank_highlight_duration = 1000 " [ms]
 highlight HighlightedyankRegion gui=reverse ctermbg=130 ctermfg=15
+
+augroup LuaHighlight
+	autocmd!
+	autocmd TextYankPost * silent! lua require'vim.highlight'.on_yank({timeout=1000,higroup="HighlightedyankRegion"})
+augroup END
 " ------------------------------------------------------------------------- }}}
 " diff enhanced																{{{
 " -----------------------------------------------------------------------------
