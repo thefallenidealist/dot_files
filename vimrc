@@ -1260,6 +1260,8 @@ Plug 'kshenoy/vim-signature'	" marks in sign column and with easier shortcuts
 								" use fzf :Marks for search
 Plug 'airblade/vim-gitgutter'	" git: show +-m in sign column, shortcuts [c ]c
 Plug 'tpope/vim-fugitive'		" Git commands for Vim
+Plug 'moll/vim-bbye'				" follow symlinks - optional dependency
+Plug 'aymericbeaumet/vim-symlink'	"follow symlinks
 Plug 'jreybert/vimagit'			" Git
 Plug 'rhysd/git-messenger.vim'	" fancy git blame
 Plug 'rhysd/conflict-marker.vim'	" git conflicts
@@ -1296,7 +1298,6 @@ Plug 'wesQ3/vim-windowswap'		" Easier window swap: <leader>ww
 " Plug 'luochen1990/rainbow'             " colored brackets
 
 " Plug 'arakashic/chromatica.nvim'
-Plug 'Asheq/close-buffers.vim'
 Plug 'chrisbra/vim-diff-enhanced'
 
 " Initialize plugin system
