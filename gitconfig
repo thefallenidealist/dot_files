@@ -32,7 +32,8 @@
 	cl = clone
 	su = submodule update --init --recursive
 	last = log -1 HEAD
-	l = log --decorate
+	l = log --decorate --abbrev-commit
+	lf = log --decorate --abbrev-commit --format=fuller
 	c = commit
 	cm = commit --allow-empty-message -m
 	cc = commit						# same as vim fugitive plugin
@@ -42,6 +43,7 @@
 	ra = rebase --abort
 	mc = merge --continue
 	ma = merge --abort
+	ama = am --abort
 	cp  = cherry-pick
 	cpc = cherry-pick --continue
 	cpa = cherry-pick --abort
@@ -109,3 +111,9 @@
 # git remote add upstream https://github.com/user/project
 # git fetch upstream
 # git pull upstream master
+
+[pull]
+	# rebase = false	# was default before git 2.27
+	ff = only	# pull - only if can be done without merge commit
+[init]
+	defaultBranch = master
