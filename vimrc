@@ -5,7 +5,6 @@
 " 0.0 - 2006. probably
 " vim: set ft=vim ts=4 sw=4 tw=78 fdm=marker noet :
 
-let s:work_pc = 0
 let s:lsp_enabled = 1
 let s:treesitter_enabled = 0
 
@@ -172,31 +171,7 @@ if has('unix')
 
 	if s:uname == "FreeBSD"
 		let g:python3_host_prog='/usr/local/bin/python3'
-		let g:clang_library_path='/usr/local/llvm50/lib'
-
-		" Universal Ctags - Exuberant Ctags fork
-		let g:ctags_exe='/usr/local/bin/uctags'
-
-		" let g:tagbar_ctags_bin=substitute(system("which exctags"), '\n', '','')
-		let g:tagbar_ctags_bin=g:ctags_exe
-
-	elseif s:uname == "Linux"
-		let g:ctags_exe='/usr/bin/ctags-exuberant'
-	else
-		let g:ctags_exe=''
 	endif " uname
-elseif has('win32')
-	" INFO 190516: /c/python3_x64/python.exe -m pip install --upgrade pip pywin
-	let $PATH.=';C:\bin'			" place where win32yank is
-	let $PATH.=';C:\python35_x64'	" work PC
-	let g:ctags_exe='c:\bin\ctags.exe'
-	if substitute(system('is_sverige'), '\n','','g') == "1"
-		let g:python3_host_prog='C:\python3_x64\python.exe'
-		" download from llvm.org "Pre-built Binaries" for Winsows (64-bit)
-		" let g:ncm2_pyclang#library_path = 'C:\msys64\mingw64\bin\libclang.dll'
-		" let g:ncm2_pyclang#library_path = 'C:\Program Files\LLVM\lib\clang\8.0.0\lib\windows'
-	endif
-	cabbrev rm del
 endif
 " ------------------------------------------------------------------------- }}}
 " build/programming															{{{
@@ -1816,40 +1791,12 @@ nmap <Leader>w <Plug>(easymotion-overwin-w)
 " INFO 180218: complicated to me, not working as expected, remaps <tab> and s
 " ------------------------------------------------------------------------- }}}
 
-" ctags																		{{{
-" -----------------------------------------------------------------------------
-" INFO will auto create tags, auto update on save (incremental update)
-" it will generate a new tag file if there is none (but it needs time, it will report "no tags file found")
-let g:gutentags_ctags_executable = g:ctags_exe
-" nnoremap <C-]> g<C-]>
-" buffer
-call SetupCommandAlias("tagsu","GutentagsUpdate")
-call SetupCommandAlias("tagu","GutentagsUpdate")
-" project
-call SetupCommandAlias("tagsu!","GutentagsUpdate!")
-call SetupCommandAlias("tagu!","GutentagsUpdate!")
-
-" 190512
-" Press tag into vsplit windows, press again to jump to another tag in another file
-" C-w z to close it
-" nnoremap <silent> <C-\> :PreviewTag<cr>
-" nnoremap <silent> <M-e> :PreviewScroll +1<cr>
-" nnoremap <silent> <M-y> :PreviewScroll -1<cr>
-" :PreviewSignature
-" noremap <C-\|>:PreviewSignature!<cr>
-
-" uctags -R --sort=foldcase --c++-kinds=+p --fields=+ianS --extras=+q -f ~/.vim/tags/libc.tags /usr/include
-" set tags+=~/.vim/tags/libc.tags
-" ------------------------------------------------------------------------- }}}
 "	Tagbar - LSP															{{{
 " -----------------------------------------------------------------------------
 " 201120
 let g:vista_default_executive = 'nvim_lsp'
 " toggle tagbar
 nnoremap <leader>t :Vista!!<CR>
-
-" nnoremap tt :tabnew<cr>:Tags<cr>
-" nnoremap tT :-tabnew<cr>:Tags<cr>
 
 " show tags from current buffer in floating window
 command! Tags		Vista finder
@@ -2276,31 +2223,6 @@ if has("gui_running")
 
 	"Invisible character colors
 	highlight NonText guifg=#2a4a59
-endif
-" ------------------------------------------------------------------------- }}}
-" work specific stuff														{{{
-" -----------------------------------------------------------------------------
-if filereadable("$HOME\posao.vim")
-	echo "subvimrc2 has been found"
-elseif filereadable("$HOME\AppData\Local\nvim\posao.vim")
-	echo "subvimrc has been found"
-endif
-
-if substitute(system('is_work_pc'), '\n','','g') == "1"
-	let s:work_pc = 1
-else
-	let s:work_pc = 0
-endif
-
-if (s:work_pc == 1)
-	" you can't use variables on the rhs in the .vimrc.
-	set tabstop=3		" tab size
-	set shiftwidth=3 	" when indenting with '>'
-	set expandtab		" convert tab to spaces
-	set softtabstop=3	" smart <BS> - delete 4 chars"
-	set textwidth=120
-	set diffopt+=iwhite	" ignore whitespace changes and also newlines (^M)
-	autocmd FileType c setlocal commentstring=/*%s*/
 endif
 " ------------------------------------------------------------------------- }}}
 
