@@ -1218,7 +1218,8 @@ Plug 'dietsche/vim-lastplace'		" Open file at last edit position
 Plug 'bogado/file-line'				" open file.txt:123
 Plug 'scrooloose/nerdtree', {'on': ['NERDTreeToggle', 'NERDTreeFind']}	" lazy loading saves 300 ms on startup
 Plug 'Xuyuanp/nerdtree-git-plugin', {'on': ['NERDTreeToggle']}
-" Plug 'ms-jpq/chadtree', {'branch': 'chad', 'do': ':UpdateRemotePlugins'}
+Plug 'kyazdani42/nvim-tree.lua'		" NERDTree + netrw replacement
+Plug 'kyazdani42/nvim-web-devicons'	" for file icons
 
 Plug 'vim-airline/vim-airline'
 " Plug 'rbong/vim-crystalline'
@@ -1343,9 +1344,11 @@ nnoremap <silent> gr			<cmd>lua vim.lsp.buf.references()<CR>
 nnoremap <silent> g0			<cmd>lua vim.lsp.buf.document_symbol()<CR>
 nnoremap <silent> gW			<cmd>lua vim.lsp.buf.workspace_symbol()<CR>
 nnoremap <silent><leader>la		<cmd>lua vim.lsp.buf.code_action()<CR>
-autocmd CursorHold * lua  vim.lsp.diagnostic.show_line_diagnostics()
+nnoremap <silent><leader>ld		<cmd>lua vim.lsp.buf.clear_refeerences()<CR>
+" autocmd CursorHold * lua  vim.lsp.diagnostic.show_line_diagnostics()
 
 command! LspDefinition		lua vim.lsp.buf.definition()
+command! LspDeclaration		lua vim.lsp.buf.declaration()
 command! LspHover			lua vim.lsp.buf.hover()
 command! LspImplementation	lua vim.lsp.buf.implementation()
 command! LspSignatureHelp	lua vim.lsp.buf.signature_help()
@@ -1715,6 +1718,21 @@ let g:NERDTreeGitStatusIndicatorMapCustom = {
     \ "Unknown"   : "?"
     \ }
 let g:NERDTreeIgnore=['\~$', '.o$']
+" ------------------------------------------------------------------------- }}}
+" File managers - lua														{{{
+" -----------------------------------------------------------------------------
+" 210325 nvim-tree.lua
+" nnoremap <leader>f :NvimTreeToggle<CR>
+" nnoremap <leader>F :NvimTreeFindFile<CR>
+
+" set termguicolors " this variable must be enabled for colors to be applied properly
+let g:nvim_tree_ignore = [ '.git', '*.bin' ]
+let g:nvim_tree_auto_close = 1		" close if is last window
+let g:nvim_tree_disable_keybindings = 0		" can't be disabled if keybindings will be customized below
+" XXX default keybindings can't be overridden (eg <tab>)
+" - if keybindings are disabled then config bellow won't be applied
+" - if keybindings are not disabled then config bellow (local tree_cb = require'nvim-tree.config'.nvim_tree_callback) is just overlay over default
+" - kludge: comment <tab> in ~/.vim/plugged/nvim-tree.lua/lua/nvim-tree/config.lua
 " ------------------------------------------------------------------------- }}}
 " git plugins																{{{
 " -----------------------------------------------------------------------------
