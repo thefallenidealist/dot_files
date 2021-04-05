@@ -7,6 +7,7 @@
 
 let s:work_pc = 0
 let s:lsp_enabled = 1
+let s:treesitter_enabled = 0
 
 " Generic Vim settings														{{{
 " -----------------------------------------------------------------------------
@@ -1172,44 +1173,51 @@ endif
 " ------------------------------------------------------------------------- }}}
 call plug#begin('~/.vim/plugged')
 
+" completions & programming
+" -----------------------------------------------------------------------------
 if has('nvim-0.5')
 if (s:lsp_enabled == 1)
 Plug 'neovim/nvim-lsp'			" LSP core, nvim 0.5+
 Plug 'nvim-lua/completion-nvim'	" LSP autocomplete, nvim 0.5+
 Plug 'steelsojka/completion-buffers'
 " Plug 'tjdevries/lsp_extensions.nvim'	" inlay hints for Rust
-endif
+endif	" if lsp_enabled
 if (s:treesitter_enabled == 1)
 Plug 'nvim-treesitter/nvim-treesitter'			" nvim 0.5+
 Plug 'nvim-treesitter/completion-treesitter'	" nvim 0.5+
-Plug 'christianchiarulli/nvcode-color-schemes.vim'	" treesitter enabled colors
-endif
-endif
-
+endif	" if treesitter_enabled
+endif	" if nvim-0.5
 Plug 'SirVer/ultisnips'
 Plug 'thomasfaingnaert/vim-lsp-ultisnips'
-
-" python3 -m pip install pynvim
-Plug 'liuchengxu/vim-clap'
-
-" Plug 'huawenyu/neogdb.vim'
-Plug 'jceb/vim-orgmode'
-Plug 'mattn/calendar-vim'
-
-Plug 'tpope/vim-unimpaired'	" easier movements around, like [q, ]q (quickfick)
-Plug 'Valloric/ListToggle'	" toggle quickfix and location list
-Plug 'stefandtw/quickfix-reflector.vim'		" editable quickfix
-Plug 'Houl/repmo-vim'		" repeat motions (repeat f/F/t/T with .)
-
-" Plug 'majutsushi/tagbar', {'on': ['TagbarToggle']}	" show tags (func, vars) in window right
-" Plug 'vim-scripts/TagHighlight'	" color typedefs as variables, needs
-" :UpdateTypesFile
-Plug 'liuchengxu/vista.vim'		" LSP tagbar
+Plug 'liuchengxu/vista.vim'				" LSP tagbar
 Plug 'octol/vim-cpp-enhanced-highlight'	" simpler works out-of-the box, but not as good as TagHighlight
 										" INFO 180525: This line must be here, otherwise C functions won't be highlighted
-" Plug 'jeaye/color_coded'	" semantic highlighter INFO 170818: doesn't work in nvim
 
-" ******************** files
+" basics
+" -----------------------------------------------------------------------------
+Plug 'ciaranm/securemodelines'
+Plug 'henrik/vim-indexed-search'	" show search as: result 123 of 456
+Plug 'osyo-manga/vim-anzu'			" show search matches in statusline (second from the right)
+" Plug 'tmsvg/pear-tree'			" auto close quotes, brackets, ...
+" Plug 'jiangmiao/auto-pairs'		" auto close quotes, brackets, ...
+Plug 'tpope/vim-surround'			" replace quotes, brackets,...
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-abolish'			" better search and replace and abbrev :Subvert
+Plug 'tpope/vim-unimpaired'			" easier movements around, like [q, ]q (quickfick)
+Plug 'Valloric/ListToggle'			" toggle quickfix and location list
+Plug 'troydm/zoomwintab.vim'		" <C-w>o wil zoom/unzoom windows/split
+Plug 'AndrewRadev/undoquit.vim'
+Plug 'ntpeters/vim-better-whitespace'	" show red block when there is a trailing whitespace
+Plug 'tpope/vim-tbone'					" Tmux copy/paste and others (:Tyank, :Tput, ...)
+Plug 'elzr/vim-json'
+Plug 'westeri/asl-vim', {'for': 'asl'}	" ACPI source language syntax
+Plug 'qpkorr/vim-bufkill'			" kill buffer without killing split :BD :BW
+Plug 'chrisbra/vim-diff-enhanced'
+Plug 'Houl/repmo-vim'				" repeat motions (repeat f/F/t/T with .)
+Plug 'gcmt/taboo.vim'				" Rename tabs
+
+" files
+" -----------------------------------------------------------------------------
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
@@ -1221,84 +1229,54 @@ Plug 'Xuyuanp/nerdtree-git-plugin', {'on': ['NERDTreeToggle']}
 Plug 'kyazdani42/nvim-tree.lua'		" NERDTree + netrw replacement
 Plug 'kyazdani42/nvim-web-devicons'	" for file icons
 
-Plug 'vim-airline/vim-airline'
-" Plug 'rbong/vim-crystalline'
-" Plug 'mkitt/tabline.vim'
-Plug 'gcmt/taboo.vim'				" Rename tabs
-
-" ******************** basics
-Plug 'ciaranm/securemodelines'
-Plug 'henrik/vim-indexed-search'	" show search as: result 123 of 456
-Plug 'osyo-manga/vim-anzu'			" show search matches in statusline
-									" (second from the right)
-" Plug 'tmsvg/pear-tree'				" auto close quotes, brackets, ...
-" Plug 'jiangmiao/auto-pairs'			" auto close quotes, brackets, ...
-Plug 'tpope/vim-surround'			" replace quotes, brackets,...
-Plug 'tpope/vim-commentary'
-Plug 'tpope/vim-abolish'            " better search and replace and abbrev :Subvert
-Plug 'troydm/zoomwintab.vim'		" <C-w>o wil zoom/unzoom windows/split
-Plug 'AndrewRadev/undoquit.vim'
-Plug 'ntpeters/vim-better-whitespace'	" show red block when there is a trailing whitespace
-Plug 'mtth/scratch.vim'
-Plug 'tpope/vim-tbone.git'
-Plug 'elzr/vim-json'
-Plug 'westeri/asl-vim', {'for': 'asl'}	" ACPI source language syntax
-
-Plug 'jremmen/vim-ripgrep'	" fast external grep
-Plug 'mhinz/vim-grepper'	" search buffers and populate quickfix
-" Plug 'ronakg/quickr-preview.vim'	" preview files in quickfix without spoiling buffer list
-
-Plug 'tomasr/molokai'		" color scheme
-Plug 'altercation/vim-colors-solarized'
-Plug 'tomasiser/vim-code-dark'		" VisualStudio inspired theme
-Plug 'powerman/vim-plugin-AnsiEsc', {'for': 'sh,conf'}	" Show shell ANSI colors as colors
-
 " git plugins
-Plug 'kshenoy/vim-signature'	" marks in sign column and with easier shortcuts
-								" use fzf :Marks for search
-Plug 'airblade/vim-gitgutter'	" git: show +-m in sign column, shortcuts [c ]c
-Plug 'tpope/vim-fugitive'		" Git commands for Vim
+" -----------------------------------------------------------------------------
+Plug 'kshenoy/vim-signature'		" marks in sign column and with easier shortcuts
+									" use fzf :Marks for search
+Plug 'airblade/vim-gitgutter'		" git: show +-m in sign column, shortcuts [c ]c
+Plug 'tpope/vim-fugitive'			" Git commands for Vim
 Plug 'moll/vim-bbye'				" follow symlinks - optional dependency
-Plug 'aymericbeaumet/vim-symlink'	"follow symlinks
-Plug 'junegunn/gv.vim'			" browse git commits, needs fugitive
-Plug 'jreybert/vimagit'			" Git
-Plug 'TimUntersberger/neogit'	" Lua magit
-Plug 'rhysd/git-messenger.vim'	" fancy git blame
+Plug 'aymericbeaumet/vim-symlink'	" follow symlinks
+Plug 'junegunn/gv.vim'				" browse git commits, needs fugitive
+Plug 'jreybert/vimagit'				" Git
+Plug 'TimUntersberger/neogit'		" Lua magit
+Plug 'rhysd/git-messenger.vim'		" fancy git blame
 Plug 'rhysd/conflict-marker.vim'	" git conflicts
 
-Plug 'tpope/vim-tbone'			" Tmux under Vim (copy/paste)
-
 " Vim session plugins
+" -----------------------------------------------------------------------------
 Plug 'tpope/vim-obsession'	" restore session, needed for tmux ressurect
 Plug 'mhinz/vim-startify'	" Fancy Vim startup screen (shows MRU, session, ...)
 Plug 'xolox/vim-session'
 Plug 'xolox/vim-misc'		" Required for vim-session
 
+" misc
+" -----------------------------------------------------------------------------
+Plug 'vim-airline/vim-airline'
+" Plug 'rbong/vim-crystalline'		" light airline
+" Plug 'mkitt/tabline.vim'			" light airline
+Plug 'jremmen/vim-ripgrep'	" fast external grep
+Plug 'mhinz/vim-grepper'	" search buffers and populate quickfix
+" Plug 'ronakg/quickr-preview.vim'	" preview files in quickfix without spoiling buffer list
+" Plug 'huawenyu/neogdb.vim'
+Plug 'jceb/vim-orgmode'
+Plug 'mattn/calendar-vim'
+" Plug 'liuchengxu/vim-clap'
+" Plug 'stefandtw/quickfix-reflector.vim'		" editable quickfix
+Plug 'tpope/vim-markdown'
+" Plug 'plasticboy/vim-markdown'
+" Plug 'mzlogin/vim-markdown-toc'		" autogenerate markdown ToC (:GenTocGFM)
 Plug 'godlygeek/tabular'	" Tabularize/align
 " Plug 'junegunn/vim-easy-align'
 " Plug 'tommcdo/vim-lion'		" simple tabularize/align
 
-" TODO 170813: check one day
-" Plug 'timonv/vim-cargo'		" simple plugin, cmds: Cargo{Build, Run, Test, Bench}
-Plug 'qpkorr/vim-bufkill'			" kill buffer without killing split :BD :BW
-" Plug 'easymotion/vim-easymotion'	" leader leader and magic begins
-" Plug 'justinmk/vim-sneak'       " lightweight easymotion
-" Plug 'myusuf3/numbers.vim'		" disable relative numbers in insert mode and non-active windows, INFO 200826: breaks floating window hover
-" Plug 'hyiltiz/vim-plugins-profile'
-" Plug 'matze/vim-move'
-Plug 'tpope/vim-markdown'
-" Plug 'plasticboy/vim-markdown'
-" Plug 'mzlogin/vim-markdown-toc'		" autogenerate markdown ToC (:GenTocGFM)
-" Plug 'vim-scripts/tinymode.vim'
-" Plug 'kien/rainbow_parentheses.vim'
-
-" Plug 'Carpetsmoker/auto_autoread.vim'
-Plug 'wesQ3/vim-windowswap'		" Easier window swap: <leader>ww
-
-" Plug 'luochen1990/rainbow'             " colored brackets
-
-" Plug 'arakashic/chromatica.nvim'
-Plug 'chrisbra/vim-diff-enhanced'
+" colors
+" -----------------------------------------------------------------------------
+Plug 'tomasr/molokai'					" color scheme
+Plug 'altercation/vim-colors-solarized'
+Plug 'tomasiser/vim-code-dark'			" VisualStudio inspired theme
+Plug 'powerman/vim-plugin-AnsiEsc', {'for': 'sh,conf'}	" Show shell ANSI colors as colors
+Plug 'christianchiarulli/nvcode-color-schemes.vim'		" treesitter enabled colors
 
 " Initialize plugin system
 call plug#end()
@@ -1308,10 +1286,6 @@ call plug#end()
 " put this after the theme plugin is installed, but before custom "highlight"
 " overrides
 colorscheme molokai
-" 200223
-" completor
-" let g:completor_racer_binary = $HOME.'/.cargo/bin/racer'
-" let g:completor_clang_binary = '/usr/local/bin/clang90'
 
 " complete something like foo::bar
 set iskeyword+=:
@@ -1324,14 +1298,6 @@ if (s:lsp_enabled == 1)
 " LSP nvim																	{{{
 " -----------------------------------------------------------------------------
 " 200723 builtin nvim (v0.5) LSP
-
-" Rust: only in cargo projects, otherwise rust-project.json needs to be
-" provided
-autocmd Filetype rust setlocal omnifunc=v:lua.vim.lsp.omnifunc
-autocmd Filetype cpp  setlocal omnifunc=v:lua.vim.lsp.omnifunc
-autocmd Filetype c    setlocal omnifunc=v:lua.vim.lsp.omnifunc
-setlocal omnifunc=v:lua.vim.lsp.omnifunc
-
 nnoremap <silent> gd			<cmd>lua vim.lsp.buf.declaration()<CR>
 nnoremap <silent> <c-]>			<cmd>lua vim.lsp.buf.definition()<CR>
 nnoremap <silent> K				<cmd>lua vim.lsp.buf.hover()<CR>
@@ -1791,20 +1757,19 @@ let g:git_messenger_include_diff="current"	" auto show dif (whiout pressing 'd' 
 " ------------------------------------------------------------------------- }}}
 " searching																	{{{
 " -----------------------------------------------------------------------------
+" 210405 vim's :grep command
+if executable("rg")
+	set grepprg=rg\ --vimgrep
+endif
+
 " 180217 Grepper
-let g:grepper = {}            " initialize g:grepper with empty dictionary
-runtime plugin/grepper.vim    " initialize g:grepper with default values
+let g:grepper = {}			" initialize g:grepper with empty dictionary
+runtime plugin/grepper.vim	" initialize g:grepper with default values
 let g:grepper.highlight = 1
 " let g:grepper.rg.grepprg .= ' --smart-case'
 
 " - -query must be the last flag
-
-if has('win32')
-	" 180218: This doesn't work under my Win10 VM for some reason
-	nnoremap <leader>a :Rg <C-r><C-w><CR>
-else
-	nnoremap <leader>a :Grepper -tool rg -query <C-r><C-w><CR>
-endif
+nnoremap <leader>a :Grepper -tool rg -query <C-r><C-w><CR>
 nnoremap <leader>a :Grepper -tool rg -cword -query<CR>
 nnoremap <leader>A :Grepper -tool rg<cr>
 nnoremap <leader>s :Grepper -tool rg -buffers -cword -query<cr>
