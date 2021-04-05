@@ -5,7 +5,6 @@
 " 0.0 - 2006. probably
 " vim: set ft=vim ts=4 sw=4 tw=78 fdm=marker noet :
 
-" TODO 2017-09-02 Windows libclang
 let s:work_pc = 0
 let s:lsp_enabled = 1
 
@@ -254,15 +253,14 @@ command! WE write | edit
 call SetupCommandAlias("we", "WE")
 call SetupCommandAlias("We", "WE")
 
-command! PU so $MYVIMRC | PlugUpgrade
+command! PU so $MYVIMRC | PlugUpgrade | PlugUpdate
 command! PI so $MYVIMRC | PlugInstall
 command! PD so $MYVIMRC | PlugClean
 
 " open help in vertical split right
 cabbrev h vert leftabove help
 call SetupCommandAlias("h", "vert leftabove help")
-" TODO 171214: resize help window split: vertical resize 84
-cabbrev man vert leftabove Man
+call SetupCommandAlias("man", "vert leftabove Man")
 " get file path:
 cabbrev fp echo @%
 " copy the current filename to the X11 2nd buffer
@@ -1179,19 +1177,17 @@ if (s:lsp_enabled == 1)
 Plug 'neovim/nvim-lsp'			" LSP core, nvim 0.5+
 Plug 'nvim-lua/completion-nvim'	" LSP autocomplete, nvim 0.5+
 Plug 'steelsojka/completion-buffers'
-" Plug 'nvim-treesitter/nvim-treesitter', { 'for': 'c,cpp,rust' }			" nvim 0.5+
-" Plug 'nvim-treesitter/completion-treesitter', { 'for': 'c,cpp,rust' }	" nvim 0.5+
-Plug 'neovim/nvim-lspconfig'
 " Plug 'tjdevries/lsp_extensions.nvim'	" inlay hints for Rust
+endif
+if (s:treesitter_enabled == 1)
+Plug 'nvim-treesitter/nvim-treesitter'			" nvim 0.5+
+Plug 'nvim-treesitter/completion-treesitter'	" nvim 0.5+
+Plug 'christianchiarulli/nvcode-color-schemes.vim'	" treesitter enabled colors
 endif
 endif
 
 Plug 'SirVer/ultisnips'
 Plug 'thomasfaingnaert/vim-lsp-ultisnips'
-
-" if executable('ctags')
-" 	Plug 'ludovicchabant/vim-gutentags', { 'for': 'c,cpp,rust' }
-" endif
 
 " python3 -m pip install pynvim
 Plug 'liuchengxu/vim-clap'
@@ -1234,7 +1230,8 @@ Plug 'ciaranm/securemodelines'
 Plug 'henrik/vim-indexed-search'	" show search as: result 123 of 456
 Plug 'osyo-manga/vim-anzu'			" show search matches in statusline
 									" (second from the right)
-Plug 'tmsvg/pear-tree'				" auto close quotes, brackets, ...
+" Plug 'tmsvg/pear-tree'				" auto close quotes, brackets, ...
+" Plug 'jiangmiao/auto-pairs'			" auto close quotes, brackets, ...
 Plug 'tpope/vim-surround'			" replace quotes, brackets,...
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-abolish'            " better search and replace and abbrev :Subvert
@@ -1262,7 +1259,9 @@ Plug 'airblade/vim-gitgutter'	" git: show +-m in sign column, shortcuts [c ]c
 Plug 'tpope/vim-fugitive'		" Git commands for Vim
 Plug 'moll/vim-bbye'				" follow symlinks - optional dependency
 Plug 'aymericbeaumet/vim-symlink'	"follow symlinks
+Plug 'junegunn/gv.vim'			" browse git commits, needs fugitive
 Plug 'jreybert/vimagit'			" Git
+Plug 'TimUntersberger/neogit'	" Lua magit
 Plug 'rhysd/git-messenger.vim'	" fancy git blame
 Plug 'rhysd/conflict-marker.vim'	" git conflicts
 
@@ -1281,13 +1280,13 @@ Plug 'godlygeek/tabular'	" Tabularize/align
 " TODO 170813: check one day
 " Plug 'timonv/vim-cargo'		" simple plugin, cmds: Cargo{Build, Run, Test, Bench}
 Plug 'qpkorr/vim-bufkill'			" kill buffer without killing split :BD :BW
-Plug 'easymotion/vim-easymotion'	" leader leader and magic begins
+" Plug 'easymotion/vim-easymotion'	" leader leader and magic begins
 " Plug 'justinmk/vim-sneak'       " lightweight easymotion
 " Plug 'myusuf3/numbers.vim'		" disable relative numbers in insert mode and non-active windows, INFO 200826: breaks floating window hover
 " Plug 'hyiltiz/vim-plugins-profile'
 " Plug 'matze/vim-move'
-" Plug 'tpope/vim-markdown'
-Plug 'plasticboy/vim-markdown'
+Plug 'tpope/vim-markdown'
+" Plug 'plasticboy/vim-markdown'
 " Plug 'mzlogin/vim-markdown-toc'		" autogenerate markdown ToC (:GenTocGFM)
 " Plug 'vim-scripts/tinymode.vim'
 " Plug 'kien/rainbow_parentheses.vim'
@@ -1318,7 +1317,8 @@ set iskeyword+=:
 set completeopt=menu,menuone,noinsert,noselect
 
 if has('nvim-0.5')
-luafile ~/.config/nvim/init.lua
+luafile ~/.config/nvim/lua/init.lua
+" require('init.lua')
 if (s:lsp_enabled == 1)
 " LSP nvim																	{{{
 " -----------------------------------------------------------------------------
@@ -1432,6 +1432,8 @@ let g:diagnostic_virtual_text_prefix = '[LSP] '
 let g:space_before_virtual_text = 5
 let g:diagnostic_auto_popup_while_jump = 1	" auto open diagnostic popup
 " ------------------------------------------------------------------------- }}}
+endif
+if (s:treesitter_enabled == 1)
 " tree-sitter																{{{
 " -----------------------------------------------------------------------------
 " 200722
@@ -1514,6 +1516,7 @@ let g:airline#extensions#hunks#enabled = 0
 " 200509 don't show "INSERT COMPL" in section_a
 let g:airline_mode_map = {}
 let g:airline_mode_map['ic'] = 'INSERT'
+let g:airline#extensions#lsp#enabled = 0	" 210223 fix startup error
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
 "" Airline - crystalline													{{{
 " -----------------------------------------------------------------------------
@@ -1699,7 +1702,7 @@ nnoremap <C-w>f :NERDTreeFocus<cr>
 nnoremap <C-w>F :NERDTreeClose<cr>
 let g:NERDTreeMapActivateNode = "<space>"
 
-let g:NERDTreeIndicatorMapCustom = {
+let g:NERDTreeGitStatusIndicatorMapCustom = {
     \ "Modified"  : "✹",
     \ "Staged"    : "✚",
     \ "Untracked" : "✭",
@@ -1738,10 +1741,11 @@ nmap <Leader>gr <Plug>(GitGutterUndoHunk)
 nmap <Leader>gu <Plug>(GitGutterUndoHunk)
 
 call SetupCommandAlias("gitt","GitGutterToggle")
-call SetupCommandAlias("Gcc","Gcommit")
-call SetupCommandAlias("Gcm","Gcommit -m")
-call SetupCommandAlias("Gca","Gcommit --amend")
-call SetupCommandAlias("Gce","Gcommit --amend --no-edit")
+call SetupCommandAlias("Gc","Git commit")
+call SetupCommandAlias("Gcc","Git commit")
+call SetupCommandAlias("Gcm","Git commit -m")
+call SetupCommandAlias("Gca","Git commit --amend")
+call SetupCommandAlias("Gce","Git commit --amend --no-edit")
 
 " let g:gitgutter_realtime = 0
 " let g:gitgutter_eager = 0
@@ -2043,11 +2047,6 @@ augroup END
 
 let g:quickr_preview_exit_on_enter = 1	" 1 = auto-close on enter XXX 190515
 " ------------------------------------------------------------------------- }}}
-" autopairs																	{{{
-" -----------------------------------------------------------------------------
-" Plugin to autoclose branckets ()
-
-" ------------------------------------------------------------------------- }}}
 " tmux - tbone.vim															{{{
 " -----------------------------------------------------------------------------
 "  cmds: :Tmux Tyank Tput Twrite Tattach
@@ -2233,13 +2232,10 @@ highlight Conceal		ctermfg=7 ctermbg=233
 " longer vertical bar for vertical splits, space for folds (default was -)
 set fillchars=fold:\ ,vert:\│
 
-" change the colors in diff mode, similiar to git diff
-" highlight DiffAdded		ctermfg=87	guifg=cyan
-" highlight DiffRemoved	ctermfg=196	guifg=red
-highlight DiffAdd    cterm=bold ctermfg=0 ctermbg=28
-highlight DiffDelete cterm=bold ctermfg=0 ctermbg=88
-highlight DiffChange cterm=bold ctermfg=0 ctermbg=30
-highlight DiffText   cterm=bold ctermfg=0 ctermbg=75
+highlight DiffAdd    cterm=bold ctermfg=0 ctermbg=22
+highlight DiffDelete cterm=bold ctermfg=0 ctermbg=52
+highlight DiffChange cterm=bold ctermfg=0 ctermbg=17
+highlight DiffText   cterm=bold ctermfg=0 ctermbg=19
 
 " auto completion menu
 highlight pmenu				ctermbg=237 ctermfg=254
@@ -2263,6 +2259,7 @@ highlight SignColumn			ctermfg=118 ctermbg=0 guifg=#A6E22E guibg=#232526
 " brighter, easier to read line numbers (column left)
 " INFO line column is the same for numbers, git marks, vim marks, linter,...
 highlight LineNr	ctermfg=253 ctermbg=234
+highlight WildMenu	ctermfg=188 ctermbg=24
 " ------------------------------------------------------------------------- }}}
 " GUI settings																{{{
 " -----------------------------------------------------------------------------
@@ -2468,10 +2465,5 @@ nnoremap <End> G
 " that file will be open in (miniature) QF window split)
 " TODO 190515: disable <C-w>v/s/d commands in location list
 
-" autocmd User VimagitEnterCommit setlocal textwidth=72
-" autocmd User VimagitLeaveCommit setlocal textwidth=0
-
 " 191203 git commit markers:
 match ErrorMsg '^\(<\|=\|>\)\{7\}\([^=].\+\)\?$'
-
-hi WildMenu ctermfg=188 ctermbg=24
