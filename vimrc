@@ -1225,6 +1225,14 @@ Plug 'mhinz/vim-startify'	" Fancy Vim startup screen (shows MRU, session, ...)
 Plug 'xolox/vim-session'
 Plug 'xolox/vim-misc'		" Required for vim-session
 
+" colors
+" -----------------------------------------------------------------------------
+Plug 'tomasr/molokai'					" color scheme
+Plug 'altercation/vim-colors-solarized'
+Plug 'tomasiser/vim-code-dark'			" VisualStudio inspired theme
+Plug 'powerman/vim-plugin-AnsiEsc', {'for': 'sh,conf'}	" Show shell ANSI colors as colors
+Plug 'christianchiarulli/nvcode-color-schemes.vim'		" treesitter enabled colors
+
 " misc
 " -----------------------------------------------------------------------------
 Plug 'vim-airline/vim-airline'
@@ -1244,14 +1252,6 @@ Plug 'tpope/vim-markdown'
 Plug 'godlygeek/tabular'	" Tabularize/align
 " Plug 'junegunn/vim-easy-align'
 " Plug 'tommcdo/vim-lion'		" simple tabularize/align
-
-" colors
-" -----------------------------------------------------------------------------
-Plug 'tomasr/molokai'					" color scheme
-Plug 'altercation/vim-colors-solarized'
-Plug 'tomasiser/vim-code-dark'			" VisualStudio inspired theme
-Plug 'powerman/vim-plugin-AnsiEsc', {'for': 'sh,conf'}	" Show shell ANSI colors as colors
-Plug 'christianchiarulli/nvcode-color-schemes.vim'		" treesitter enabled colors
 
 " Initialize plugin system
 call plug#end()
