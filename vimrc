@@ -374,9 +374,6 @@ augroup my_group_with_a_very_uniq_name
 	autocmd FileType help nnoremap <buffer> q :wincmd c<cr>
 	autocmd FileType qf,quickfix,netrw,fugitive,fugitiveblame nnoremap <buffer> q :q<cr>
 	autocmd FileType help,man nnoremap <buffer> <cr> <C-]>
-	if exists(":NumbersDisable")
-		autocmd FileType help,man,qf :NumbersDisable	" Disable Numbers plugin in help or man
-	endif
 
 	" force Vim to threat .md files as markdown and not Modula
 	" or use tpope/vim-markdown plugin
@@ -1248,8 +1245,6 @@ Plug 'christianchiarulli/nvcode-color-schemes.vim'		" treesitter enabled colors
 " misc
 " -----------------------------------------------------------------------------
 Plug 'vim-airline/vim-airline'
-" Plug 'rbong/vim-crystalline'		" light airline
-" Plug 'mkitt/tabline.vim'			" light airline
 Plug 'jremmen/vim-ripgrep'	" fast external grep
 Plug 'mhinz/vim-grepper'	" search buffers and populate quickfix
 " Plug 'ronakg/quickr-preview.vim'	" preview files in quickfix without spoiling buffer list
@@ -1479,77 +1474,11 @@ let g:airline#extensions#obsession#indicator_text = 'Ses' " default: '$'
 let g:airline#extensions#branch#enabled = 0
 let g:airline#extensions#hunks#enabled = 0
 
-
-" function! StatusLine(current, width)
-"   return (a:current ? crystalline#mode() . '%#Crystalline#' : '%#CrystallineInactive#')
-"         \ . ' %f%h%w%m%r '
-"         \ . (a:current ? '%#CrystallineFill# %{fugitive#head()} ' : '')
-"         \ . '%=' . (a:current ? '%#Crystalline# %{&paste?"PASTE ":""}%{&spell?"SPELL ":""}' . crystalline#mode_color() : '')
-"         \ . (a:width > 80 ? ' %{&ft}[%{&enc}][%{&ffs}] %l/%L %c%V %P ' : ' ')
-" endfunction
-
-" function! TabLine()
-"   let l:vimlabel = has("nvim") ?  " NVIM " : " VIM "
-"   return crystalline#bufferline(2, len(l:vimlabel), 1) . '%=%#CrystallineTab# ' . l:vimlabel
-" endfunction
-
-" let g:crystalline_statusline_fn = 'StatusLine'
-" let g:crystalline_tabline_fn = 'TabLine'
-" let g:crystalline_theme = 'default'
-
-" set showtabline=2
-" set laststatus=2
-
 " 200509 don't show "INSERT COMPL" in section_a
 let g:airline_mode_map = {}
 let g:airline_mode_map['ic'] = 'INSERT'
 let g:airline#extensions#lsp#enabled = 0	" 210223 fix startup error
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" }}}
-"" Airline - crystalline													{{{
-" -----------------------------------------------------------------------------
-"" 191210
-"function! StatusLine(current, width)
-"	let l:s = ''
-
-"	if a:current
-"		let l:s .= crystalline#mode() . crystalline#right_mode_sep('')
-"	else
-"		let l:s .= '%#CrystallineInactive#'
-"	endif
-"	let l:s .= ' %f%h%w%m%r '
-"	if a:current
-"		let l:s .= crystalline#right_sep('', 'Fill') . ' %{fugitive#head()}'
-"	endif
-
-"	let l:s .= '%='
-"	if a:current
-"		let l:s .= crystalline#left_sep('', 'Fill') . ' %{&paste ?"PASTE ":""}%{&spell?"SPELL ":""}'
-"		let l:s .= crystalline#left_mode_sep('')
-"	endif
-"	if a:width > 80
-"		let l:s .= ' %{&ft}[%{&fenc!=#""?&fenc:&enc}][%{&ff}] %l/%L %c%V %P '
-"	else
-"		let l:s .= ' '
-"	endif
-
-"	return l:s
-"endfunction
-
-"function! TabLine()
-"	let l:vimlabel = has('nvim') ?  ' NVIM ' : ' VIM '
-"	return crystalline#bufferline(2, len(l:vimlabel), 1) . '%=%#CrystallineTab# ' . l:vimlabel
-"endfunction
-
-"let g:crystalline_enable_sep = 1
-"let g:crystalline_statusline_fn = 'StatusLine'
-"let g:crystalline_tabline_fn = 'TabLine'
-"let g:crystalline_theme = 'default'
-
-"set showtabline=2
-"set guioptions-=e
-"set laststatus=2
-" ------------------------------------------------------------------------- }}}
-
 " Commenter																	{{{
 " -----------------------------------------------------------------------------
 " for tpope commenter, muscle memory from NERDcommenter
