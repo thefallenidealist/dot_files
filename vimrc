@@ -5,8 +5,13 @@
 " 0.0 - 2006. probably
 " vim: set ft=vim ts=4 sw=4 tw=78 fdm=marker noet :
 
-let s:lsp_enabled = 1
-let g:treesitter_enabled = 1
+if has('nvim-0.5')
+	let g:lsp_enabled = 1
+	let g:treesitter_enabled = 1
+else
+	let g:lsp_enabled = 0
+	let g:treesitter_enabled = 0
+endif
 
 " Generic Vim settings														{{{
 " -----------------------------------------------------------------------------
@@ -1151,7 +1156,7 @@ call plug#begin('~/.vim/plugged')
 " completions & programming
 " -----------------------------------------------------------------------------
 if has('nvim-0.5')
-if (s:lsp_enabled == 1)
+if (g:lsp_enabled == 1)
 Plug 'neovim/nvim-lsp'			" LSP core, nvim 0.5+
 Plug 'nvim-lua/completion-nvim'	" LSP autocomplete, nvim 0.5+
 Plug 'steelsojka/completion-buffers'
@@ -1201,11 +1206,13 @@ Plug 'dietsche/vim-lastplace'		" Open file at last edit position
 Plug 'bogado/file-line'				" open file.txt:123
 Plug 'scrooloose/nerdtree', {'on': ['NERDTreeToggle', 'NERDTreeFind']}	" lazy loading saves 300 ms on startup
 Plug 'Xuyuanp/nerdtree-git-plugin', {'on': ['NERDTreeToggle']}
+if has('nvim-0.5')
 Plug 'kyazdani42/nvim-tree.lua'		" NERDTree + netrw replacement
 Plug 'kyazdani42/nvim-web-devicons'	" for file icons
 Plug 'nvim-lua/popup.nvim'				" needed for telescope
 Plug 'nvim-lua/plenary.nvim'			" needed for telescope
 Plug 'nvim-telescope/telescope.nvim'	" fuzzy everything
+endif
 
 " git plugins
 " -----------------------------------------------------------------------------
@@ -1217,7 +1224,9 @@ Plug 'moll/vim-bbye'				" follow symlinks - optional dependency
 Plug 'aymericbeaumet/vim-symlink'	" follow symlinks
 Plug 'junegunn/gv.vim'				" browse git commits, needs fugitive
 Plug 'jreybert/vimagit'				" Git
+if has('nvim-0.5')
 Plug 'TimUntersberger/neogit'		" Lua magit
+endif
 Plug 'rhysd/git-messenger.vim'		" fancy git blame
 Plug 'rhysd/conflict-marker.vim'	" git conflicts
 
@@ -1270,9 +1279,8 @@ set iskeyword+=:
 set completeopt=menu,menuone,noinsert,noselect
 
 if has('nvim-0.5')
-luafile ~/.config/nvim/lua/init.lua
-" require('init.lua')
-if (s:lsp_enabled == 1)
+lua require('init')
+if (g:lsp_enabled == 1)
 " LSP nvim																	{{{
 " -----------------------------------------------------------------------------
 " 200723 builtin nvim (v0.5) LSP

@@ -3,6 +3,9 @@
 
 local g = vim.g		-- global variables from VimScript
 
+-- LSP																		{{{
+-------------------------------------------------------------------------------
+if g.lsp_enabled == 1 then
 require'lspconfig'.clangd.setup			{on_attach=require'completion'.on_attach}
 require'lspconfig'.pyls.setup			{on_attach=require'completion'.on_attach}
 require'lspconfig'.rust_analyzer.setup	{on_attach=require'completion'.on_attach}
@@ -13,6 +16,8 @@ require'lspconfig'.bashls.setup{}
 
 --- disable diagnostics:
 -- vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end
+end
+--------------------------------------------------------------------------- }}}
 
 -- treesitter																{{{
 -------------------------------------------------------------------------------
@@ -64,4 +69,5 @@ require('telescope').setup{
 		},
 	}
 }
+--------------------------------------------------------------------------- }}}
 --------------------------------------------------------------------------- }}}
