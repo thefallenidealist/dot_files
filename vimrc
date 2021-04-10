@@ -6,7 +6,7 @@
 " vim: set ft=vim ts=4 sw=4 tw=78 fdm=marker noet :
 
 let s:lsp_enabled = 1
-let s:treesitter_enabled = 0
+let g:treesitter_enabled = 1
 
 " Generic Vim settings														{{{
 " -----------------------------------------------------------------------------
@@ -1157,7 +1157,7 @@ Plug 'nvim-lua/completion-nvim'	" LSP autocomplete, nvim 0.5+
 Plug 'steelsojka/completion-buffers'
 " Plug 'tjdevries/lsp_extensions.nvim'	" inlay hints for Rust
 endif	" if lsp_enabled
-if (s:treesitter_enabled == 1)
+if (g:treesitter_enabled == 1)
 Plug 'nvim-treesitter/nvim-treesitter'			" nvim 0.5+
 Plug 'nvim-treesitter/completion-treesitter'	" nvim 0.5+
 endif	" if treesitter_enabled
@@ -1378,16 +1378,6 @@ let g:diagnostic_insert_delay = 1			" don't show it in insert mode
 let g:diagnostic_virtual_text_prefix = '[LSP] '
 let g:space_before_virtual_text = 5
 let g:diagnostic_auto_popup_while_jump = 1	" auto open diagnostic popup
-" ------------------------------------------------------------------------- }}}
-endif
-if (s:treesitter_enabled == 1)
-" tree-sitter																{{{
-" -----------------------------------------------------------------------------
-" 200722
-if exists(":TSBufEnable")
-	" moved to ~/.config/nvim/treesitter.lua
-	" TODO 200828
-endif
 " ------------------------------------------------------------------------- }}}
 endif
 " fuzzy everything (Telescope)												{{{
