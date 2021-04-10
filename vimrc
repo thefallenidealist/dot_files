@@ -1203,6 +1203,9 @@ Plug 'scrooloose/nerdtree', {'on': ['NERDTreeToggle', 'NERDTreeFind']}	" lazy lo
 Plug 'Xuyuanp/nerdtree-git-plugin', {'on': ['NERDTreeToggle']}
 Plug 'kyazdani42/nvim-tree.lua'		" NERDTree + netrw replacement
 Plug 'kyazdani42/nvim-web-devicons'	" for file icons
+Plug 'nvim-lua/popup.nvim'				" needed for telescope
+Plug 'nvim-lua/plenary.nvim'			" needed for telescope
+Plug 'nvim-telescope/telescope.nvim'	" fuzzy everything
 
 " git plugins
 " -----------------------------------------------------------------------------
@@ -1387,6 +1390,48 @@ if exists(":TSBufEnable")
 endif
 " ------------------------------------------------------------------------- }}}
 endif
+" fuzzy everything (Telescope)												{{{
+" -----------------------------------------------------------------------------
+" 171205 fzf.vim
+" 210409 nvim-telescope
+" - documenation - part in :h Telescope, mostly on GitHub
+
+" nnoremap <leader>o <cmd>lua require('telescope.builtin').find_files()<cr>
+nnoremap <leader>o <cmd>Telescope find_files<cr>
+nnoremap <leader>m <cmd>Telescope oldfiles<cr>
+nnoremap <leader>b <cmd>Telescope buffers<cr>
+nnoremap ; <cmd>Telescope buffers<cr>
+nnoremap to  :tab split<cr>:Telescope find_files<cr>
+nnoremap tO :-tab split<cr>:Telescope find_files<cr>
+nnoremap tm  :tab split<cr>:Telescope oldfiles<cr>
+nnoremap tM :-tab split<cr>:Telescope oldfiles<cr>
+nnoremap tb  :tab split<cr>:Telescope buffers<cr>
+nnoremap tB :-tab split<cr>:Telescope buffers<cr>
+
+" FZF missing things TODO 210409
+" nnoremap <leader>w :Windows<CR>
+" imap <c-x><c-l> <plug>(fzf-complete-buffer-line)
+" " 201012
+" " Fuzzy search all files in CWD:
+" command! -bang -nargs=* RgFiles call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case --glob !.git ".shellescape(<q-args>), 1, {'options': '--delimiter : --nth 4..'}, <bang>0)
+" zsh (doesn't work):
+" alias vim='vi -c "Telescope oldfiles"'
+
+nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+nnoremap <leader>ll <cmd>Telescope lsp_document_diagnostics<cr>
+
+" keys:
+" <C-x>/<C-v>	open in split/vsplit
+" <C-t>			open in tab
+" <C-u>/<C-d>	scroll in preview
+
+highlight TelescopeNormal			ctermbg=233
+highlight TelescopePreviewNormal	ctermbg=233
+highlight TelescopeBorder			ctermbg=233 ctermfg=196
+highlight TelescopeSelection		ctermbg=232 ctermfg=120
+highlight TelescopeMatching			ctermfg=10
+" ------------------------------------------------------------------------- }}}
 endif
 
 " open header																{{{
@@ -1517,107 +1562,6 @@ nmap <leader>cc         <Plug>CommentaryLine
 vmap <leader>cc         <Plug>Commentary
 nmap <leader>cy       yy<Plug>CommentaryLine
 vmap <leader>cy      ygv<Plug>Commentary
-" ------------------------------------------------------------------------- }}}
-" fuzzy open																{{{
-" -----------------------------------------------------------------------------
-" :Files, :Commits, :Windows, :Tags, :BTags
-nnoremap <leader>o :Files<CR>
-nnoremap <leader>m :FZFMru<CR>
-nnoremap <leader>b :Buffers<CR>
-nnoremap <leader>w :Windows<CR>
-nnoremap to :tabnew<cr>:Files<CR>
-nnoremap tO :-tabnew<cr>:Files<CR>
-nnoremap tm :tabnew<cr>:FZFMru<CR>
-nnoremap tM :-tabnew<cr>:FZFMru<CR>
-nnoremap tb :tabnew<cr>:Buffers<cr>
-nnoremap tB :-tabnew<cr>:Buffers<cr>
-nnoremap tt :tabnew<cr>:Tags<cr>
-nnoremap tT :-tabnew<cr>:Tags<cr>
-nnoremap ; :Buffers<CR>
-
-imap <c-x><c-l> <plug>(fzf-complete-line)
-imap <c-x><c-l> <plug>(fzf-complete-buffer-line)
-
-function! s:build_quickfix_list(lines)
-	" - <tab> to select multiple files
-	" - call this function to fill QF with that files
-	call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
-	copen
-	cc
-endfunction
-
-let g:fzf_action = {
-			\ 'ctrl-q': function('s:build_quickfix_list'),
-			\ 'ctrl-y': 'tab split',
-			\ 'ctrl-x': 'split',
-			\ 'ctrl-v': 'vsplit' }
-
-" [Buffers] Jump to the existing window if possible
-let g:fzf_buffers_jump = 0
-
-" [[B]Commits] Customize the options used by 'git log':
-" let g:fzf_commits_log_options = '--graph --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr"'
-
-" 171205 close FZF windows with <esc> (insted of <C-W>c)
-" TODO 181105: Check this under Windows
-if has('nvim')
-	aug fzf_setup
-		autocmd!
-		autocmd TermOpen term://*FZF tnoremap <silent> <buffer><nowait> <esc> <c-c>
-		autocmd FileType fzf set nonumber norelativenumber
-	aug END
-end
-
-" 191124 use floating window for FZF
-let $FZF_DEFAULT_OPTS='--layout=reverse'	" show hints at top of the screen not bottom
-
-" FZFMru - don't sort, show most recent first
-let g:fzf_mru_no_sort = 1
-
-" 201012
-" Fuzzy search all files in CWD:
-command! -bang -nargs=* RgFiles call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case --glob !.git ".shellescape(<q-args>), 1, {'options': '--delimiter : --nth 4..'}, <bang>0)
-" ------------------------------------------------------------------------- }}}
-
-" fuzzy fzf																	{{{
-" -----------------------------------------------------------------------------
-" 201012
-highlight FzfNormal		ctermbg=234 ctermfg=252
-" inner and outer border
-" highlight FzfBorder1	ctermbg=NONE ctermfg=196
-" highlight FzfBorder2	ctermbg=NONE ctermfg=160
-highlight FzfBorder1	ctermbg=234 ctermfg=196
-highlight FzfBorder2	ctermbg=234 ctermfg=160
-highlight FzfHl			ctermbg=NONE ctermfg=82
-highlight FzfCurrent	ctermbg=232 ctermfg=232
-
-let g:fzf_layout = {
-	\ 'window': {
-		\'width': 0.8,
-		\'height': 0.9,
-		\'highlight': 'FzfBorder1'
-	\ }
-\ }
-
-let g:fzf_colors =
-\ { 'fg':      ['fg', 'FzfNormal'],
-  \ 'bg':      ['bg', 'FzfNormal'],
-  \ 'hl':      ['fg', 'FzfHl'],
-  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-  \ 'bg+':     ['bg', 'FzfCurrent', 'CursorColumn'],
-  \ 'hl+':     ['fg', 'Statement'],
-  \ 'info':    ['fg', 'PreProc'],
-  \ 'border':  ['fg', 'FzfBorder2'],
-  \ 'prompt':  ['fg', 'Conditional'],
-  \ 'pointer': ['fg', 'Exception'],
-  \ 'marker':  ['fg', 'Keyword'],
-  \ 'spinner': ['fg', 'Label'],
-  \ 'header':  ['fg', 'Comment'] }
-
-" let g:fzf_history_dir = '~/.history-fzf'
-
-" 201029 don't auto change cwd:
-" let g:rg_derive_root='true'
 " ------------------------------------------------------------------------- }}}
 " vim orgmode																{{{
 " -----------------------------------------------------------------------------
