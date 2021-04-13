@@ -107,6 +107,7 @@ install_vim()
 
 	ln -sf $BASEDIR/vimrc		$HOME/.vim/vimrc
 	ln -sf $BASEDIR/vimrc		$HOME/.config/nvim/init.vim
+	ln -sf $BASEDIR/nvim/lua	$HOME/.config/nvim/
 	ln -sf $BASEDIR/snippets	$HOME/.vim
 	if [ "$FAST" != "y" ] ; then
 		$PIP install --user pynvim
