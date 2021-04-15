@@ -1155,8 +1155,8 @@ call plug#begin('~/.vim/plugged')
 if has('nvim-0.5')
 if (g:lsp_enabled == 1)
 Plug 'neovim/nvim-lsp'			" LSP core, nvim 0.5+
-Plug 'nvim-lua/completion-nvim'	" LSP autocomplete, nvim 0.5+
-Plug 'steelsojka/completion-buffers'
+Plug 'neovim/nvim-lspconfig'	" common LSP configurations
+Plug 'hrsh7th/nvim-compe'		" autocomplete, recomended by nvim-lspconfig
 " Plug 'tjdevries/lsp_extensions.nvim'	" inlay hints for Rust
 endif	" if lsp_enabled
 if (g:treesitter_enabled == 1)
@@ -1293,6 +1293,7 @@ nnoremap <silent> gW			<cmd>lua vim.lsp.buf.workspace_symbol()<CR>
 nnoremap <silent><leader>la		<cmd>lua vim.lsp.buf.code_action()<CR>
 nnoremap <silent><leader>ld		<cmd>lua vim.lsp.buf.clear_refeerences()<CR>
 " autocmd CursorHold * lua  vim.lsp.diagnostic.show_line_diagnostics()
+nnoremap <buffer><silent> <C-space> <cmd>lua vim.lsp.diagnostic.show_line_diagnostics({ border = "single" })<CR>
 
 command! LspDefinition		lua vim.lsp.buf.definition()
 command! LspDeclaration		lua vim.lsp.buf.declaration()
@@ -1317,62 +1318,13 @@ highlight LspDiagnosticsVirtualTextError	ctermfg=red		ctermbg=black
 highlight LspDiagnosticsVirtualTextWarning	ctermfg=208		ctermbg=black
 highlight LspDiagnosticsVirtualTextHint		ctermfg=105		ctermbg=black
 " ------------------------------------------------------------------------- }}}
-" LSP complete nvim 														{{{
-" -----------------------------------------------------------------------------
-" Use completion-nvim in every buffer
-autocmd BufEnter * lua require'completion'.on_attach()
-
-let g:completion_enable_auto_popup = 1
-let g:completion_enable_snippet = 'UltiSnips'
-" disable <tab> key in snippets (so it can be used with completion-nvim)
-let g:UltiSnipsExpandTrigger =			"<C-y>"		" default was <tab>
-let g:completion_confirm_key = ""
-imap <expr> <cr>  pumvisible() ? complete_info()["selected"] != "-1" ?
-		\ "\<Plug>(completion_confirm_completion)"  :
-		\ "\<c-e>\<CR>" : "\<CR>"
-let g:completion_enable_auto_hover = 1
-let g:completion_enable_auto_signature = 1
-let g:completion_enable_auto_paren = 1
-augroup CompletionTriggerCharacter
-	autocmd!
-	autocmd BufEnter * let g:completion_trigger_character = ['.']
-	autocmd BufEnter *.c,*.cpp let g:completion_trigger_character = ['.', '->', '::']
-augroup end
-let g:completion_trigger_keyword_length = 2
-let g:completion_chain_complete_list = {
-\ 'default' : {
-\   'default': [
-\       {'complete_items': ['lsp', 'snippet', 'buffers']},
-\       {'complete_items': ['path'], 'triggered_only': ['/']},
-\       {'mode': '<c-p>'},
-\       {'mode': '<c-n>'}]
-\   }
-\}
-" let g:completion_matching_strategy_list = ['exact', 'substring', 'fuzzy']
-let g:completion_matching_strategy_list = ['exact', 'fuzzy']
-let g:completion_matching_ignore_case = 1
-let g:completion_matching_smart_case = 1
-let g:completion_trigger_on_delete = 1
-" sort according to complete_items[]:
-let g:completion_sorting = 'none'
-
-" triggering autocompletition
-" manual: <C-x><C-o>
-imap <tab> <Plug>(completion_smart_tab)
-imap <s-tab> <Plug>(completion_smart_s_tab)
-
-" Set completeopt to have a better completion experience
-set completeopt=menuone,noinsert,noselect
-" Avoid showing message extra message when using completion
-set shortmess+=c
-" ------------------------------------------------------------------------- }}}
 " LSP diagnostic nvim 														{{{
 " -----------------------------------------------------------------------------
-nnoremap <silent> ]e :lua vim.lsp.diagnostic.goto_next()<cr>
-nnoremap <silent> [e :lua vim.lsp.diagnostic.goto_prev()<cr>
+nnoremap <silent> ]e :lua vim.lsp.diagnostic.goto_next({ popup_opts = { border = "single" }})<cr>
+nnoremap <silent> [e :lua vim.lsp.diagnostic.goto_prev({ popup_opts = { border = "single" }})<cr>
 " no jump to warning for now
-nnoremap <silent> ]w :lua vim.lsp.diagnostic.goto_next()<cr>
-nnoremap <silent> [w :lua vim.lsp.diagnostic.goto_prev()<cr>
+nnoremap <silent> ]w :lua vim.lsp.diagnostic.goto_next({ popup_opts = { border = "single" }})<cr>
+nnoremap <silent> [w :lua vim.lsp.diagnostic.goto_prev({ popup_opts = { border = "single" }})<cr>
 nnoremap <silent> <leader><space> :lua vim.lsp.diagnostic.set_loclist()<cr>
 command! LspAll		lua vim.lsp.diagnostic.set_loclist()<cr>
 
