@@ -6,9 +6,34 @@ local g = vim.g		-- global variables from VimScript
 -- LSP																		{{{
 -------------------------------------------------------------------------------
 if g.lsp_enabled == 1 then
---- disable diagnostics:
--- vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end
+-- vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end		--- disable diagnostics
+vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+	vim.lsp.diagnostic.on_publish_diagnostics, {
+		virtual_text = false,	-- disable inline diagnostics
+		signs = true,			-- enable signs in signcolumn
+	}
+)
 
+-- signcolumn/gutter symbols
+vim.fn.sign_define("LspDiagnosticsSignError",		{text = "x" , texthl = "LspDiagnosticsVirtualTextError"})
+vim.fn.sign_define("LspDiagnosticsSignWarning",		{text = "w" , texthl = "LspDiagnosticsVirtualTextWarning"})
+vim.fn.sign_define("LspDiagnosticsSignInformation",	{text = "i" , texthl = "LspDiagnosticsVirtualTextHint"})
+vim.fn.sign_define("LspDiagnosticsSignHint",		{text = "h" , texthl = "LspDiagnosticsVirtualTextHint"})
+
+-- neovim/nvim-lspconfig
+-- language servers setup													{{{
+-------------------------------------------------------------------------------
+-- pkg install llvm-devel-13
+require'lspconfig'.clangd.setup {
+	name = 'clangd',
+	cmd = {'clangd-devel'},
+}
+-- pip install cmake-language-server
+require'lspconfig'.cmake.setup{}
+
+-- pkg install rust-analyzer
+require'lspconfig'.rust_analyzer.setup{}
+--------------------------------------------------------------------------- }}}
 -- floating windows borders													{{{
 -------------------------------------------------------------------------------
 -- neovim 0.5 as of 210413
@@ -35,16 +60,6 @@ vim.api.nvim_exec(
 
 -- vim.cmd [[nnoremap <buffer><silent> <C-space> :lua vim.lsp.diagnostic.show_line_diagnostics({ border = "single" })<CR>]]
 --------------------------------------------------------------------------- }}}
-
-
-
--- neovim/nvim-lspconfig
-require'lspconfig'.clangd.setup {
-	name = 'clangd',
-	cmd = {'clangd-devel'},
-}
-
-
 -- LSP autocomplete - nvim-compe											{{{
 -------------------------------------------------------------------------------
 -- 210415
