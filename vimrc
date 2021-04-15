@@ -142,6 +142,8 @@ set ignorecase		" case insensitive search, needed for the line below
 set smartcase		" If searched word starts with an uppercase then be case sensitive
 set incsearch		" search as you type INFO for caseinsensitive search: /something\c
 " set hlsearch        " highlight search - disabled because it will activate themself after reloading vimrc
+" TODO better, check if highlight is active (HOW?):
+nnoremap <silent><Esc><Esc> <Esc>:nohlsearch<CR><Esc>:echo "hlsearch disabled"<cr>
 """"""""""""""""""""""""""""""""""""}}}
 "		spell						{{{
 """""""""""""""""""""""""""""""""""""""
@@ -168,6 +170,8 @@ set sessionoptions=buffers,curdir,folds,help,winpos
 " XXX 181128: won't restore full help window: status will be 'Normal', not
 " 'Help' s so <C-]> won't work as expected
 set foldmethod=marker
+set signcolumn=yes		" always show column for git and lint signs
+set updatetime=50		" [ms], used for CursorHold and swapfiles, was 4s
 " ------------------------------------------------------------------------- }}}
 " OS specific																{{{
 " -----------------------------------------------------------------------------
@@ -269,8 +273,6 @@ cabbrev zoa %foldopen!
 " Don't show ^M in DOS files
 command! FixDos edit ++ff=dos
 
-" cabbrev css CtrlSpaceSaveWorkspace
-" cabbrev csl CtrlSpaceLoadWorkspace
 cabbrev css :mksession!
 cabbrev csl :source Session.vim
 
@@ -299,6 +301,8 @@ vnoremap <F1> <esc>
 
 " Enter new line without going to insert mode
 nnoremap <cr> o<esc>
+" ';' already used, ,/; repeat backward/forward t/T/f/F command
+nnoremap , ;
 
 " swap the behaviour between j/k and gj/gk
 nnoremap j gj
@@ -374,6 +378,7 @@ augroup my_group_with_a_very_uniq_name
 	autocmd FileType help nnoremap <buffer> q :wincmd c<cr>
 	autocmd FileType qf,quickfix,netrw,fugitive,fugitiveblame nnoremap <buffer> q :q<cr>
 	autocmd FileType help,man nnoremap <buffer> <cr> <C-]>
+	autocmd FileType help,man set signcolumn=no
 
 	" force Vim to threat .md files as markdown and not Modula
 	" or use tpope/vim-markdown plugin
@@ -461,10 +466,6 @@ nnoremap <C-w>x :wincmd l<cr>:wincmd c<cr>:echo "closed window on the right side
 " other options: P: reverse previous, W: reverse next
 
 if has('nvim')
-	" nnoremap <A-h> :tabprev<cr>
-	" nnoremap <A-l> :tabnext<cr>
-	" nnoremap <A-j> :CtrlSpaceGoDown<cr>
-	" nnoremap <A-k> :CtrlSpaceGoUp<cr>
 	" navigate windows
 	tnoremap <A-h> <C-\><C-N><C-w>h
 	tnoremap <A-j> <C-\><C-N><C-w>j
@@ -625,8 +626,6 @@ nnoremap <esc>[ <esc>[
 " breaking the habit
 imap <C-c> <C-o>:echoe "Use esc, bogajebo"<cr>
 " ------------------------------------------------------------------------- }}}
-" TODO better, check if highlight is active (HOW?):
-nnoremap <silent><Esc><Esc> <Esc>:nohlsearch<CR><Esc>:echo "hlsearch disabled"<cr>
 " leader mappings															{{{
 " -----------------------------------------------------------------------------
 " another leader keys:
