@@ -3,9 +3,31 @@
 
 local g = vim.g		-- global variables from VimScript
 
+local settings = {}
+function settings.settings()
+	settings.options()
+	settings.keyboard()
+	if g.lsp_enabled == 1 then
+		settings.lsp()
+	end
+	if g.treesitter_enabled == 1 then
+		settings.treesitter()
+	end
+end
+
+-- options																	{{{
+-------------------------------------------------------------------------------
+function settings.options()
+--------------------------------------------------------------------------- }}}
+
+-- keyboard maps															{{{
+-------------------------------------------------------------------------------
+function settings.keyboard()
+end
+--------------------------------------------------------------------------- }}}
 -- LSP																		{{{
 -------------------------------------------------------------------------------
-if g.lsp_enabled == 1 then
+function settings.lsp()
 -- vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end		--- disable diagnostics
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
 	vim.lsp.diagnostic.on_publish_diagnostics, {
@@ -144,7 +166,7 @@ end
 -- treesitter																{{{
 -------------------------------------------------------------------------------
 -- 200722, 201121
-if g.treesitter_enabled == 1 then
+function settings.treesitter()
 require'nvim-treesitter.configs'.setup {
 	ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
 	highlight = {
@@ -193,3 +215,5 @@ require('telescope').setup{
 }
 --------------------------------------------------------------------------- }}}
 --------------------------------------------------------------------------- }}}
+
+settings.settings()		-- call settings, put it after all settings.*() functions
