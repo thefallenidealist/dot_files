@@ -9,38 +9,37 @@
 # [includeIf "gitdir:~/github-private/"]
 	# path = ~/github-private/.gitconfig-private
 
-
 [core]
 	pager = less -F -X
-	# autocrlf = false	# 181127 work PC
-	# autocrlf=true
 
 [alias]
-	# private = config user.email "me@private-mail.com"
 	s = status
 	sn = status -uno
 	si = status --ignored
-	# ! means pass the whole line to the shell
-	; s = !git remote get-url origin && git status	# TODO posao
 	co = checkout
 	com = checkout master
 	br = branch
-	# br = branch --sort=committerdate	# 181127 work PC
-	br2 = for-each-ref --sort=committerdate refs/heads/ --format='%(committerdate:short) %(refname:short)'
+	br = branch --format='%(color:green)%(HEAD)%(color:reset) %(committerdate:short) %(color:yellow)%(refname:short)'
 	a = add
 	au = add -u
 	cl = clone
 	su = submodule update --init --recursive
-	last = log -1 HEAD
-	l = log --decorate --abbrev-commit
-	lf = log --decorate --abbrev-commit --format=fuller
+	l   = log --decorate --abbrev-commit
+	l1  = log -1 HEAD
+	lf  = log --format='%C(yellow)commit %h%Creset%C(auto)%d%nAuthor:     %an <%ae>%nAuthorDate: %C(blue)%ai %nCommitDate: %C(blue)%ci %n%n    %s%n' --decorate	# as fuller without CommiterAuthor
+	lol = log --decorate --graph --branches --remotes --pretty=oneline --abbrev-commit
+	lsh = log --decorate --graph --branches --remotes --pretty=short   --abbrev-commit
+	ll  = log --pretty=format:"%C(green)%h\\ %C(yellow)[%ad]%C(red)%d\\ %C(reset)%s%C('blue bold')\\ [%cn]" --decorate --date=relative
 	c = commit
 	cm = commit --allow-empty-message -m
 	cc = commit						# same as vim fugitive plugin
 	ca = commit --amend				# same as vim fugitive plugin
 	ce = commit --amend --no-edit	# same as vim fugitive plugin
-	rc = rebase --continue
-	ra = rebase --abort
+	rb  = rebase
+	rc  = rebase --continue
+	ra  = rebase --abort
+	rbc = rebase --continue
+	rba = rebase --abort
 	mc = merge --continue
 	ma = merge --abort
 	ama = am --abort
@@ -61,39 +60,30 @@
 	dd0 = foreach --recursive git diff
 	dd1 = foreach --recursive git diff --name-status
 	dt = difftool
-	lol = log --graph --branches --remotes --pretty=oneline --abbrev-commit
-	lsh = log --graph --branches --remotes --pretty=short --abbrev-commit
-	ll  = log --pretty=format:"%C(green)%h\\ %C(yellow)[%ad]%Cred%d\\ %Creset%s%C('blue bold')\\ [%cn]" --decorate --date=relative
-	ll  = log --pretty=format:"%C(green)%h\\ %C(yellow)[%ad]%C(red)%d\\ %C(reset)%s%C('blue bold')\\ [%cn]" --decorate --date=relative
-	# ll2 = log --pretty=format:"%C(green)%h\\ %C(yellow)[%ad]%Cred%d\\ %Creset%s%C('blue bold')\\ [%cn] %Cred%d\\ %creset" --decorate --date=relative
 	ap = apply --ignore-space-change --ignore-whitespace
 	ap2 = apply --reject --whitespace=fix
 	app = apply --reject --whitespace=fix
-	blame2 = log -p -M --follow --stat --	# nicely show changests and commit messages throught whole history for selected file
-
-	brc = rev-parse --abbrev-ref HEAD   # show only current branch
-	# pusho = push --set-upstream origin $(git rev-parse --abbrev-ref HEAD) # TODO push current branch which doesn't exists on remote
 
 [log]
 	decorate = full
-	# decorate with branch pointers
-	# decorate = short	# 181127 posao
+
 [color]
-	ui = auto
-	# ui = always	# INFO 200824: don't use it, it will break redirection to file and git diff plugins (GitMessenger)
+	ui = auto	# INFO 200824: don't use "always", it will break redirection to file and git diff plugins (GitMessenger)
+
 [color "branch"]
 	current = yellow reverse
 	local = yellow
 	remote = green
+
 [color "diff"]
 	meta = yellow bold
 	frag = magenta bold
 	old = red bold
-	new = cyan bold
+	new = green bold
+
 [color "status"]
 	added = yellow
-	changed = cyan
-	#untracked = magenta
+	changed = green
 	untracked = red
 
 [apply]
@@ -102,18 +92,9 @@
 [diff]
 	submodule=diff
 
-
-# examples
-# change remote:
-# git remote set-url origin https://github.com/user/project
-#
-# resync fork
-# git remote add upstream https://github.com/user/project
-# git fetch upstream
-# git pull upstream master
-
 [pull]
 	# rebase = false	# was default before git 2.27
 	ff = only	# pull - only if can be done without merge commit
+
 [init]
 	defaultBranch = master
