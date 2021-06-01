@@ -36,7 +36,7 @@ alias pkgdd='pkg info -d'
 alias pkgD='pkg info -r'	# which packages depends on that package
 alias pkga='pkg info -a'	# all installed packages
 alias pkgi='pkg info'
-alias pkgs='pkg info -as | sort -k 2 -hr | column -t'
+alias pkgs='pkg info -as | sort -k 2 -h | column -t'
 
 #alias bup0='portaudit -Faq'
 alias bup0='pkg audit -Fq'

@@ -10,12 +10,13 @@ PS1="$(print '%{\e[0;34m%}%m%{\e[0m%}%{\e[0;31m%}%#%{\e[0m%}') "
 # ------------------ alias - system utils--------------------------------------
 alias disklabel="disklabel -h"
 alias poweroff="halt -p"
-alias lsblk='for i in $(for i in {1..$(sysctl -n hw.diskcount)} ; do  sysctl -n hw.disknames | cut -d , -f $i | cut -d : -f 1 ; done) ; do echo "--------------------------------------------------------------------------------" ; disklabel -h $i ; done'
+alias lsblk='for i in $(for i in {1..$(sysctl -n hw.diskcount)} ; do sysctl -n hw.disknames | cut -d , -f $i | cut -d : -f 1 ; done) ; do echo "--------------------------------------------------------------------------------" ; disklabel -h $i ; done'
 
 # ------------------ alias - unix tools ---------------------------------------
 alias ls='colorls -Gh'
 alias grep="grep"
-alias man="TERMINFO=~/.terminfo/ LESS=C TERM=mostlike PAGER=less man"
+# alias man="TERMINFO=~/.terminfo/ LESS=C TERM=mostlike PAGER=less man"
+alias man="TERMINFO=~/.terminfo/ LESS=C PAGER=less man"
 alias msg="less -f /var/log/messages"
 
 # ------------------ alias - pkg ----------------------------------------------
@@ -27,4 +28,4 @@ alias pkgl="pkg_info -L"	# list files installed by package
 # ------------------ alias - user programs ------------------------------------
 
 # -----------------------------------------------------------------------------
-[ -f ~/.fzf/shell/key-bindings.zsh ] && source ~/.fzf/shell/key-bindings.zsh
+[ -f /usr/local/share/zsh/site-functions/_fzf_key_bindings ] && source /usr/local/share/zsh/site-functions/_fzf_key_bindings

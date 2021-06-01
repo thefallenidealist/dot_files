@@ -4,6 +4,7 @@ HISTFILE=~/.history.zsh
 HISTSIZE=10000	# maximum number of lines that are kept in a session
 SAVEHIST=10000	# maximum number of lines that are kept in the history file
 setopt no_beep
+setopt print_exit_value	# print exit value ($?) only if not 0
 autoload -Uz compinit
 compinit
 autoload colors ; colors
@@ -13,7 +14,7 @@ setopt histignoredups		# Ignore duplicated entries in history
 setopt histignorespace		# and with trailing spaces
 setopt incappendhistory		# Immediately append to the history file, not just when a term is killed
 # 190505 - up/down - local history, Ctrl-up/down - global history
-setopt sharehistory
+# setopt sharehistory
 
 # # https://superuser.com/questions/446594/separate-up-arrow-lookback-for-local-and-global-zsh-history
 # up-line-or-local-history()
@@ -84,19 +85,9 @@ zstyle ':completion:*:commands' list-colors '=*=1;31'
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'	# INFO 181228: "smart case" autocomplete
 # ------------------------------------------------------------------------- }}}
 
-# include per-host configuration
-if [ -e ~/.zshrc_local ]; then
-	source ~/.zshrc_local
-else
-	print "~/.zshrc_local not found."
-fi
-
 export LD_LIBRARY_PATH=$HOME/.opt/lib:$LD_LIBRARY_PATH
-export PATH="$HOME/scripts:$HOME/.opt:$HOME/.opt/bin:$HOME/.opt/sbin:$HOME/.opt/scripts:$PATH"
-export PATH="$PATH:/opt/scripts:/opt/bin"
-export PATH="$PATH:$HOME/.cargo/bin:$HOME/.local/bin:$HOME/.opt/riscv"
-# 200227 needed for root, for some reason it is not default:
-export PATH="$PATH:/usr/local/sbin:/usr/local/bin"
+PATH=$HOME/scripts:$HOME/.opt:$HOME/.opt/bin:$HOME/.opt/sbin:/opt/scripts:/opt/bin:/usr/local/bin:/usr/local/sbin:$PATH
+PATH="$PATH:$HOME/.cargo/bin:$HOME/.local/bin:$HOME/.opt/riscv"
 
 export MANPATH=$HOME/.opt/share/man:$MANPATH
 # INFO 190422: ripgrep will look for a single configuration file if and only if the RIPGREP_CONFIG_PATH environment variable is set and is non-empty.
@@ -108,11 +99,12 @@ case $(whoami) in
 		# hostname in black on red
 		PS1="$(print '%{\e[0;30;41m%}%M%#%{\e[0m%}') "
 		unset MANPATH	# root doesn't need to read man pages from ~/rust
+		PATH=$PATH:/home/johnny/.opt/bin	# enable X11 clipboard for root's vim
 		;;
 esac
 PS2="$(print '%{\e[0;31m%}>%{\e[0m%}') "
 # right
-RPS1="$(print '%{\e[0;33m%}[%~]%{\e[0;34m%}[%?]%{\e[0;32m%}[%y]%{\e[0;31m%}%{\e[0;31m%}[%D{%y.%m.%d. %H:%M:%S}]%{\e[0m%}')"
+RPS1="$(print '%{\e[0;33m%}[%~]%{\e[0;32m%}[%y]%{\e[0;31m%}%{\e[0;31m%}[%D{%y.%m.%d. %H:%M:%S}]%{\e[0m%}')"
 # -------------------------------------------------------------------------- }}}
 
 if [ "$UID" -eq "0" ] ; then export DISPLAY=:0 ; fi	# enable X11 clipboard for root's vim
@@ -179,8 +171,8 @@ alias -g Vim='~/.vimrc'
 alias -g Tmux='~/.tmux.conf'
 alias -g H='| head'
 alias -g T='| tail'
-# alias -g G='| grep --color'
-alias -g G='| rg --no-line-number --case-sensitive'
+alias -g G='| grep --color'
+# alias -g G='| rg --no-line-number --case-sensitive'
 alias -g C='| wc -l'
 alias -g S='> /dev/null 2>&1'
 alias -g Z='| fzf'
@@ -202,8 +194,8 @@ alias sw0="swapoff /dev/gpt/swap"
 alias sw1="swapon  /dev/gpt/swap"
 alias sw2='sw0; sw1'
 
-alias zsnap_used="zfs get -o name,value used |grep @"
-alias zsnap_destroy_all="zfs list -H -o name -t snapshot | xargs -n1 zfs destroy"
+alias zsnap-used="zfs list -t snapshot -s used"
+alias zsnap-destroy-all="zfs list -H -o name -t snapshot | xargs -n1 zfs destroy"
 alias beadm=bectl	# 12.0 has beadm tool in base system as bectl
 alias zdf="zpool list -o name,size,allocated,capacity"	# INFO 200731: better use zfs list to get free space
 alias jkill="service jail stop"
@@ -230,7 +222,7 @@ alias less='less -XMr'
 
 alias df='df -h'
 alias dff='/opt/df'
-alias dfs='df -h | sort -h -k 4'	# sort by size
+alias dfs='df -h | sort -h -k 3'	# sort by size
 alias du='du -h'
 
 # alias w='fetch'
@@ -256,6 +248,8 @@ alias newfs.ntfs='mkntfs'
 alias u='(date && uname -a && uptime)'
 alias uu='(date && uname -a && uptime) > `uname -r | cut -b 1-3`.`/bin/date +'%y%m%d'`'
 alias xxd="hexdump -C"		# xxd is part of vim package
+alias diffcolor='sed -e "s/^+.*$/`tput setf 6 bold`&`tput sgr0`/" \
+                  -e "s/^-.*$/`tput setf 4 bold`&`tput sgr0`/"'
 # -------------------------------------------------------------------------- }}}
 # ------------------ alias - archivers ------------------------------------- {{{
 alias untar='tar xvf'
@@ -297,6 +291,7 @@ alias vio="vi -c Files"
 alias vis="vi -S"
 #alias s='screen -U'
 alias s='tmux'
+alias sat="tmux att"
 alias history='history -Ef'	# pretty history with European dates"
 
 alias cal='/usr/local/bin/cal -e -nod'
@@ -350,6 +345,7 @@ alias zathura-tabbed="tabbed -c zathura -e"		# XXX 200315 don't work as expected
 alias mupdf=zathura
 alias rgf="rg --no-ignore --files | grep "
 alias gp='WINEPREFIX=/mnt/vm/wine/gp6 wine start /unix "/mnt/vm/wine/gp6/drive_c/Program Files/Guitar Pro 6/GuitarPro.exe"'
+alias memff1='echo "$(echo "scale=2; $(ps -U ff1 -o rss | sed "1 d" | paste -sd+ - | bc)/1024/1024" | bc) GB"'
 # -------------------------------------------------------------------------- }}}
 
 # ------------------ custom function - ssh --------------------------------- {{{
@@ -410,9 +406,12 @@ function mm() {
 }
 
 # 201029 should be faster than grep:
-export FZF_DEFAULT_COMMAND="rg --files --hidden --follow --glob '!.git' --no-ignore"
+export FZF_DEFAULT_COMMAND="rg --files --hidden --follow --glob '!.git' --smart-case"
+# export FZF_DEFAULT_OPTS='--layout=reverse --border  --info=inline'
+export FZF_DEFAULT_OPTS='--border  --info=inline'
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+source /usr/local/share/examples/fzf/shell/key-bindings.zsh
 
 # zsh TODO check one day
 # setopt append_history # Allow multiple terminal sessions to all append to one zsh command history
@@ -428,3 +427,10 @@ export QT_QPA_PLATFORMTHEME=qt5ct
 
 # 200919 hello again slrn, after so many years/decade
 NNTPSERVER='news.gmane.io'; export NNTPSERVER
+
+# include per-host configuration
+if [ -e ~/.zshrc_local ]; then
+	source ~/.zshrc_local
+else
+	print "~/.zshrc_local not found."
+fi

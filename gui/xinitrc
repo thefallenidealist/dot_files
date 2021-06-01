@@ -58,6 +58,9 @@ xrandr --dpi 96 &
 # exec xterm -title glavni -geometry 100x20+50+50 -e tmux
 # exec xterm -title glavni -geometry 100x20+50+50 -e 'tmux new-session -d -s glavni -n Wcwm ; tmux send-keys -t glavni:Wcwm "cwm -vv" Enter; tmux attach -t glavni:Wcwm '
 
+pkill ssh-agent
+eval $(ssh-agent)
+
 # xrandr --dpi 144
 # 181107:
 # exec $HOME/.opt/bin/cwm -vv
